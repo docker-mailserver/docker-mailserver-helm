@@ -1,0 +1,125 @@
+                                                                        
+                                        ^                                 
+                              (CCCC%((((((((((%(/                         
+                        (GG@#O(%77777(((t((((/  //                        
+                       G@#%%%77777ttttttttt(((////^                       
+                     %OOO77777ttttttttttttt(((((///                       
+               /CG##@#O776tt((t6#66##6tttttt(((((//^                      
+              CGC%%7777tt666ttt6###666tttttt(((////^                      
+           (CGOO#####66#67(7#@##66667(tttttt((((//(                       
+          CC//((O######O/   (O###O6777ttttt(((((//^                       
+         ((/(GGC/(C((GC/^/((^/C%(%OO77tttt((((///(                        
+         C((GGC//(GGG@C^/CC(^^CC((CO%(7((((((///(                         
+         C^ %%((CGGCCGG/^(C/^^(C((COO7tttt((((/(                          
+          /(/(OOO%(((%G%/ ^ ^((((C######6t((/(%                           
+            #O(77((7(((CCC(G@GG##O7777(76#####/                           
+            O7(7(((777((%CGGGC%%%777((((76O#@@G                           
+          ^#676ttttt6#6666666777tttt((/(77OO(/%                           
+          (//7766####6t666tttttt((((((tt7666(7                            
+          (/(66##O6677tt666tt(ttttttttttt6677%                            
+           ###6tttttttttt6#6ttttttttttt(767OO                             
+         (#7(t6tttttttttttt66ttttttttt(((6O%                              
+        C@O((tttttttttttttt6#6ttttttttttt6O(                              
+     (O#67(7ttt(((t6######66##6tt((((777667                               
+    #OO###66tt66##66677tt666667((((((t#6(6O                               
+      ^/(((%O###67777((t((ttt(((((((((#%                                  
+               /####6(tttttttttt6t(t676@@(                                
+                   ^O#7tttt6ttt666((66O##OO/                              
+                    /%#67tt#6ttt66(7#####77%                              
+                       #@#(##ttt####O%OO(  ((                             
+                       /@@#@@####O%%%OG/    %^                            
+                       G@@###OOO%(%%%G%    /#%                            
+                      /#@C((((/((((G#C     (%GO                           
+                      /GGC((((((CG#@#/    // /O(                          
+                     ^CG@#GGGGGGCCGC     ^/^   (G                         
+                     CCGC%((((((CGC     /(      /#(                       
+                     CCGC(((((((GG/     (^       %G                       
+
+
+          GOOD NEWS, EVERYONE!
+
+You've successfully launched docker-mailserver helm chart!
+
+{{- if .Values.demoMode.enabled -}}  
+
+But wait, dear reader. You're still running in DEMO MODE.
+
+What does this mean? We set you up a demo user (user is "user@example.com", password is "password"), so that
+you can confirm your services are setup correctly. Once you're ready to configure docker-mailserver _for realz_
+here's what you need to do:
+
+1. Update values.yaml, and set pod.demoMode.enabled to "false". Also set your domains under "domains", removing "example.com"
+2. From the /helm-chart/ directory, execute ../setup.sh using a custom path, to create your users and setup your DKIM key(s), as follows:
+
+   ../setup.sh -p docker-mailserver/config email add <email address> [password]
+   ../setup.sh -p docker-mailserver/config config dkim
+
+NOTE: The above step is mandatory if you disable demo mode. Without valid DKIM keys, the chart WON'T DEPLOY
+
+3. Upgrade the helm chart to apply your changes, by running:
+
+   helm upgrade {{ .Release.Namespace }} docker-mailserver
+
+{{- else }}
+
+You're not in demo mode! Assuming all has gone well, execute the commands below to retrieve the TXT records
+to add to your DNS zones, to finish setting up DKIM:
+{{/* Mount a dkim key for every domain configured */}}
+---               
+{{ range .Values.domains }}
+{{- $path := printf "cat docker-mailserver/config/opendkim/keys/%s/mail.txt" . }}
+    {{ $path }}
+{{ end }}
+---
+{{ end }}
+
+{{ if .Values.haproxy.enabled -}}  
+{{ if .Values.poorMansK8sLb.enabled -}} 
+
+-------
+You're running with HAProxy enabled, and poor-mans-k8s-lb turned on. Provided you've correctly setup your 
+haproxy.webhook.url and haproxy.webhook.token, you don't need to do anything further in
+order for your external access to work
+-------
+
+{{ else if .Values.haproxy.deploy_ingress_chart -}} 
+
+-------
+You're configured for HAProxy in "ingress" mode. Theoretically you don't have to do anything, provided the 
+ingress resource started up correctly - you should be able to access your external IP on the standard email
+ports, and have it "Just Work (tm)"
+-------
+
+{{ else -}} 
+
+-------
+You've enabled haproxy support, but you've not activated ingress or poorMansK8sLb. You'll need to manually configure
+your haproxy to send the incoming traffic to the node running your pod, on the configured nodeport ports. Use the
+"send-proxy" value for ports 25,110,143,993 and 995 (but not 465 and 587)
+-------
+{{ end }}
+{{ else }}
+
+-------
+You've disabled haproxy support. This means that you'll need to MANUALLY configure how your services are exposed
+to the internet. You may be running in host mode, or nodeport mode, or some other complex configuration.
+-------
+{{ end }}
+
+{{- if .Values.rainloop.enabled -}}
+{{- if .Values.rainloop.ingress.enabled -}}
+{{ if .Values.haproxy.enabled -}}  
+---
+You've enabled RainLoop integration. Because you're using HAProxy, you'll need to configure RainLoop
+to use an IMAPS server of {{ template "dockermailserver.fullname" . }} on port 10993 (with SSL), since port 993
+expects to receive a PROXY header from haproxy, for external IMAPS connections. Use port 465 (with SSL) for SMTP
+---
+{{ else }}
+---
+You've enabled RainLoop integration. You'll need to configure RainLoop
+to use an IMAPS server of {{ template "dockermailserver.fullname" . }} on port 993 (with SSL), and an
+SMTP server of {{ template "dockermailserver.fullname" . }} on port 465 (with SSL)
+---
+{{ end }}
+{{ end }}
+{{ end }}

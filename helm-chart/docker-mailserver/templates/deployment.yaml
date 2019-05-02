@@ -1,0 +1,123 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  labels:
+    app: {{ template "dockermailserver.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+  name: {{ template "dockermailserver.fullname" . }}
+spec:
+  replicas: {{ default 2 .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "dockermailserver.fullname" . }}
+      release: "{{ .Release.Name }}"
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: "RollingUpdate"
+  template:
+    metadata:
+      labels:
+        app: {{ template "dockermailserver.fullname" . }}
+        release: "{{ .Release.Name }}"
+    spec:
+      volumes:
+         - name: "data"
+           persistentVolumeClaim:
+             claimName: {{ template "dockermailserver.pvcName" . }}
+         - name: "config"
+           emptyDir: {}
+         - name: "configmap"
+           configMap:
+             name: {{ template "dockermailserver.fullname" . }}-configs
+         - name: "opendkim-keys"
+           secret:
+             secretName: {{ template "dockermailserver.fullname" . }}-secrets
+         - name: "ssl-cert"
+           secret:
+             secretName: {{ template "dockermailserver.fullname" . }}-tls
+
+      initContainers:
+        - name: prep-config
+          image: busybox:1.28
+          command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]
+          volumeMounts:
+            - name: configmap
+              mountPath: /tmp/configmaps
+              readOnly: true         
+            - name: config
+              mountPath: /tmp/docker-mailserver/                   
+        
+      containers: 
+        - name: dockermailserver
+          env:
+          {{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
+
+          image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+          resources:
+{{ toYaml .Values.resources | indent 12 -}}
+          securityContext:
+            privileged: {{ default false .Values.pod.dockermailserver.securityContext.privileged }}
+            {{- if eq .Values.pod.dockermailserver.enable_fail2ban 1.0 }}
+            capabilities:
+              add:
+                - "NET_ADMIN"
+            {{ end }}
+          volumeMounts:
+            - name: config
+              mountPath: /tmp/docker-mailserver
+            - name: ssl-cert
+              mountPath: /tmp/ssl
+              readOnly: true              
+            - name: data
+              mountPath: /var/mail
+              subPath: mail
+            - name: data
+              mountPath: /var/mail-state
+              subPath: mail-state
+            - name: configmap
+              subPath: dovecot.cf
+              mountPath: /etc/dovecot/conf.d/zz-custom.cf
+              readOnly: true  
+            - name: configmap
+              subPath: TrustedHosts
+              mountPath: /tmp/docker-mailserver/opendkim/TrustedHosts
+              readOnly: true                        
+            - name: configmap
+              subPath: SigningTable
+              mountPath: /tmp/docker-mailserver/opendkim/SigningTable
+              readOnly: true    
+            - name: configmap
+              subPath: KeyTable
+              mountPath: /tmp/docker-mailserver/opendkim/KeyTable
+              readOnly: true       
+              {{- if .Values.demoMode.enabled }} 
+            - name: opendkim-keys
+              mountPath: "/tmp/docker-mailserver/opendkim/keys/example.com/mail.private"
+              subPath: "example.com-mail.private"
+              readOnly: true
+              {{- else -}}
+              {{/* Mount a dkim key for every domain configured */}}               
+              {{- range .Values.domains }}
+              {{- $path := printf "/tmp/docker-mailserver/opendkim/keys/%s/mail.private" . }}
+              {{- $name := printf "%s-mail.private" . }}              
+            - name: opendkim-keys
+              mountPath: {{ $path }}
+              subPath: {{ $name }}
+              readOnly: true              
+              {{- end }}     
+              {{- end }}                                   
+          livenessProbe:
+            exec:
+               command:
+                 - /bin/bash
+                 - /tmp/docker-mailserver/am-i-healthy.sh
+               initialDelaySeconds: 600
+               timeoutSeconds: 60
+               failureThreshold: 3
+      restartPolicy: "Always"
+

@@ -1,0 +1,324 @@
+---
+image:
+  # image.name is the name of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
+  name: "tvial/docker-mailserver"
+  # image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
+  tag: "release-v6.1.0"
+
+demoMode:
+  # demoMode.enabled ignores the contents of helm-chart/docker-mailserver/config and creates minimal static configuration to be used instead. A single account (user "user@example.com", password "password") will be configured for the purpose of validating core functions and connectivity, before applying user config
+  enabled: true
+
+# HAProxy can be used as an upstream proxy, with the PROXY protocol, to present real-world origin source IPs
+# to postscreen (and dovecot), so that spam / SPF filtering can be applied. This avoids the undesirable source IP
+# obfuscation which occurs within the normal Kubernetes network
+haproxy:
+
+  # haproxy.enabled configures postscreen/imaps for proxy-protocol support from an upstream haproxy instance
+  # If this is enabled, you _must_ access SMTP (TCP 25), submission (TCP 587), and IMAPS (TCP 993) via haproxy.
+  enabled: true
+
+  # If haproxy is in external-auto mode, specify the webhook URL and secret used to update haproxy config
+  # Example implementation at https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/
+  # haproxy.webhookUrl is the URL to call to update a webhook on a remote HAProxy instance
+  webhookUrl: 
+  # haproxy.webhookSecret is the secret to be included in the webhook call (above)
+  webhookSecret: 
+
+  # These values populate dovecot's list of networks it'll "trust" for incoming haproxy connections.
+  # A space-separated list, on a single line, is required
+  # By default, we allow all RFC1918 private ranges, but this can be tightened up for the known IP/range
+  # of your HAProxy instance
+  # haproxy.trustedNetworks is the list of sources (in CIDR format, space-separated) to permit haproxy PROXY protocol from
+  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
+
+# If you choose _not_ to use haproxy, and you're not exposing your services with a load-balanced service
+# with an external traffic policy in "Local" mode, you risk having the source IP of incoming mail overwritten
+# with a local Kubernetes cluster IP, as part of the ingress routing of the connection. This, in turn, 
+# will cause all incoming to appear to be coming from an internal IP, causing SPF tests to fail.
+# Disable the following to bypass SPF tests altogether, to accommodate this scenario.
+# spfTestsDisabled will ignore all SPF-based spam tests, in the event that you cannot obtain valid source IP details on ingress emails
+spfTestsDisabled: false
+
+# If you're using David's hacked-up automatic external haproxy design, then enable
+# the following to launch the appropriate containers to call back to the haproxy webhook
+# Details at https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/ 
+poorMansK8sLb:
+  # poorMansK8sLb.enabled will include containers to call a webhook on an external HAProxy instance
+  enabled: false
+
+# List all the domains to be used below - this is necessary to correctly configure DKIM keys for email signing
+# domains is the list of domains to be served by your docker-mailserver instance
+domains: []
+#  - your-first-domain.com
+#  - your-second-domain.com
+
+livenessTests:
+  # livenessTests.enabled will add a liveness test, which will classify a pod as 'unhealthy' if any livenessTests.commands (below) return non-zero
+  enabled: true
+  # livenessTests.commands is an array of commands to be executed within the docker-mailserver container, intended to prove that the container is healthy. Each command must exit 0 under normal (healthy) circumstances
+  commands:
+    - "clamscan /tmp/docker-mailserver/TrustedHosts"
+
+pod:
+  # pod.dockermailserver section refers to the configuration of the docker-mailserver pod itself. Note that teh many environment variables which define the behaviour of docker-mailserver are configured here
+  dockermailserver:
+
+    ## Host networking requested for this pod. Use the host’s network namespace. If this option is set, the ports that
+    ## will be used must be specified.
+    ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
+    # pod.dockermailserver.hostNetwork will configure the pod to use the host's network namespace
+    hostNetwork: false
+    ## Use the host’s pid namespace
+    ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
+    # pod.dockermailserver.hostPID defines whether the pod should use the host's PID namespace (default false)
+    hostPID: false
+    securityContext:
+      ## pod.dockermailserver.securityContext defines whether the container should be run in "privileged" mode (essentially, root on the host)
+      ## Ref: http://kubernetes.io/docs/api-reference/v1/definitions/#_v1_securitycontext
+      ## Default: false
+      privileged:
+
+    ## The following variables affect the behaviour of docker-mailserver
+    ## See https://github.com/tomav/docker-mailserver#environment-variables for details
+    ## Note that docker-mailserver expects most true/false values to present as 0 or 1, so that's how you should adjust the values below
+    ## Although it's inconsistent with the way the rest of values.yaml is structured, this has
+    ## been intentionally to maintain consistency with dockrer-mailserver scripts and documentation
+
+    # pod.dockermailserver.override_hostname sets the hostname (and therefore the SMTP banner) of the docker-mailserver pod
+    override_hostname: "mail.batcave.org"
+    dms_debug: 0
+    enable_clamav: 1
+    one_dir: 1
+    enable_pop3: 0
+
+    ## Whether to enable fail2ban. Only makes sense if you're running services in host mode without haproxy.
+    ## Default false
+    enable_fail2ban: 0
+
+    smtp_only: 0
+    # ssl_type: "manual"
+    # ssl_cert_path: "/tmp/ssl/tls.crt"
+    # ssl_key_path: "/tmp/ssl/tls.key"
+    tls_level:
+    spoof_protection:
+    enable_srs: 0
+    permit_docker: 
+    virusmails_delete_delay:
+    enable_postfix_virtual_transport:
+    postfix_dagent:
+    postfix_mailbox_size_limit:
+    postfix_message_size_limit:
+    enable_managesieve:
+    postmaster_address: "postmaster@domain.com"
+    postscreen_action: "enforce"
+    report_recipient: 0
+    report_sender: 
+    report_interval: "daily"
+    enable_spamassassin: 1
+    sa_tag: 2.0
+    sa_tag2: 6.31
+    sa_kill: 6.31
+    sa_spam_subject: "*** spam ***"
+    enable_fetchmail: 0
+    fetchmail_poll: 300
+    enable_ldap: 
+    ldap_start_tls:
+    ldap_server_host: 
+    ldap_search_base:
+    ldap_bind_dn:
+    ldap_bind_pw:
+    ldap_query_filter_user:
+    ldap_query_filter_group:
+    ldap_query_filter_alias:
+    ldap_query_filter_domain:
+    dovecot_tls:
+    dovecot_user_filter:
+    dovecot_user_attr:
+    dovecot_pass_filter:
+    dovecot_pass_attr:
+    enable_postgrey: 0
+    postgrey_delay: 300
+    postgrey_max_age: 35
+    postgrey_auto_whitelist_clients: 5
+    postgrey_text: "delayed by postgrey"
+    enable_saslauthd: 0
+    saslauthd_mechanisms: 
+    saslauthd_mech_options:
+    saslauthd_ldap_server:
+    saslauthd_ldap_ssl:
+    saslauthd_ldap_bind_dn:
+    saslauthd_ldap_password:
+    saslauthd_ldap_search_base:
+    saslauthd_ldap_filter:
+    sasl_passwd:
+    srs_exclude_domains:
+    srs_secret:
+    srs_domainname:
+    default_relay_host:
+    relay_host:
+    relay_port: 25
+    relay_user:
+    relay_password:
+
+service:
+  ## What scope the service should be exposed in. One of:
+  ## - LoadBalancer (to the world)
+  ## - ClusterIP (to the cluster)
+  ## - NodePort (to the world, in a custom way)
+  type: "NodePort"
+  ## If there is a port associated with a given service, expose it here.
+  # port:
+  ## If there is a particular IP that should be used for the service, specify it here.
+  ## Note: It's quite unlikely that an IP should be specific. Normally, the best thing to do is leave it to Kubernetes
+  ##       to allocate a free IP from the pool.
+  ## Default: Automatically assign a random IP
+  # privateIp:
+  ## Only relevant if the `type` above is "LoadBalancer"
+  loadBalancer:
+    ## If there is already a reserved public IP that this load balancer should use, indicate it here.
+    ## Default: Automatically assign a random, ephemeral IP
+    # publicIp:
+    ## If there should be firewall rules restricting the load balancer to a limited set of IPs, specify those IPs below
+    ## in CIDR format. If all IPs shoud be allowed access, set the CIDR as "0.0.0.0/0"
+    allowedIps:
+      - "0.0.0.0/0"
+    ## If there is a Hostname associated with this site, add it here and it will be rendered in the documentation.
+    # hostName:
+  # service.nodePort is an array of ports exposed if we are using nodeport for our services (an an external, non-cluster LB)
+  nodePort:
+    smtp: 30025
+    pop3: 30110
+    imap: 30143
+    smtps: 30465
+    submission: 30587
+    imaps: 30993
+    pop3s: 30995
+
+## How many versions of the deployment to run on kubernetes
+## Default: 2
+deployment:
+  replicas: 1
+
+## More generally, a "request" can be thought of as "how much is this container expected to need usually". it should be
+## possible to burst outside these constraints (during a high load operation). However, Kubernetes may kill the pod
+## if the node is under too higher load and the burst is outside its request
+##
+## Limits are hard limits. Violating them is either impossible, or results in container death. I'm not sure whether
+## making these optional is a good idea or not; at the moment, I think I'm happy to defer QOS to the cluster and try
+## and keep requests close to usage.
+##
+## Requests are what are used to determine whether more software "fits" onto the cluster.
+##
+## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
+## Ref: https://github.com/kubernetes/kubernetes/blob/master/docs/design/resource-qos.md
+## Ref: https://docs.docker.com/engine/reference/run/#/runtime-constraints-on-resources
+resources:
+  requests:
+    ## How much CPU this container is expected to need
+    cpu: "1"
+    ## How much memory this container is expected to need.
+    ## Reduce these at requests your peril - too few resources can cause daemons (i.e., clamd) to fail, or timeouts to occur.
+    ## A test installation with clamd running was killed when it consumed 1437Mi (which is why this value was increased to 1536)
+    memory: "1536Mi"
+  limits:
+    ## The max CPU this container should be allowed to use
+    cpu: "2"
+    ## The max memory this container should be allowed to use. Note: If a container exceeds its memory limit,
+    ## it may terminated.
+    memory: "2048Mi"
+
+persistence:
+  size: "10Gi"
+  # Uncomment the backup.kubernetes.io/deltas annotation below if you use https://github.com/miracle2k/k8s-snapshots
+  annotations: {}
+    # backup.kubernetes.io/deltas: PT1H P2D P30D P180D
+
+## Monitoring adds the prometheus.io annotations to pods and services, so that the Prometheus Kubernetes SD mechanism
+## as configured in the examples will automatically discover both the pods and the services to query.
+##
+## This defaults on, as the annotations should do no harm where Prometheus is not available but will automatically
+## expose the application where Prometheus is.
+##
+## See https://github.com/prometheus/docs/blob/master/content/docs/operating/configuration.md
+## See https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus-kubernetes.yml
+monitoring:
+  ## Whether to scrape this service with the montoring toolkit. Mostly useful for blackbox probing of a given service
+  ## to ensure it's "up"
+  service:
+    ## monitoring should be configured to only scrape services that have a value of "true"
+    scrape: "false"
+    ## Path on which metrics are exposed
+    path: "/metrics"
+    ## Port on which HTTP server is served
+    port: "9102"
+  ## Whether to scape the pods associated with this application. Useful for collecting metrics.
+  pod:
+    ## monitoring shoudl be configured to only scrape pods that have a value of `true`
+    scrape: "false"
+    ## Path on which metrics are exposed
+    path: "/metrics"
+    ## Port on which HTTP server is served
+    port: "9102"
+    
+## These values define how the certificate created by the chart is processed by cert-manager
+## Ensure you've setup your ClusterIssuers (letsencrypt-staging and letsencrypt-prod) and DNS provider
+ssl:
+  issuer:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsname: example.com
+  dns01provider: cloudflare
+
+# Values imported from https://github.com/t13a/helm-chart-rainloop/blob/master/values.yaml
+rainloop:
+  # rainloop.enabled will include a rainloop (webmail) pod in the release
+  enabled: true
+  image:
+    # rainloop.image.name is the docker container to use for the rainloop pod
+    name: "hardware/rainloop"
+    # rainloop.image.tag is the tag of the docker container to use for the rainloop pod
+    tag: "latest"
+    pullPolicy: "Always"
+  persistence:
+    size: "1Gi"
+    # Uncomment the backup.kubernetes.io/deltas annotation below if you use https://github.com/miracle2k/k8s-snapshots
+    annotations: {}
+      # backup.kubernetes.io/deltas: PT1H P2D P30D P180D    
+  service:
+    port: 80
+  container:
+    port: 8888
+  ingress:
+    enabled: true
+    hosts:
+      - rainloop.example.com
+    annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+    path: /
+    tls: []
+
+## These values are for the haproxy-ingress sub-chart
+haproxy-ingress:
+  # haproxy-ingress.deploychart will deploy an haproxy-ingress sub-chart, configured for the TCP ports used by docker-mailserver
+  deploychart: true
+  controller:
+    kind: "Deployment"
+    enableStaticPorts: false
+    tcp:
+      25: "default/docker-mailserver:25::PROXY-V1"
+      110: "default/docker-mailserver:110::PROXY-V1"
+      143: "default/docker-mailserver:143::PROXY-V1"            
+      465: "default/docker-mailserver:465"
+      587: "default/docker-mailserver:587"
+      993: "default/docker-mailserver:993::PROXY-V1"  
+      995: "default/docker-mailserver:995::PROXY-V1"     
+    service:
+      externalTrafficPolicy: "Local"
+    # Set to avoid CI error when running the generated manifest through kubeval (FIXME)
+    podAnnotations: 
+      set-to-avoid-lint-errors-in: "docker-mailserver"
+  # 10 is the default, but explicitly setting this value avoids a CI error when running the generated manifest through kubeval
+  # Will be fixed with an upstream PR
+  revisionHistoryLimit: 10

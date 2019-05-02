@@ -1,0 +1,58 @@
+suite: oobe
+templates:
+  - configmap.yaml
+  - secret.yaml
+  - deployment.yaml
+tests:
+
+  # Demo mode is on OOB, so test it functions as expected
+  - it: should correctly configure configmaps if demo mode is enabled
+    asserts:
+      - matchRegex:
+          path: data.postfix-accounts\.cf
+          pattern: user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
+      - matchRegex:
+          path: data.SigningTable
+          pattern: \*\@example.com mail._domainkey.example.com
+      - matchRegex:
+          path: data.KeyTable
+          pattern: mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private
+      - matchRegex:
+          path: data.TrustedHosts
+          pattern: 127.0.0.1   
+
+  - it: should correctly configure secrets if demo mode is enabled
+    asserts:
+      - matchRegex:
+          path: data.example\.com-mail\.private
+          pattern: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS
+        template: secret.yaml
+
+  # SPF tests shoudl be performed under normal circumstances
+  - it: should perform SPF tests under normal conditions
+    asserts:
+      - notMatchRegex:
+          path: data.postfix-main\.cf
+          pattern: smtpd_recipient_restrictions
+
+  # HAProxy is enabled by default
+  - it: should correctly configure postfix/dovecot if haproxy support is enabled
+    set:
+    asserts:
+      - matchRegex:
+          path: data.postfix-main\.cf
+          pattern: haproxy
+      - matchRegex:
+          path: data.dovecot\.cf
+          pattern: haproxy             
+
+  - it: should configure imaps port 10993 for rainloop if enabled (and haproxy enabled)
+    set:   
+    asserts:
+      - matchRegex:
+          path: data.dovecot\.cf
+          pattern: rainloop
+
+  - it: manifest should match snapshot
+    asserts:
+      - matchSnapshot: {}              

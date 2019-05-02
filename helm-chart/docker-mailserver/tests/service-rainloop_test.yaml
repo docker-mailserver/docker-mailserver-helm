@@ -1,0 +1,22 @@
+suite: service-rainloop
+templates:
+  - service-rainloop.yaml
+tests:
+
+  - it: should create rainloop service if enabled
+    set:
+      rainloop.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1     
+
+  - it: should not create rainloop service if disabled
+    set:
+      rainloop.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0 
+
+  - it: manifest should match snapshot
+    asserts:
+      - matchSnapshot: {}            

@@ -1,0 +1,13 @@
+---
+## Here, helm keep track of what dependencies that are required for the application. Dependencies should be listed here,
+## then the dependencies updated with:
+##
+##    helm dep update
+##
+## and the requirements.lock file commited.
+##
+ dependencies:
+   - name: "haproxy-ingress"
+     version: "0.0.11"
+     repository: "https://kubernetes-charts-incubator.storage.googleapis.com/"
+     condition: haproxy-ingress.deploychart

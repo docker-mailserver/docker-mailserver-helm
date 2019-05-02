@@ -1,0 +1,85 @@
+---
+kind: "Service"
+apiVersion: "v1"
+metadata:
+  annotations:
+    ## These annontations mark the service as monitorable by Prometheus, both directly as a service level metric and
+    ## via the blackbox exporter. For more information, see
+    ## values.yaml
+    prometheus.io/scrape: {{ .Values.monitoring.service.scrape | quote }}
+    prometheus.io/probe: {{ .Values.monitoring.service.probe | quote }}
+    prometheus.io/path: {{ .Values.monitoring.service.path | quote }}
+    prometheus.io/port: {{ .Values.monitoring.service.port | quote }}
+    ##  
+    ## If a load balancer is being used, ensure that the newer type of LB that passes along IP information is used
+    ## rather than the legacy one.
+    {{- if eq .Values.service.type "LoadBalancer" }}service.beta.kubernetes.io/external-traffic: "OnlyLocal"{{ end }}
+  labels:
+    app: {{ template "dockermailserver.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+  name: {{ template "dockermailserver.fullname" . }}
+spec:
+  selector:
+    app: {{ template "dockermailserver.fullname" . }}
+    release: "{{ .Release.Name }}"
+  ports:
+    - protocol: "TCP"
+      name: "25-smtp"
+      port: 25
+      clusterIP: "None"
+  {{- if eq .Values.service.type "NodePort" }}    
+      nodePort: {{ default "30025" .Values.service.nodePort.smtp }}
+  {{ end }}  
+    - protocol: "TCP"
+      name: "110-pop3"
+      port: 110
+  {{- if eq .Values.service.type "NodePort" }}    
+      nodePort: {{ default "30110" .Values.service.nodePort.pop3 }}
+  {{ end }}   
+    - protocol: "TCP"
+      name: "143-imap"
+      port: 143
+  {{- if eq .Values.service.type "NodePort" }}    
+      nodePort: {{ default "30143" .Values.service.nodePort.imap }}
+  {{ end }}       
+    - protocol: "TCP"
+      name: "465-smtps"
+      port: 465
+  {{- if eq .Values.service.type "NodePort" }}    
+      nodePort: {{ default "30465" .Values.service.nodePort.smtps }}
+  {{ end }}    
+    - protocol: "TCP"
+      name: "587-submission"
+      port: 587
+  {{- if eq .Values.service.type "NodePort" }}    
+      nodePort: {{ default "30587" .Values.service.nodePort.submission }}
+  {{ end }}   
+    - protocol: "TCP"
+      name: "993-imaps"
+      port: 993
+  {{- if eq .Values.service.type "NodePort" }}    
+      nodePort: {{ default "30993" .Values.service.nodePort.imaps }}
+  {{ end }}   
+    - protocol: "TCP"
+      name: "995-pop3s"
+      port: 995
+  {{- if eq .Values.service.type "NodePort" }}    
+      nodePort: {{ default "30995" .Values.service.nodePort.pop3s }}
+  {{ end }}    
+  {{- if .Values.rainloop.enabled }}
+    - protocol: "TCP"
+      name: "10993-imaps-rainloop"
+      port: 10993        
+  {{ end }}
+  type: {{ default "ClusterIP" .Values.service.type }}
+  {{ if eq .Values.service.type "LoadBalancer" -}}
+  {{ if .Values.service.loadBalancer.publicIp -}}
+  loadBalancerIP: {{ .Values.service.loadBalancer.publicIp }}
+  {{ if .Values.service.loadBalancer.allowedIps -}}
+  loadBalancerSourceRanges:
+{{ .Values.service.loadBalancer.allowedIps | toYaml | indent 4 }}
+  {{ end -}}
+  {{ end -}}
+  {{ end }}

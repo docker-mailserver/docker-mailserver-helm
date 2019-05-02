@@ -1,0 +1,33 @@
+
+suite: pvc-rainloop
+templates:
+  - pvc-rainloop.yaml
+tests:
+  
+  - it: should apply annotations from persistence.annotations
+    set:
+      rainloop.persistence.annotations.backup\.banana\.io/deltas: pancakes
+    asserts:
+      - equal:
+          path: metadata.annotations.backup\.banana\.io/deltas
+          value: pancakes
+
+  - it: should create rainloop pvc if enabled
+    set:
+      rainloop.enabled: true
+      rainloop.persistence.size: 1Pb
+    asserts:
+      - equal:
+          path: spec.resources.requests.storage
+          value: 1Pb
+
+  - it: should not create rainloop pvc if disabled
+    set:
+      rainloop.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0          
+
+  - it: manifest should match snapshot
+    asserts:
+      - matchSnapshot: {}    

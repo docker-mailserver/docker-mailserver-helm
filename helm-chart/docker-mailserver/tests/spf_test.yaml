@@ -1,0 +1,15 @@
+suite: disable_spf_tests
+templates:
+  - configmap.yaml
+tests:
+  - it: should disable SPF tests when requested
+    set:
+      disable_spf_tests: true
+    asserts:
+      - notMatchRegex:
+          path: data.postfix-main\.cf
+          pattern: private/policyd-spf
+
+  - it: manifest should match snapshot
+    asserts:
+      - matchSnapshot: {}    
