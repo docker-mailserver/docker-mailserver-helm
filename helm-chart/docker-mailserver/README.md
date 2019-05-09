@@ -20,6 +20,7 @@ This helm chart deploys docker-mailserver into a Kubernetes cluster, in a manner
     - [Install helm and cert-manager](#install-helm-and-cert-manager)
   - [Installation](#installation-1)
   - [Operation](#operation)
+    - [Download setup.sh](#download-setupsh)
     - [Create / Update / Delete users](#create--update--delete-users)
     - [Setup OpenDKIM](#setup-opendkim)
     - [Setup RainLoop](#setup-rainloop)
@@ -108,12 +109,35 @@ $ helm install --name docker-mailserver docker-mailserver
 
 ## Operation
 
+### Download setup.sh
+
+Download the [upstream setup.sh](https://raw.githubusercontent.com/tomav/docker-mailserver/master/setup.sh) to a local folder (*ideally the same location you store your custom values.yaml*)
+
+Run `./setup.sh` without arguments for a list of full options
+
 ### Create / Update / Delete users
+
+Run `./setup.sh <email address>` to create the email addresses in `$PWD/config`
+
+Example output:
+```
+[funkypenguin:~/demo] ./setup.sh email add david@kowalski.elpenguino.net
+"docker inspect" requires at least 1 argument.
+See 'docker inspect --help'.
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+Enter Password:
+[funkypenguin:~/demo] %
+```
 
 ### Setup OpenDKIM
 
+
+Example output:
 ```
-[funkypenguin:~/Documents/Personal/Projects/docker-mailserver/helm-chart] add-helm-chart 1 ± ../setup.sh config dkim
+[funkypenguin:~/demo] ./setup.sh config dkim
 "docker inspect" requires at least 1 argument.
 See 'docker inspect --help'.
 
@@ -125,7 +149,7 @@ Creating DKIM KeyTable
 Creating DKIM SigningTable
 Creating DKIM private key /tmp/docker-mailserver/opendkim/keys/example.com/mail.private
 Creating DKIM TrustedHosts
-[funkypenguin:~/Documents/Personal/Projects/docker-mailserver/helm-chart] add-helm-chart* ±
+[funkypenguin:~/demo] 
 ```
 
 ### Setup RainLoop

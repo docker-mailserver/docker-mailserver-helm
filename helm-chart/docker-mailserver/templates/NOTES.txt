@@ -49,14 +49,15 @@ you can confirm your services are setup correctly. Once you're ready to configur
 here's what you need to do:
 
 1. Update values.yaml, and set pod.demoMode.enabled to "false". Also set your domains under "domains", removing "example.com"
-2. From the /helm-chart/ directory, execute ../setup.sh using a custom path, to create your users and setup your DKIM key(s), as follows:
+2. Download https://raw.githubusercontent.com/tomav/docker-mailserver/master/setup.sh to your current working directory
+3. From your current working directory, use ./setup.sh to create your users and setup your DKIM key(s), as follows:
 
-   ../setup.sh -p docker-mailserver/config email add <email address> [password]
-   ../setup.sh -p docker-mailserver/config config dkim
+   ./setup.sh email add <email address> [password]
+   ./setup.sh config dkim
 
 NOTE: The above step is mandatory if you disable demo mode. Without valid DKIM keys, the chart WON'T DEPLOY
 
-3. Upgrade the helm chart to apply your changes, by running:
+4. Upgrade the helm chart to apply your changes, by running:
 
    helm upgrade {{ .Release.Namespace }} docker-mailserver
 
@@ -67,7 +68,7 @@ to add to your DNS zones, to finish setting up DKIM:
 {{/* Mount a dkim key for every domain configured */}}
 ---               
 {{ range .Values.domains }}
-{{- $path := printf "cat docker-mailserver/config/opendkim/keys/%s/mail.txt" . }}
+{{- $path := printf "cat config/opendkim/keys/%s/mail.txt" . }}
     {{ $path }}
 {{ end }}
 ---
