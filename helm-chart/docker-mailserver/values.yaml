@@ -247,7 +247,7 @@ monitoring:
   ## to ensure it's "up"
   service:
     ## monitoring should be configured to only scrape services that have a value of "true"
-    scrape: "false"
+    scrape: "true"
     ## Path on which metrics are exposed
     path: "/metrics"
     ## Port on which HTTP server is served
@@ -255,7 +255,7 @@ monitoring:
   ## Whether to scape the pods associated with this application. Useful for collecting metrics.
   pod:
     ## monitoring shoudl be configured to only scrape pods that have a value of `true`
-    scrape: "false"
+    scrape: "true"
     ## Path on which metrics are exposed
     path: "/metrics"
     ## Port on which HTTP server is served
