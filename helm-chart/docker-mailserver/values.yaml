@@ -248,6 +248,8 @@ monitoring:
   service:
     ## monitoring should be configured to only scrape services that have a value of "true"
     scrape: "true"
+    ## monitoring should be configured to only probe services that have a value of "true"
+    probe: "false"    
     ## Path on which metrics are exposed
     path: "/metrics"
     ## Port on which HTTP server is served
@@ -256,6 +258,8 @@ monitoring:
   pod:
     ## monitoring shoudl be configured to only scrape pods that have a value of `true`
     scrape: "true"
+    ## monitoring should be configured to only probe services that have a value of "true"
+    probe: "false"    
     ## Path on which metrics are exposed
     path: "/metrics"
     ## Port on which HTTP server is served
