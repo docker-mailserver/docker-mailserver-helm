@@ -174,9 +174,9 @@ manifest should match snapshot:
                 command:
                 - /bin/bash
                 - /tmp/docker-mailserver/am-i-healthy.sh
-                failureThreshold: 3
                 initialDelaySeconds: 600
                 timeoutSeconds: 60
+              failureThreshold: 3                
             name: dockermailserver
             resources:
               limits:

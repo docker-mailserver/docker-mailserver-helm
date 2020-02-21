@@ -118,6 +118,6 @@ spec:
                  - /tmp/docker-mailserver/am-i-healthy.sh
                initialDelaySeconds: 600
                timeoutSeconds: 60
-               failureThreshold: 3
+            failureThreshold: 3
       restartPolicy: "Always"
 
