@@ -3,7 +3,7 @@
 {{- $fullName := include "dockermailserver.fullname" . -}}
 {{- $servicePort := .Values.rainloop.service.port -}}
 {{- $ingressPath := .Values.rainloop.ingress.path -}}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   labels:
