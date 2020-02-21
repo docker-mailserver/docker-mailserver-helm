@@ -43,7 +43,7 @@ spec:
 
       initContainers:
         - name: prep-config
-          image: busybox:1.28
+          image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
           command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]
           volumeMounts:
             - name: configmap

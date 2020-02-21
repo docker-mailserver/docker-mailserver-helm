@@ -5,6 +5,13 @@ image:
   # image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
   tag: "release-v6.1.0"
 
+initContainer:
+  image:
+    # image.name is the name of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
+    name: "busybox"
+    # image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
+    tag: "1.28"
+
 demoMode:
   # demoMode.enabled ignores the contents of helm-chart/docker-mailserver/config and creates minimal static configuration to be used instead. A single account (user "user@example.com", password "password") will be configured for the purpose of validating core functions and connectivity, before applying user config
   enabled: true
