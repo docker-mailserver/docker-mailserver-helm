@@ -10,7 +10,7 @@ manifest should match snapshot:
         prometheus.io/scrape: "false"
       labels:
         app: RELEASE-NAME-docker-mailserver
-        chart: docker-mailserver-0.1.0
+        chart: docker-mailserver-0.2.0
         heritage: Tiller
         release: RELEASE-NAME
       name: RELEASE-NAME-docker-mailserver-rainloop
