@@ -11,7 +11,7 @@ metadata:
     release: "{{ .Release.Name }}"
   name: {{ template "dockermailserver.fullname" . }}-rainloop
 spec:
-  serviceAccount: {{ template "dockermailserver.rainloop.serviceAccountName" . }}
+  serviceAccountName: {{ template "dockermailserver.rainloop.serviceAccountName" . }}
   replicas: {{ default 2 .Values.deployment.replicas }}
   selector:
     matchLabels:
