@@ -326,6 +326,7 @@ haproxy:
   # haproxy.deploychart will deploy an haproxy sub-chart, configured for the TCP ports used by docker-mailserver
   deploychart: true
   controller:
+    replicaCount: 1
     kind: "Deployment"
     enableStaticPorts: false
     tcp:
@@ -341,6 +342,10 @@ haproxy:
     # Set to avoid CI error when running the generated manifest through kubeval (FIXME)
     podAnnotations: 
       set-to-avoid-lint-errors-in: "docker-mailserver"
+
+  defaultBackend:
+    replicaCount: 1
+
   # 10 is the default, but explicitly setting this value avoids a CI error when running the generated manifest through kubeval
   # Will be fixed with an upstream PR
   revisionHistoryLimit: 10
