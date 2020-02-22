@@ -15,6 +15,15 @@ initContainer:
 serviceAccount:
   create: "true"
 
+## By default, the chart will create a configmap based on the contents of the config/ subdirectory
+## If you want to create the configmap yourself, set useExisting to "true", and specify the name
+## of the existing configmap.
+## This is an advanced feature, allowing further customization / templating of config elements
+##
+configMap:
+  useExisting: false
+  name: name-of-configmap
+
 ## Create the necessary PodSecurityPolicies (PSPs) for docker-mailserver, haproxy, and rainloop to work
 ##
 psp:

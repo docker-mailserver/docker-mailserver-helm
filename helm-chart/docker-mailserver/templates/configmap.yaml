@@ -1,3 +1,5 @@
+{{/* This whole template is only necessary if we've enabled creation of the configmap (default true) */}}
+{{- if not .Values.configMap.useExisting -}}  
 ---
 apiVersion: "v1"
 kind: "ConfigMap"
@@ -70,3 +72,4 @@ data:
     {{ . }} && \
     {{- end }}
     echo "All healthy"
+{{- end -}}
