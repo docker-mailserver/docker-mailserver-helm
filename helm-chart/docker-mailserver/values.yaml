@@ -290,6 +290,7 @@ rainloop:
   enabled: true
   serviceAccount:
     create: true
+    name: "rainloop"
   image:
     # rainloop.image.name is the docker container to use for the rainloop pod
     name: "hardware/rainloop"
