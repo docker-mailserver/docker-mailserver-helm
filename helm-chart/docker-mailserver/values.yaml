@@ -12,6 +12,9 @@ initContainer:
     # image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
     tag: "1.28"
 
+serviceAccount:
+  create: "true"
+
 demoMode:
   # demoMode.enabled ignores the contents of helm-chart/docker-mailserver/config and creates minimal static configuration to be used instead. A single account (user "user@example.com", password "password") will be configured for the purpose of validating core functions and connectivity, before applying user config
   enabled: true
@@ -285,6 +288,8 @@ ssl:
 rainloop:
   # rainloop.enabled will include a rainloop (webmail) pod in the release
   enabled: true
+  serviceAccount:
+    create: true
   image:
     # rainloop.image.name is the docker container to use for the rainloop pod
     name: "hardware/rainloop"

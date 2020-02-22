@@ -25,6 +25,7 @@ spec:
         app: {{ template "dockermailserver.fullname" . }}
         release: "{{ .Release.Name }}"
     spec:
+      serviceAccount: {{ template "dockermailserver.serviceAccountName" . }}
       volumes:
          - name: "data"
            persistentVolumeClaim:
