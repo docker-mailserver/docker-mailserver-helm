@@ -34,17 +34,6 @@ spec:
                             # * set the set-group-ID bit for a file whose GID does not match
                             #   the filesystem or any of the supplementary GIDs of the
                             #   calling process.    
-  requiredDropCapabilities:
-    - SYS_PTRACE            # * Trace arbitrary processes using ptrace(2);
-                            # * apply get_robust_list(2) to arbitrary processes;
-                            # * transfer data to or from the memory of arbitrary processes
-                            #   using process_vm_writev(2);
-                            # * inspect processes using kcmp(2).
-    - MKNOD                 # Create special files using mknod(2)  
-    - SYS_CHROOT            # Use chroot(2); change mount namespaces using setns(2).  
-    - KILL                  # Bypass permission checks for sending signals (see kill(2))                      
-    - IPC_LOCK              # Lock memory (mlock(2), mlockall(2), mmap(2), shmctl(2))
-    - IPC_OWNER             # Bypass permission checks for operations on System V IPC objects.      
     - SETGID                # * Make arbitrary manipulations of process GIDs and
                             #   supplementary GID list;
                             # * forge GID when passing socket credentials via UNIX domain
@@ -56,7 +45,18 @@ spec:
                             # * forge UID when passing socket credentials via UNIX domain
                             #   sockets;
                             # * write a user ID mapping in a user namespace (see
-                            #   user_namespaces(7)).     
+                            #   user_namespaces(7)).                             
+  requiredDropCapabilities:
+    - SYS_PTRACE            # * Trace arbitrary processes using ptrace(2);
+                            # * apply get_robust_list(2) to arbitrary processes;
+                            # * transfer data to or from the memory of arbitrary processes
+                            #   using process_vm_writev(2);
+                            # * inspect processes using kcmp(2).
+    - MKNOD                 # Create special files using mknod(2)  
+    - SYS_CHROOT            # Use chroot(2); change mount namespaces using setns(2).  
+    - KILL                  # Bypass permission checks for sending signals (see kill(2))                      
+    - IPC_LOCK              # Lock memory (mlock(2), mlockall(2), mmap(2), shmctl(2))
+    - IPC_OWNER             # Bypass permission checks for operations on System V IPC objects.          
     - AUDIT_CONTROL         # Enable and disable kernel auditing
     - AUDIT_READ            # Allow reading the audit log via a multicast netlink socket
     - BLOCK_SUSPEND         # Employ features that can block system suspend
