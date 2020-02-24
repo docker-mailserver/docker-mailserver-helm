@@ -17,33 +17,6 @@ spec:
     - AUDIT_WRITE           # Write records to kernel auditing log
     - CHOWN                 # Make arbitrary changes to file UIDs and GIDs 
     - NET_BIND_SERVICE      # Bind a socket to Internet domain privileged ports (port numbers less than 1024).  
-  requiredDropCapabilities:
-    - SYS_PTRACE            # * Trace arbitrary processes using ptrace(2);
-                            # * apply get_robust_list(2) to arbitrary processes;
-                            # * transfer data to or from the memory of arbitrary processes
-                            #   using process_vm_writev(2);
-                            # * inspect processes using kcmp(2).
-    - MKNOD                 # Create special files using mknod(2)  
-    - SYS_CHROOT            # Use chroot(2); change mount namespaces using setns(2).  
-    - KILL                  # Bypass permission checks for sending signals (see kill(2))                      
-    - IPC_LOCK              # Lock memory (mlock(2), mlockall(2), mmap(2), shmctl(2))
-    - IPC_OWNER             # Bypass permission checks for operations on System V IPC objects.      
-    - SETGID                # * Make arbitrary manipulations of process GIDs and
-                            #   supplementary GID list;
-                            # * forge GID when passing socket credentials via UNIX domain
-                            #   sockets;
-                            # * write a group ID mapping in a user namespace (see
-                            #   user_namespaces(7)).
-    - SETUID                # Make arbitrary manipulations of process UIDs (setuid(2),
-                            #   setreuid(2), setresuid(2), setfsuid(2));
-                            # * forge UID when passing socket credentials via UNIX domain
-                            #   sockets;
-                            # * write a user ID mapping in a user namespace (see
-                            #   user_namespaces(7)).     
-    - AUDIT_CONTROL         # Enable and disable kernel auditing
-    - AUDIT_READ            # Allow reading the audit log via a multicast netlink socket
-    - BLOCK_SUSPEND         # Employ features that can block system suspend
-    - DAC_READ_SEARCH       # Bypass file read permission checks and directory read and execute permission checks;
     - DAC_OVERRIDE          # Bypass file read, write, and execute permission checks.  (DAC is an abbreviation of "discretionary access control".)
     - FOWNER                # * Bypass permission checks on operations that normally require
                             #   the filesystem UID of the process to match the UID of the
@@ -60,7 +33,34 @@ spec:
                             #   file is modified;
                             # * set the set-group-ID bit for a file whose GID does not match
                             #   the filesystem or any of the supplementary GIDs of the
-                            #   calling process.
+                            #   calling process.    
+    - SETGID                # * Make arbitrary manipulations of process GIDs and
+                            #   supplementary GID list;
+                            # * forge GID when passing socket credentials via UNIX domain
+                            #   sockets;
+                            # * write a group ID mapping in a user namespace (see
+                            #   user_namespaces(7)).
+    - SETUID                # Make arbitrary manipulations of process UIDs (setuid(2),
+                            #   setreuid(2), setresuid(2), setfsuid(2));
+                            # * forge UID when passing socket credentials via UNIX domain
+                            #   sockets;
+                            # * write a user ID mapping in a user namespace (see
+                            #   user_namespaces(7)).                             
+  requiredDropCapabilities:
+    - SYS_PTRACE            # * Trace arbitrary processes using ptrace(2);
+                            # * apply get_robust_list(2) to arbitrary processes;
+                            # * transfer data to or from the memory of arbitrary processes
+                            #   using process_vm_writev(2);
+                            # * inspect processes using kcmp(2).
+    - MKNOD                 # Create special files using mknod(2)  
+    - SYS_CHROOT            # Use chroot(2); change mount namespaces using setns(2).  
+    - KILL                  # Bypass permission checks for sending signals (see kill(2))                      
+    - IPC_LOCK              # Lock memory (mlock(2), mlockall(2), mmap(2), shmctl(2))
+    - IPC_OWNER             # Bypass permission checks for operations on System V IPC objects.          
+    - AUDIT_CONTROL         # Enable and disable kernel auditing
+    - AUDIT_READ            # Allow reading the audit log via a multicast netlink socket
+    - BLOCK_SUSPEND         # Employ features that can block system suspend
+    - DAC_READ_SEARCH       # Bypass file read permission checks and directory read and execute permission checks;
     - LEASE                 # Establish leases on arbitrary files (see fcntl(2))
     - LINUX_IMMUTABLE       # Set the FS_APPEND_FL and FS_IMMUTABLE_FL inode flags (see ioctl_iflags(2))
     - MAC_ADMIN             # Allow MAC configuration or state changes
