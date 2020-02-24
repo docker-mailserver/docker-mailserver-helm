@@ -40,8 +40,11 @@ spec:
              secretName: {{ template "dockermailserver.fullname" . }}-secrets
          - name: "ssl-cert"
            secret:
+{{ if not .Values.tls.useExisting }}
+             secretName: {{ .Values.tls.existingName }}
+{{- else }}
              secretName: {{ template "dockermailserver.fullname" . }}-tls
-
+{{- end }}
       initContainers:
         - name: prep-config
           image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
