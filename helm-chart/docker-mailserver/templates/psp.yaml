@@ -46,6 +46,7 @@ spec:
                             #   sockets;
                             # * write a user ID mapping in a user namespace (see
                             #   user_namespaces(7)).                             
+    - SYS_CHROOT            # Use chroot(2); change mount namespaces using setns(2).  
   requiredDropCapabilities:
     - SYS_PTRACE            # * Trace arbitrary processes using ptrace(2);
                             # * apply get_robust_list(2) to arbitrary processes;
@@ -53,7 +54,6 @@ spec:
                             #   using process_vm_writev(2);
                             # * inspect processes using kcmp(2).
     - MKNOD                 # Create special files using mknod(2)  
-    - SYS_CHROOT            # Use chroot(2); change mount namespaces using setns(2).  
     - KILL                  # Bypass permission checks for sending signals (see kill(2))                      
     - IPC_LOCK              # Lock memory (mlock(2), mlockall(2), mmap(2), shmctl(2))
     - IPC_OWNER             # Bypass permission checks for operations on System V IPC objects.          
