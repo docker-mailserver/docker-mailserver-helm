@@ -40,8 +40,8 @@ spec:
              secretName: {{ template "dockermailserver.fullname" . }}-secrets
          - name: "ssl-cert"
            secret:
-{{ if not .Values.tls.useExisting }}
-             secretName: {{ .Values.tls.existingName }}
+{{ if .Values.ssl.useExisting }}
+             secretName: {{ .Values.ssl.existingName }}
 {{- else }}
              secretName: {{ template "dockermailserver.fullname" . }}-tls
 {{- end }}

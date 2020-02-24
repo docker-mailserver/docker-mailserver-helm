@@ -26,9 +26,16 @@ configMap:
 secret:
   useExisting: false  
 
-tls:
+## These values define how the certificate created by the chart is processed by cert-manager
+## Ensure you've setup your ClusterIssuers (letsencrypt-staging and letsencrypt-prod) and DNS provider
+ssl:
+  issuer:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  dnsname: example.com
+  dns01provider: cloudflare
   useExisting: false
-  # existingName: name-of-existing-secret
+  existingName: name-of-existing-secret
 
 ## Create the necessary PodSecurityPolicies (PSPs) for docker-mailserver, haproxy, and rainloop to work
 ##
@@ -295,14 +302,7 @@ monitoring:
     ## Port on which HTTP server is served
     port: "9102"
     
-## These values define how the certificate created by the chart is processed by cert-manager
-## Ensure you've setup your ClusterIssuers (letsencrypt-staging and letsencrypt-prod) and DNS provider
-ssl:
-  issuer:
-    name: letsencrypt-staging
-    kind: ClusterIssuer
-  dnsname: example.com
-  dns01provider: cloudflare
+
 
 # Values imported from https://github.com/t13a/helm-chart-rainloop/blob/master/values.yaml
 rainloop:
