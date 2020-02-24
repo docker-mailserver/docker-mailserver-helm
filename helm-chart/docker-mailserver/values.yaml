@@ -22,7 +22,9 @@ serviceAccount:
 ##
 configMap:
   useExisting: false
-  name: name-of-configmap
+
+secret:
+  useExisting: false  
 
 ## Create the necessary PodSecurityPolicies (PSPs) for docker-mailserver, haproxy, and rainloop to work
 ##
