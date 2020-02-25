@@ -232,6 +232,8 @@ service:
     imaps: 30993
     pop3s: 30995
 
+  annotations: {}
+
 ## How many versions of the deployment to run on kubernetes
 ## Default: 2
 deployment:
