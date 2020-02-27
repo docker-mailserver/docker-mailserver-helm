@@ -143,4 +143,8 @@ We list them here (and include this template in deployment.yaml) to keep deploym
   value: {{ .Values.pod.dockermailserver.relay_user | quote }}
 - name: RELAY_PASSWORD
   value: {{ .Values.pod.dockermailserver.relay_password | quote }}
+- name: PFLOGSUMM_TRIGGER
+  value: {{ .Values.pod.dockermailserver.pflogsumm_trigger | quote }}
+- name: PFLOGSUMM_RECIPIENT
+  value: {{ .Values.pod.dockermailserver.pflogsumm_recipient | quote }}
 {{- end -}}

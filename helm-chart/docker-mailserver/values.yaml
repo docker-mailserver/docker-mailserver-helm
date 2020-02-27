@@ -179,6 +179,8 @@ pod:
     postgrey_max_age: 35
     postgrey_auto_whitelist_clients: 5
     postgrey_text: "delayed by postgrey"
+    pflogsumm_trigger:
+    pflogsumm_recipient:
     enable_saslauthd: 0
     saslauthd_mechanisms: 
     saslauthd_mech_options:
