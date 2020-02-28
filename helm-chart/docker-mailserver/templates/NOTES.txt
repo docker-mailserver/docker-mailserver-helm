@@ -79,7 +79,7 @@ to add to your DNS zones, to finish setting up DKIM:
 
 -------
 You're running with HAProxy enabled, and poor-mans-k8s-lb turned on. Provided you've correctly setup your 
-haproxy.webhook.url and haproxy.webhook.token, you don't need to do anything further in
+poorMansK8sLb.webhook.url and poorMansK8sLb.webhook.token, you don't need to do anything further in
 order for your external access to work
 -------
 

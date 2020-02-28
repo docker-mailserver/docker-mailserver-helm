@@ -46,29 +46,6 @@ demoMode:
   # demoMode.enabled ignores the contents of helm-chart/docker-mailserver/config and creates minimal static configuration to be used instead. A single account (user "user@example.com", password "password") will be configured for the purpose of validating core functions and connectivity, before applying user config
   enabled: true
 
-# HAProxy can be used as an upstream proxy, with the PROXY protocol, to present real-world origin source IPs
-# to postscreen (and dovecot), so that spam / SPF filtering can be applied. This avoids the undesirable source IP
-# obfuscation which occurs within the normal Kubernetes network
-haproxy:
-
-  # haproxy.enabled configures postscreen/imaps for proxy-protocol support from an upstream haproxy instance
-  # If this is enabled, you _must_ access SMTP (TCP 25), submission (TCP 587), and IMAPS (TCP 993) via haproxy.
-  enabled: true
-
-  # If haproxy is in external-auto mode, specify the webhook URL and secret used to update haproxy config
-  # Example implementation at https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/
-  # haproxy.webhookUrl is the URL to call to update a webhook on a remote HAProxy instance
-  webhookUrl: 
-  # haproxy.webhookSecret is the secret to be included in the webhook call (above)
-  webhookSecret: 
-
-  # These values populate dovecot's list of networks it'll "trust" for incoming haproxy connections.
-  # A space-separated list, on a single line, is required
-  # By default, we allow all RFC1918 private ranges, but this can be tightened up for the known IP/range
-  # of your HAProxy instance
-  # haproxy.trustedNetworks is the list of sources (in CIDR format, space-separated) to permit haproxy PROXY protocol from
-  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
-
 # If you choose _not_ to use haproxy, and you're not exposing your services with a load-balanced service
 # with an external traffic policy in "Local" mode, you risk having the source IP of incoming mail overwritten
 # with a local Kubernetes cluster IP, as part of the ingress routing of the connection. This, in turn, 
@@ -83,6 +60,12 @@ spfTestsDisabled: false
 poorMansK8sLb:
   # poorMansK8sLb.enabled will include containers to call a webhook on an external HAProxy instance
   enabled: false
+  # If haproxy is in external-auto mode, specify the webhook URL and secret used to update haproxy config
+  # Example implementation at https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/
+  # poorMansK8sLb.webhookUrl is the URL to call to update a webhook on a remote HAProxy instance
+  webhookUrl: 
+  # poorMansK8sLb.webhookSecret is the secret to be included in the webhook call (above)
+  webhookSecret:
 
 # List all the domains to be used below - this is necessary to correctly configure DKIM keys for email signing
 # domains is the list of domains to be served by your docker-mailserver instance
@@ -342,8 +325,8 @@ rainloop:
 
 ## These values are for the haproxy sub-chart
 haproxy:
-  # haproxy.deploychart will deploy an haproxy sub-chart, configured for the TCP ports used by docker-mailserver
-  deploychart: true
+  # haproxy.enabled will deploy an haproxy sub-chart, configured for the TCP ports used by docker-mailserver
+  enabled: true
   controller:
     replicaCount: 1
     kind: "Deployment"
@@ -364,6 +347,13 @@ haproxy:
 
   defaultBackend:
     replicaCount: 1
+
+  # These values populate dovecot's list of networks it'll "trust" for incoming haproxy connections.
+  # A space-separated list, on a single line, is required
+  # By default, we allow all RFC1918 private ranges, but this can be tightened up for the known IP/range
+  # of your HAProxy instance
+  # haproxy.trustedNetworks is the list of sources (in CIDR format, space-separated) to permit haproxy PROXY protocol from
+  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
 
   # 10 is the default, but explicitly setting this value avoids a CI error when running the generated manifest through kubeval
   # Will be fixed with an upstream PR

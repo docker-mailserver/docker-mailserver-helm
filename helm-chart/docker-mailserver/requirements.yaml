@@ -10,5 +10,5 @@
    - name: "kubernetes-ingress"
      version: "0.7.0"
      repository: "https://haproxytech.github.io/helm-charts"
-     condition: haproxy.deploychart
+     condition: haproxy.enabled
      alias: "haproxy"
