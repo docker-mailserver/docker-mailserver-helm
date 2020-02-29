@@ -15,9 +15,6 @@ initContainer:
 serviceAccount:
   create: "true"
 
-# Allow operator to put docker-mailserver "to sleep", to exec into a broken deployment and debug
-debug_in_sleep: "false"
-
 ## By default, the chart will create a configmap based on the contents of the config/ subdirectory
 ## If you want to create the configmap yourself, set useExisting to "true", and specify the name
 ## of the existing configmap.

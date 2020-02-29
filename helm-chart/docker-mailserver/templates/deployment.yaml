@@ -70,10 +70,6 @@ spec:
               add:
                 - "NET_ADMIN"
             {{ end }}
-          {{ if .Values.debug_in_sleep }}
-          command: [ "/bin/sleep" ]
-          args: [ "999h" ]
-          {{ - end -}}
           volumeMounts:
             - name: config
               mountPath: /tmp/docker-mailserver
