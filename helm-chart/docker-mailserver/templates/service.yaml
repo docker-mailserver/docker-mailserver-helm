@@ -29,52 +29,55 @@ spec:
     release: "{{ .Release.Name }}"
   ports:
     - protocol: "TCP"
-      name: "25-smtp"
+      name: "tcp-smtp"
       port: 25
   {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30025" .Values.service.nodePort.smtp }}
   {{ end }}  
     - protocol: "TCP"
-      name: "110-pop3"
+      name: "tcp-pop3"
       port: 110
   {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30110" .Values.service.nodePort.pop3 }}
   {{ end }}   
     - protocol: "TCP"
-      name: "143-imap"
+      name: "tcp-imap"
       port: 143
   {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30143" .Values.service.nodePort.imap }}
   {{ end }}       
     - protocol: "TCP"
-      name: "465-smtps"
+      name: "tcp-smtps"
       port: 465
   {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30465" .Values.service.nodePort.smtps }}
   {{ end }}    
     - protocol: "TCP"
-      name: "587-submission"
+      name: "tcp-submission"
       port: 587
   {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30587" .Values.service.nodePort.submission }}
   {{ end }}   
     - protocol: "TCP"
-      name: "993-imaps"
+      name: "tcp-imaps"
       port: 993
   {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30993" .Values.service.nodePort.imaps }}
   {{ end }}   
     - protocol: "TCP"
-      name: "995-pop3s"
+      name: "tcp-pop3s"
       port: 995
   {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30995" .Values.service.nodePort.pop3s }}
   {{ end }}    
+    - protocol: "TCP"
+      name: "tcp-managesieve"
+      port: 4190  
   {{- if .Values.rainloop.enabled }}
     - protocol: "TCP"
-      name: "10993-imaps-rainloop"
+      name: "tcp-imaps-rainloop"
       port: 10993        
-  {{ end }}
+  {{ end }}  
   type: {{ default "ClusterIP" .Values.service.type }}
   {{ if eq .Values.service.type "LoadBalancer" -}}
   {{ if .Values.service.loadBalancer.publicIp -}}
