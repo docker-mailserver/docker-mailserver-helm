@@ -24,6 +24,10 @@ spec:
       labels:
         app: {{ template "dockermailserver.fullname" . }}
         release: "{{ .Release.Name }}"
+        {{- if .Values.pod.dockermailserver.annotations }}
+      annotations:
+{{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}  
+        {{ end }}             
     spec:
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       volumes:
