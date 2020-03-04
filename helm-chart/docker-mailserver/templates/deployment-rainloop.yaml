@@ -10,10 +10,6 @@ metadata:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
   name: {{ template "dockermailserver.fullname" . }}-rainloop
-  {{- if .Values.rainloop.annotations }}
-  annotations:
-  {{ toYaml .Values.rainloop.annotations | indent 4 }}  
-  {{ end }}  
 spec:
   replicas: {{ default 2 .Values.deployment.replicas }}
   selector:
@@ -30,6 +26,10 @@ spec:
       labels:
         app: {{ template "dockermailserver.fullname" . }}-rainloop
         release: "{{ .Release.Name }}"
+        {{- if .Values.rainloop.annotations }}
+        annotations:
+        {{ toYaml .Values.rainloop.annotations | indent 10 }}  
+        {{ end }}          
     spec:
       serviceAccountName: {{ template "dockermailserver.rainloop.serviceAccountName" . }}
       containers:

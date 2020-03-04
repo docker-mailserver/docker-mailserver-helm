@@ -324,8 +324,8 @@ rainloop:
     tls: []
 
   # Annotations for the rainloop deployment - this is where you'd enable istio if necessary
-  annotations:
-    istio-injection: disabled
+  annotations: {}
+    # istio-injection: disabled
 
 ## These values are for the haproxy sub-chart
 haproxy:
