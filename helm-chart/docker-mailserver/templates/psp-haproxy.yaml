@@ -1,5 +1,5 @@
 {{/* This whole template is only necessary if we've enabled PSPs */}}
-{{- if .Values.psp.create -}}  
+{{- if and .Values.psp.create .Values.haproxy.enabled -}}  
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
