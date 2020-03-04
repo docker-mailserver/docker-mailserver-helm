@@ -52,6 +52,9 @@ spec:
             - name: data
               mountPath: "/rainloop/data"
               subPath: "rainloop"
+          env:
+          - name: LOG_TO_STDOUT
+            value: "true"
 
       volumes:
       - name: "data"
