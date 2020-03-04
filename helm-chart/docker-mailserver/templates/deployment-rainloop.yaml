@@ -27,8 +27,8 @@ spec:
         app: {{ template "dockermailserver.fullname" . }}-rainloop
         release: "{{ .Release.Name }}"
         {{- if .Values.rainloop.annotations }}
-        annotations:
-        {{ toYaml .Values.rainloop.annotations | indent 10 }}  
+      annotations:
+{{ toYaml .Values.rainloop.annotations | indent 4 }}  
         {{ end }}          
     spec:
       serviceAccountName: {{ template "dockermailserver.rainloop.serviceAccountName" . }}
