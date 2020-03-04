@@ -323,10 +323,6 @@ rainloop:
     path: /
     tls: []
 
-  # Annotations for the rainloop deployment - this is where you'd enable istio if necessary
-  annotations: {}
-    # istio-injection: disabled
-
 ## These values are for the haproxy sub-chart
 haproxy:
   # haproxy.enabled will deploy an haproxy sub-chart, configured for the TCP ports used by docker-mailserver
