@@ -73,6 +73,9 @@ spec:
     - protocol: "TCP"
       name: "tcp-managesieve"
       port: 4190  
+    - protocol: "TCP"
+      name: "tcp-dsync"
+      port: 4711        
   {{- if .Values.rainloop.enabled }}
     - protocol: "TCP"
       name: "tcp-imaps-rainloop"
