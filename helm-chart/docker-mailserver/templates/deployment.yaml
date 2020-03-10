@@ -104,7 +104,7 @@ spec:
               readOnly: true   
             {{- if .Values.pod.dockermailserver.enable_dovecot_replication }}
             - name: configmap
-              subPath: DovecotReplication
+              subPath: 80-replication.conf
               mountPath: /etc/dovecot/conf.d/80-replication.conf
               readOnly: true   
             {{ end }}                  
