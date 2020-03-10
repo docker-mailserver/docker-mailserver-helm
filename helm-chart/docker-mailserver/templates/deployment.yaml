@@ -102,7 +102,7 @@ spec:
               subPath: KeyTable
               mountPath: /tmp/docker-mailserver/opendkim/KeyTable
               readOnly: true   
-            {{- if eq .Values.pod.dockermailserver.enable_replication 1.0 }}
+            {{- if .Values.pod.dockermailserver.enable_replication }}
             - name: configmap
               subPath: DovecotReplication
               mountPath: /etc/dovecot/conf.d/80-replication.conf

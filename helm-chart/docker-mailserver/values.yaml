@@ -118,7 +118,7 @@ pod:
 
     # Whether to enable dovecot replication. Allows the syncronization of a pair of dovecot servers
     # https://wiki.dovecot.org/Replication
-    enable_dovecot_replication: 1
+    enable_dovecot_replication: true
 
     smtp_only: 0
     # ssl_type: "manual"

@@ -63,7 +63,7 @@ data:
       }                        
     }
 
-  80-replication.conf:|
+  80-replication.conf: |
     mail_plugins = $mail_plugins notify replication
 
     service replicator {
@@ -82,7 +82,7 @@ data:
         user = docker
       }
     }
-
+    
     doveadm_port = 4117
     doveadm_password = secret
 
