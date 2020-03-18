@@ -107,6 +107,10 @@ spec:
               subPath: 80-replication.conf
               mountPath: /etc/dovecot/conf.d/80-replication.conf
               readOnly: true   
+            - name: configmap
+              subPath: 91-override-sieve.conf
+              mountPath: /etc/dovecot/conf.d/91-override-sieve.conf
+              readOnly: true                 
             {{ end }}                  
               {{- if .Values.demoMode.enabled }} 
             - name: opendkim-keys

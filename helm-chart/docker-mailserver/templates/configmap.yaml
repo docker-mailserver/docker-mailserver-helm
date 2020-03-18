@@ -98,6 +98,12 @@ data:
       #mail_replica = tcp:anotherhost.example.com:12345 # use port 12345 explicitly
     }
 
+  91-override-sieve.conf: |
+    plugin {
+      sieve = /var/mail/sieve/%d/%n/.dovecot.sieve
+      sieve_dir = /var/mail/sieve/%d/%n/sieve
+    }
+
   {{ end -}}
   am-i-healthy.sh: |
     #!/bin/bash
