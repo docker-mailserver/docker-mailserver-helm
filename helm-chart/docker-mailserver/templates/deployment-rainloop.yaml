@@ -19,8 +19,8 @@ spec:
   strategy:
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 1
-    type: "RollingUpdate"
+      maxUnavailable: 0
+    type: "Recreate"
   template:
     metadata:
       labels:
