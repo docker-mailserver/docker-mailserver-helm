@@ -59,7 +59,8 @@ spec:
               readOnly: true         
             - name: config
               mountPath: /tmp/docker-mailserver/                   
-        
+          resources:
+{{ toYaml .Values.initContainer.resources | indent 12 }}        
       containers: 
         - name: dockermailserver
           env:
