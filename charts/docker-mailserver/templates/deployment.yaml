@@ -52,7 +52,7 @@ spec:
       initContainers:
         - name: prep-config
           image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
-          ImagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
           command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]
           volumeMounts:
             - name: configmap
@@ -67,7 +67,7 @@ spec:
           env:
           {{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
-          ImagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
           securityContext:
@@ -139,5 +139,12 @@ spec:
             initialDelaySeconds: 600
             timeoutSeconds: 60
             failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 25
+            initialDelaySeconds: 600
+            periodSeconds: 20              
+            timeoutSeconds: 1
+            failureThreshold: 3            
       restartPolicy: "Always"
 
