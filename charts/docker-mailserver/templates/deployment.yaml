@@ -54,6 +54,8 @@ spec:
           image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
           imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
           command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]
+          securityContext:
+{{ toYaml .Values.pod.dockermailserver.securityContext | indent 12 }}          
           volumeMounts:
             - name: configmap
               mountPath: /tmp/configmaps
