@@ -14,11 +14,7 @@ spec:
     matchLabels:
       app: {{ template "dockermailserver.fullname" . }}
       release: "{{ .Release.Name }}"
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: "RollingUpdate"
+  strategy: {{- toYaml .Values.pod.dockermailserver.strategy | nindent 4 }}      
   template:
     metadata:
       labels:

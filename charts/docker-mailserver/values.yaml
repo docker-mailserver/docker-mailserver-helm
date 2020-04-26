@@ -115,6 +115,16 @@ pod:
     # pod.dockermailserver.hostPID defines whether the pod should use the host's PID namespace (default false)
     hostPID: false
 
+    ## Update strategy - only really applicable for deployments with RWO PVs attached
+    ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the 
+    ## PV, and the "incoming" pod can never start. Changing the strategy to "Recreate" will 
+    ## terminate the single previous pod, so that the new, incoming pod can attach to the PV    
+    strategy: {}
+      # rollingUpdate:
+      #   maxSurge: 1
+      #   maxUnavailable: 1
+      # type: "RollingUpdate"
+
     ## The following variables affect the behaviour of docker-mailserver
     ## See https://github.com/tomav/docker-mailserver#environment-variables for details
     ## Note that docker-mailserver expects most true/false values to present as 0 or 1, so that's how you should adjust the values below
@@ -324,6 +334,17 @@ rainloop:
     # rainloop.image.tag is the tag of the docker container to use for the rainloop pod
     tag: "latest"
     pullPolicy: "Always"
+
+    ## Update strategy - only really applicable for deployments with RWO PVs attached
+    ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the 
+    ## PV, and the "incoming" pod can never start. Changing the strategy to "Recreate" will 
+    ## terminate the single previous pod, so that the new, incoming pod can attach to the PV    
+    strategy: {}
+      # rollingUpdate:
+      #   maxSurge: 1
+      #   maxUnavailable: 1
+      # type: "RollingUpdate"
+          
   persistence:
     size: "1Gi"
     # Uncomment the backup.kubernetes.io/deltas annotation below if you use https://github.com/miracle2k/k8s-snapshots
