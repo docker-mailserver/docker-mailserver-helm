@@ -1,0 +1,7 @@
+# This file defines the config for "ct" (chart tester) used by the helm linting GitHub workflow
+
+# Here we define every possible upstream repo our charts use in `requirements.yaml`
+chart-repos:
+  - haproxy=https://haproxytech.github.io/helm-charts
+
+lint-conf: .ci/lint-config.yaml

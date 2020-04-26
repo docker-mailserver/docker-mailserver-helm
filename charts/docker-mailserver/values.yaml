@@ -31,8 +31,6 @@ initContainer:
       ## it may terminated.
       memory: "64Mi"
 
-
-
 serviceAccount:
   create: "true"
 
@@ -318,8 +316,6 @@ monitoring:
     path: "/metrics"
     ## Port on which HTTP server is served
     port: "9102"
-    
-
 
 # Values imported from https://github.com/t13a/helm-chart-rainloop/blob/master/values.yaml
 rainloop:
