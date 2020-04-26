@@ -53,9 +53,7 @@ spec:
         - name: prep-config
           image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
           imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
-          command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]
-          securityContext:
-{{ toYaml .Values.pod.dockermailserver.securityContext | indent 12 }}          
+          command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]        
           volumeMounts:
             - name: configmap
               mountPath: /tmp/configmaps
@@ -72,8 +70,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-          securityContext:
-{{ toYaml .Values.pod.dockermailserver.securityContext | indent 12 }}
             {{- if eq .Values.pod.dockermailserver.enable_fail2ban 1.0 }}
             capabilities:
               add:

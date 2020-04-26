@@ -114,13 +114,6 @@ pod:
     ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
     # pod.dockermailserver.hostPID defines whether the pod should use the host's PID namespace (default false)
     hostPID: false
-    securityContext:
-      ## pod.dockermailserver.securityContext defines whether the container should be run in "privileged" mode (essentially, root on the host)
-      ## Ref: http://kubernetes.io/docs/api-reference/v1/definitions/#_v1_securitycontext
-      ## Default: false
-      privileged: false
-      runAsUser: 10001
-      runAsGroup: 10001
 
     ## The following variables affect the behaviour of docker-mailserver
     ## See https://github.com/tomav/docker-mailserver#environment-variables for details
