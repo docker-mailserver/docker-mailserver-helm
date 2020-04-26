@@ -3,6 +3,33 @@ entries:
   docker-mailserver:
   - apiVersion: v1
     appVersion: 6.3.0
+    created: "2020-04-26T21:55:19.742795758Z"
+    dependencies:
+    - alias: haproxy
+      condition: haproxy.enabled
+      name: kubernetes-ingress
+      repository: https://haproxytech.github.io/helm-charts
+      version: 0.7.0
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
+    digest: 93daadb566c909debfd6a2a8821835d54394427bbaba1c3a9ae7b8785931fe5c
+    keywords:
+    - mailserver
+    - postfix
+    - dovecot
+    - amavis
+    - imap
+    maintainers:
+    - email: davidy@funkypenguin.co.nz
+      name: funkypenguin
+    name: docker-mailserver
+    sources:
+    - https://github.com/funkypenguin/docker-mailserver
+    urls:
+    - https://github.com/funkypenguin/helm-docker-mailserver/releases/download/docker-mailserver-0.2.3/docker-mailserver-0.2.3.tgz
+    version: 0.2.3
+  - apiVersion: v1
+    appVersion: 6.3.0
     created: "2020-04-20T02:13:48.250642829Z"
     dependencies:
     - alias: haproxy
