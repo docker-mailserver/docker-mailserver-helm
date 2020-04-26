@@ -148,7 +148,10 @@ pod:
     enable_dovecot_replication: true
 
     smtp_only: 0
-    # ssl_type: "manual"
+
+    # Set this to "manual" or "letsencrypt". Leaving it set empty will disable SSL support
+    ssl_type:
+    
     # ssl_cert_path: "/tmp/ssl/tls.crt"
     # ssl_key_path: "/tmp/ssl/tls.key"
     tls_level:
