@@ -151,7 +151,7 @@ pod:
 
     # Set this to "manual" or "letsencrypt". Leaving it set empty will disable SSL support
     ssl_type:
-    
+
     # ssl_cert_path: "/tmp/ssl/tls.crt"
     # ssl_key_path: "/tmp/ssl/tls.key"
     tls_level:
@@ -326,7 +326,7 @@ monitoring:
 # Values imported from https://github.com/t13a/helm-chart-rainloop/blob/master/values.yaml
 rainloop:
   # rainloop.enabled will include a rainloop (webmail) pod in the release
-  enabled: true
+  enabled: false
   serviceAccount:
     create: true
     name: "rainloop"
