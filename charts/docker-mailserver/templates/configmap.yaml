@@ -38,17 +38,17 @@ data:
     smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination, reject_unauth_pipelining, reject_invalid_helo_hostname, reject_non_fqdn_helo_hostname, reject_unknown_recipient_domain, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net
   {{ end -}}
   dovecot.cf: |
-  {{ if .Values.haproxy.enabled -}}
+  {{- if .Values.haproxy.enabled }}
     haproxy_trusted_networks = {{ .Values.haproxy.trustedNetworks }}
   {{ end }}
-  service imap-login {
+    service imap-login {
       inet_listener imap {
         {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
       }  
       inet_listener imaps {
         {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
       }
-    {{ if .Values.rainloop.enabled -}}  
+    {{- if .Values.rainloop.enabled }}
       inet_listener imaps-rainloop {
         port = 10993
         ssl = yes
@@ -63,7 +63,6 @@ data:
         {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
       }                        
     }
-  {{ end -}}
 
 
   80-replication.conf: |
@@ -97,7 +96,7 @@ data:
     }
 
     plugin {
-      mail_replica = tcp:anotherhost.example.com # use doveadm_port
+      #mail_replica = tcp:anotherhost.example.com       # use doveadm_port
       #mail_replica = tcp:anotherhost.example.com:12345 # use port 12345 explicitly
     }
 
