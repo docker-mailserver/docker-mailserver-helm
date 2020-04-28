@@ -94,7 +94,7 @@ data:
     }
 
     plugin {
-      mail_replica = tcp:anotherhost.example.com # use doveadm_port
+      #mail_replica = tcp:anotherhost.example.com       # use doveadm_port
       #mail_replica = tcp:anotherhost.example.com:12345 # use port 12345 explicitly
     }
 
