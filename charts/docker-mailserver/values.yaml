@@ -31,8 +31,6 @@ initContainer:
       ## it may terminated.
       memory: "64Mi"
 
-
-
 serviceAccount:
   create: "true"
 
@@ -55,7 +53,10 @@ ssl:
     kind: ClusterIssuer
   dnsname: example.com
   dns01provider: cloudflare
-  useExisting: false
+
+  # Set this to false to let the chart try to assemble a CR for you. This feature will be deprecated soon, and users will 
+  # need to manage cert-manager outside of this chart (the dependencies involved make it fragile)
+  useExisting: true 
   existingName: name-of-existing-secret
 
 ## Create the necessary PodSecurityPolicies (PSPs) for docker-mailserver, haproxy, and rainloop to work
@@ -115,6 +116,16 @@ pod:
     # pod.dockermailserver.hostPID defines whether the pod should use the host's PID namespace (default false)
     hostPID: false
 
+    ## Update strategy - only really applicable for deployments with RWO PVs attached
+    ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the 
+    ## PV, and the "incoming" pod can never start. Changing the strategy to "Recreate" will 
+    ## terminate the single previous pod, so that the new, incoming pod can attach to the PV    
+    strategy: {}
+      # rollingUpdate:
+      #   maxSurge: 1
+      #   maxUnavailable: 1
+      # type: "RollingUpdate"
+
     ## The following variables affect the behaviour of docker-mailserver
     ## See https://github.com/tomav/docker-mailserver#environment-variables for details
     ## Note that docker-mailserver expects most true/false values to present as 0 or 1, so that's how you should adjust the values below
@@ -137,7 +148,10 @@ pod:
     enable_dovecot_replication: true
 
     smtp_only: 0
-    # ssl_type: "manual"
+
+    # Set this to "manual" or "letsencrypt". Leaving it set empty will disable SSL support
+    ssl_type:
+
     # ssl_cert_path: "/tmp/ssl/tls.crt"
     # ssl_key_path: "/tmp/ssl/tls.key"
     tls_level:
@@ -308,13 +322,11 @@ monitoring:
     path: "/metrics"
     ## Port on which HTTP server is served
     port: "9102"
-    
-
 
 # Values imported from https://github.com/t13a/helm-chart-rainloop/blob/master/values.yaml
 rainloop:
   # rainloop.enabled will include a rainloop (webmail) pod in the release
-  enabled: true
+  enabled: false
   serviceAccount:
     create: true
     name: "rainloop"
@@ -324,6 +336,17 @@ rainloop:
     # rainloop.image.tag is the tag of the docker container to use for the rainloop pod
     tag: "latest"
     pullPolicy: "Always"
+
+    ## Update strategy - only really applicable for deployments with RWO PVs attached
+    ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the 
+    ## PV, and the "incoming" pod can never start. Changing the strategy to "Recreate" will 
+    ## terminate the single previous pod, so that the new, incoming pod can attach to the PV    
+    strategy: {}
+      # rollingUpdate:
+      #   maxSurge: 1
+      #   maxUnavailable: 1
+      # type: "RollingUpdate"
+          
   persistence:
     size: "1Gi"
     # Uncomment the backup.kubernetes.io/deltas annotation below if you use https://github.com/miracle2k/k8s-snapshots

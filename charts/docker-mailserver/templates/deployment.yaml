@@ -14,11 +14,7 @@ spec:
     matchLabels:
       app: {{ template "dockermailserver.fullname" . }}
       release: "{{ .Release.Name }}"
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: "RollingUpdate"
+  strategy: {{- toYaml .Values.pod.dockermailserver.strategy | nindent 4 }}      
   template:
     metadata:
       labels:
@@ -42,12 +38,14 @@ spec:
          - name: "opendkim-keys"
            secret:
              secretName: {{ template "dockermailserver.fullname" . }}-secrets
+{{ if .Values.pod.dockermailserver.ssl_type }}             
          - name: "ssl-cert"
            secret:
 {{ if .Values.ssl.useExisting }}
              secretName: {{ .Values.ssl.existingName }}
 {{- else }}
              secretName: {{ template "dockermailserver.fullname" . }}-tls
+{{- end }}
 {{- end }}
       initContainers:
         - name: prep-config
@@ -78,9 +76,11 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /tmp/docker-mailserver
+{{ if .Values.pod.dockermailserver.ssl_type }}              
             - name: ssl-cert
               mountPath: /tmp/ssl
               readOnly: true              
+{{- end }}              
             - name: data
               mountPath: /var/mail
               subPath: mail
