@@ -118,13 +118,13 @@ pod:
 
     ## Update strategy - only really applicable for deployments with RWO PVs attached
     ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the 
-    ## PV, and the "incoming" pod can never start. Changing the strategy to "Recreate" will 
+    ## PV, and the "incoming" pod can never start. Setting the strategy to "Recreate" (our default) will 
     ## terminate the single previous pod, so that the new, incoming pod can attach to the PV    
-    strategy: {}
+    strategy:
       # rollingUpdate:
       #   maxSurge: 1
       #   maxUnavailable: 1
-      # type: "RollingUpdate"
+      type: "Recreate"
 
     ## The following variables affect the behaviour of docker-mailserver
     ## See https://github.com/tomav/docker-mailserver#environment-variables for details
@@ -339,13 +339,13 @@ rainloop:
 
     ## Update strategy - only really applicable for deployments with RWO PVs attached
     ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the 
-    ## PV, and the "incoming" pod can never start. Changing the strategy to "Recreate" will 
-    ## terminate the single previous pod, so that the new, incoming pod can attach to the PV    
-    strategy: {}
+    ## PV, and the "incoming" pod can never start. Setting the strategy to "Recreate" (our default) will 
+    ## terminate the single previous pod, so that the new, incoming pod can attach to the PV.    
+    strategy:
       # rollingUpdate:
       #   maxSurge: 1
       #   maxUnavailable: 1
-      # type: "RollingUpdate"
+      type: "Recreate"
           
   persistence:
     size: "1Gi"
