@@ -168,7 +168,7 @@ pod:
     enable_fetchmail: 0
     fetchmail_poll: 300
     enable_ldap: 
-    ldap_start_tls:
+    ldap_start_tls: # MUST BE "yes" or "no" - quoted strings
     ldap_server_host: 
     ldap_search_base:
     ldap_bind_dn:
