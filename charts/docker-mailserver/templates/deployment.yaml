@@ -88,6 +88,10 @@ spec:
               mountPath: /var/mail-state
               subPath: mail-state
             - name: configmap
+              subPath: dovecot-services.cf
+              mountPath: /etc/dovecot/conf.d/services.cf
+              readOnly: true  
+            - name: configmap
               subPath: dovecot.cf
               mountPath: /etc/dovecot/conf.d/zz-custom.cf
               readOnly: true  

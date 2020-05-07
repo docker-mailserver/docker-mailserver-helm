@@ -37,7 +37,7 @@ data:
   {{ if .Values.spfTestsDisabled }}
     smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination, reject_unauth_pipelining, reject_invalid_helo_hostname, reject_non_fqdn_helo_hostname, reject_unknown_recipient_domain, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net
   {{ end -}}
-  dovecot.cf: |
+  dovecot-services.cf: |
   {{- if .Values.haproxy.enabled }}
     haproxy_trusted_networks = {{ .Values.haproxy.trustedNetworks }}
   {{ end }}
