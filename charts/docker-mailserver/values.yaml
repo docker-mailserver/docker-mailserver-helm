@@ -96,6 +96,12 @@ livenessTests:
   commands:
     - "clamscan /tmp/docker-mailserver/TrustedHosts"
 
+deployment:
+
+  ## Add annotations to the deployment
+  ## Useful for using something like stash to backup data (https://stash.run/docs/v0.9.0-rc.0/guides/latest/auto-backup/workload/)
+  annotations: {}
+
 pod:
   # pod.dockermailserver section refers to the configuration of the docker-mailserver pod itself. Note that teh many environment variables which define the behaviour of docker-mailserver are configured here
   dockermailserver:
