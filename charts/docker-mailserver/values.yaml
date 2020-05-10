@@ -67,6 +67,9 @@ demoMode:
 # spfTestsDisabled will ignore all SPF-based spam tests, in the event that you cannot obtain valid source IP details on ingress emails
 spfTestsDisabled: false
 
+# List extra RBL domains to use for hard reject filtering
+rblRejectDomains: []
+
 # If you're using David's hacked-up automatic external haproxy design, then enable
 # the following to launch the appropriate containers to call back to the haproxy webhook
 # Details at https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/ 
