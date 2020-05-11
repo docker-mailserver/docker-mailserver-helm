@@ -15,7 +15,7 @@ jobs:
           
       - name: Run chart-testing (lint)
         id: lint
-        uses: helm/chart-testing-action@v3
+        uses: helm/chart-testing-action@v1.0.0-rc.2
         with:
           config: .ci/ct-config.yaml
           command: lint
@@ -28,7 +28,7 @@ jobs:
         if: steps.lint.outputs.changed == 'true'
 
       - name: Run chart-testing (install)
-        uses: helm/chart-testing-action@v3
+        uses: helm/chart-testing-action@v1.0.0-rc.2
         with:
           command: install
           config: .ci/ct-config.yaml
