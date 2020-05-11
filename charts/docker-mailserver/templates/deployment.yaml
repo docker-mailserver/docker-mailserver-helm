@@ -8,7 +8,7 @@ metadata:
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
   name: {{ template "dockermailserver.fullname" . }}
-{{- if .Values.pod.dockermailserver.annotations }}
+{{- if .Values.deployment.annotations }}
   annotations:
 {{ toYaml .Values.deployment.annotations | indent 4 }}  
 {{ end }}        
