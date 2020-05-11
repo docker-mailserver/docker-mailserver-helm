@@ -15,19 +15,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    # - uses: azure/setup-helm@v1
-    #   id: installhelm3
-    #   with:
-    #     version: 'v3.0.3'
-    # - name: Publish helm charts
-    #   uses: funkypenguin/helm-gh-pages-action@v1.1.1
-    #   with:
-    #     # A personal access token needed to push your site after it has been built.
-    #     access-token: ${{ secrets.CR_TOKEN }}
-    #     # The branch expected by GitHub to have the static files needed for your site.
-    #     deploy-branch: chart
-    #     # The folder in which the helm charts are located
-    #     charts-folder: charts
 
     - name: Fetch history
       run: git fetch --prune --unshallow

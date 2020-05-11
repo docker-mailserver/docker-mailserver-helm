@@ -1,7 +1,7 @@
-name: Lint and Test Charts
+name: Testing
 
 on: 
-  push:
+  pull_request:
     paths:
       - 'charts/**'   
       - '.github/**'            

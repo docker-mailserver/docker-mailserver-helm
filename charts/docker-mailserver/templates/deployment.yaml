@@ -142,13 +142,13 @@ spec:
                command:
                  - /bin/bash
                  - /tmp/docker-mailserver/am-i-healthy.sh
-            initialDelaySeconds: 600
-            timeoutSeconds: 60
-            failureThreshold: 3
+            initialDelaySeconds: 60
+            timeoutSeconds: 10
+            failureThreshold: 2
           readinessProbe:
             tcpSocket:
               port: 25
-            initialDelaySeconds: 600
+            initialDelaySeconds: 60
             periodSeconds: 20              
             timeoutSeconds: 1
             failureThreshold: 3            
