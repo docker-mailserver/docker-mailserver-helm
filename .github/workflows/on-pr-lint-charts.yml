@@ -1,0 +1,21 @@
+name: Linting
+
+on: 
+  pull_request:
+    paths:
+      - 'charts/**'   
+      - '.github/**'            
+
+jobs:
+  ct-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+          
+      - name: Run chart-testing (lint)
+        id: lint
+        uses: helm/chart-testing-action@v1.0.0-rc.2
+        with:
+          config: .ci/ct-config.yaml
+          command: lint

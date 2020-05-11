@@ -18,7 +18,7 @@ We list them here (and include this template in deployment.yaml) to keep deploym
 - name: SMTP_ONLY
   value: {{ .Values.pod.dockermailserver.smtp_only | quote }}
 - name: SSL_TYPE
-  value: {{ default "manual" .Values.pod.dockermailserver.ssl_type | quote }}
+  value: {{ .Values.pod.dockermailserver.ssl_type | quote }}
 - name: SSL_CERT_PATH
   value: {{ default "/tmp/ssl/tls.crt" .Values.pod.dockermailserver.ssl_cert_path | quote }}   
 - name: SSL_KEY_PATH

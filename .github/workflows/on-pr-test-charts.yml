@@ -1,13 +1,13 @@
-name: Lint and Test Charts
+name: Testing
 
 on: 
-  push:
+  pull_request:
     paths:
       - 'charts/**'   
       - '.github/**'            
 
 jobs:
-  lint-test:
+  ct-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,20 +15,20 @@ jobs:
           
       - name: Run chart-testing (lint)
         id: lint
-        uses: helm/chart-testing-action@v1.0.0-rc.1
+        uses: helm/chart-testing-action@v1.0.0-rc.2
         with:
           config: .ci/ct-config.yaml
           command: lint
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.0.0-alpha.3
+        uses: helm/kind-action@v1.0.0-rc.1
         with:
           install_local_path_provisioner: true
         # Only build a kind cluster if there are chart changes to test.
         if: steps.lint.outputs.changed == 'true'
 
       - name: Run chart-testing (install)
-        uses: helm/chart-testing-action@v1.0.0-rc.1
+        uses: helm/chart-testing-action@v1.0.0-rc.2
         with:
           command: install
           config: .ci/ct-config.yaml
