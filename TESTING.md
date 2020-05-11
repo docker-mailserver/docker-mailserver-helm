@@ -7,6 +7,11 @@ Every pull request to the master branch trigger the following tests:
 * ct lint
 * ct install
 
+
+[![Linting](https://github.com/funkypenguin/helm-docker-mailserver/workflows/Linting/badge.svg)](.github/workflows/on-pr-lint-charts.yml)
+[![Testing](https://github.com/funkypenguin/helm-docker-mailserver/workflows/Testing/badge.svg)](.github/workflows/on-pr-test-charts.yml)
+
+
 # Local testing
 
 If you're submitting a PR, and you want to ensure your changes will pass automated testing (above), here are your options:
