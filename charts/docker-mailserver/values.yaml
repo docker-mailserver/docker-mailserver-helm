@@ -247,7 +247,6 @@ service:
 
   annotations: {}
 
-
 deployment:
 
   ## How many versions of the deployment to run on kubernetes
