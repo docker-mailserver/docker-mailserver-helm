@@ -96,12 +96,6 @@ livenessTests:
   commands:
     - "clamscan /tmp/docker-mailserver/TrustedHosts"
 
-deployment:
-
-  ## Add annotations to the deployment
-  ## Useful for using something like stash to backup data (https://stash.run/docs/v0.9.0-rc.0/guides/latest/auto-backup/workload/)
-  annotations: {}
-
 pod:
   # pod.dockermailserver section refers to the configuration of the docker-mailserver pod itself. Note that teh many environment variables which define the behaviour of docker-mailserver are configured here
   dockermailserver:
@@ -253,10 +247,16 @@ service:
 
   annotations: {}
 
-## How many versions of the deployment to run on kubernetes
-## Default: 2
+
 deployment:
+
+  ## How many versions of the deployment to run on kubernetes
+  ## Default: 2
   replicas: 1
+
+  ## Add annotations to the deployment
+  ## Useful for using something like stash to backup data (https://stash.run/docs/v0.9.0-rc.0/guides/latest/auto-backup/workload/)
+  annotations: {}  
 
 ## More generally, a "request" can be thought of as "how much is this container expected to need usually". it should be
 ## possible to burst outside these constraints (during a high load operation). However, Kubernetes may kill the pod
