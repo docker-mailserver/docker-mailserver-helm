@@ -7,7 +7,7 @@ on:
       - '.github/**'            
 
 jobs:
-  lint-test:
+  ct-lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,7 +15,7 @@ jobs:
           
       - name: Run chart-testing (lint)
         id: lint
-        uses: helm/chart-testing-action@v1.0.0-rc.1
+        uses: helm/chart-testing-action@v3
         with:
           config: .ci/ct-config.yaml
           command: lint
