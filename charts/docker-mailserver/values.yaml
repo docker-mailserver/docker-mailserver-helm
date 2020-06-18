@@ -3,7 +3,7 @@ image:
   # image.name is the name of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
   name: "tvial/docker-mailserver"
   # image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
-  tag: "release-v6.1.0"
+  tag: "release-v7.0.0"
   pullPolicy: "IfNotPresent"
 
 initContainer:
