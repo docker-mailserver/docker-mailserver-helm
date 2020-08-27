@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'charts/**'
+      - 'deploy/helm/charts/**'
       - '.github/**'         
 
 jobs:
@@ -16,30 +16,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Fetch history
-      run: git fetch --prune --unshallow
-
     - name: Configure Git
       run: |
         git config user.name "$GITHUB_ACTOR"
         git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-    # See https://github.com/helm/chart-releaser-action/issues/6
-    - name: Install Helm
-      run: |
-        curl -fsSLo get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-        chmod 700 get_helm.sh
-        ./get_helm.sh
-
     - name: Run chart-releaser
-      uses: helm/chart-releaser-action@v1.0.0-rc.2
+      uses: helm/chart-releaser-action@v1.0.0
+      with:
+        charts_dir: deploy/helm/charts/
       env:
         CR_TOKEN: "${{ secrets.CR_TOKEN }}"
-
-    - name: Emit repository_dispatch
-      uses: mvasigh/dispatch-action@master
-      with:
-        token: ${{ secrets.CR_TOKEN }}
-        repo: charts
-        owner: geek-cookbook
-        event_type: chart_update
