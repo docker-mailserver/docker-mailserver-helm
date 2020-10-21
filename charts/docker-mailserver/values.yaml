@@ -182,9 +182,9 @@ pod:
     ldap_query_filter_domain:
     dovecot_tls:
     dovecot_user_filter:
-    dovecot_user_attr:
+    dovecot_user_attrs:
     dovecot_pass_filter:
-    dovecot_pass_attr:
+    dovecot_pass_attrs:
     enable_postgrey: 0
     postgrey_delay: 300
     postgrey_max_age: 35

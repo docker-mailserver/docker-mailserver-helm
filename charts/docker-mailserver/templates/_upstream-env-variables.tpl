@@ -91,12 +91,12 @@ We list them here (and include this template in deployment.yaml) to keep deploym
   value: {{ .Values.pod.dockermailserver.dovecot_tls | quote }}
 - name: DOVECOT_USER_FILTER
   value: {{ .Values.pod.dockermailserver.dovecot_user_filter | quote }}
-- name: DOVECOT_USER_ATTR
-  value: {{ .Values.pod.dockermailserver.dovecot_user_attr | quote }}
+- name: DOVECOT_USER_ATTRS
+  value: {{ .Values.pod.dockermailserver.dovecot_user_attrs | quote }}
 - name: DOVECOT_PASS_FILTER
   value: {{ .Values.pod.dockermailserver.dovecot_pass_filter | quote }}
-- name: DOVECOT_PASS_ATTR
-  value: {{ .Values.pod.dockermailserver.dovecot_pass_attr | quote }}
+- name: DOVECOT_PASS_ATTRS
+  value: {{ .Values.pod.dockermailserver.dovecot_pass_attrs | quote }}
 - name: ENABLE_POSTGREY
   value: {{ .Values.pod.dockermailserver.enable_postgrey | quote }}
 - name: POSTGREY_DELAY
