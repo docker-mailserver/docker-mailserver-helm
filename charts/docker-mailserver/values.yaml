@@ -181,7 +181,7 @@ pod:
     ldap_query_filter_alias:
     ldap_query_filter_domain:
     dovecot_tls:
-    dovecot_ldap_version:
+    dovecot_ldap_version: 3
     dovecot_default_pass_scheme:
     dovecot_auth_bind:
     dovecot_user_filter:
