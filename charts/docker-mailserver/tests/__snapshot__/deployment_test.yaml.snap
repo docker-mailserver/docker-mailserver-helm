@@ -120,7 +120,7 @@ manifest should match snapshot:
               value: null
             - name: DOVECOT_PASS_FILTER
               value: null
-            - name: DOVECOT_PASS_ATTR
+            - name: DOVECOT_PASS_ATTRS
               value: null
             - name: ENABLE_POSTGREY
               value: "0"
