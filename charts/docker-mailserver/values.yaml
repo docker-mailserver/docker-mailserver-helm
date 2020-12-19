@@ -97,6 +97,9 @@ livenessTests:
     - "clamscan /tmp/docker-mailserver/TrustedHosts"
 
 pod:
+  # pass custom envs into the dockermailserver pod
+  env: []
+  
   # pod.dockermailserver section refers to the configuration of the docker-mailserver pod itself. Note that teh many environment variables which define the behaviour of docker-mailserver are configured here
   dockermailserver:
 
