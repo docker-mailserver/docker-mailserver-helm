@@ -68,6 +68,7 @@ spec:
         - name: dockermailserver
           env:
           {{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
+          {{ toYaml .Values.pod.env | indent 10 }}
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
