@@ -63,7 +63,9 @@ spec:
             - name: config
               mountPath: /tmp/docker-mailserver/                   
           resources:
-{{ toYaml .Values.initContainer.resources | indent 12 }}        
+{{ toYaml .Values.initContainer.resources | indent 12 }}  
+          securityContext:
+{{ toYaml .Values.initContainer.containerSecurityContext | indent 12 }}
       containers: 
         - name: dockermailserver
           env:
@@ -77,6 +79,8 @@ spec:
               add:
                 - "NET_ADMIN"
             {{ end }}
+          securityContext:
+{{ toYaml .Values.initContainer.containerSecurityContext | indent 12 }}            
           volumeMounts:
             - name: config
               mountPath: /tmp/docker-mailserver

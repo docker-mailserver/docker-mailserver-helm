@@ -1,13 +1,14 @@
-name: Publish helm chart
+name: Lint and Test Charts
 
 on:
-  push:
-    branches:
-      - master
-      - main # assume that the branch name may change in future
+  # push:
+  #   paths:
+  #     - 'charts/**'
+  #     - '.github/**'
+  pull_request:
     paths:
-      - 'charts/**'
-      - '.github/**'
+      - 'charts/**'   
+      - '.github/**'        
   workflow_dispatch:
 
 env:
@@ -15,7 +16,7 @@ env:
   HELM_VERSION: v3.4.1
 
 jobs:
-  lint-chart:
+  lint-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,7 +35,7 @@ jobs:
           chmod 755 kube-score
 
       - name: Kube-score generated manifests
-        run: helm template  --values charts/.ci/values-kube-score.yaml charts/* | ./kube-score score -
+        run: helm template  --values .ci/values-kube-score.yaml charts/* | ./kube-score score -
               --ignore-test pod-networkpolicy
               --ignore-test deployment-has-poddisruptionbudget
               --ignore-test deployment-has-host-podantiaffinity
@@ -55,47 +56,17 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed --config .ci/ct-config.yaml)
+          changed=$(ct list-changed --config charts/.ci/ct-config.yaml)
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
           fi
 
       - name: Run chart-testing (lint)
-        run: ct lint --config .ci/ct-config.yaml
+        run: ct lint --config charts/.ci/ct-config.yaml
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.0.0
         if: steps.list-changed.outputs.changed == 'true'
 
-      # We need cert-manager already installed in the cluster because we assume the CRDs exist
-      - name: Install cert-manager
-        run: |
-          helm repo add jetstack https://charts.jetstack.io --force-update
-          helm install cert-manager jetstack/cert-manager --set installCRDs=true --wait
-        if: steps.list-changed.outputs.changed == 'true'
-
       - name: Run chart-testing (install)
-        run: ct install --config .ci/ct-config.yaml
-        if: steps.list-changed.outputs.changed == 'true'
-
-  publish-chart:
-
-    runs-on: ubuntu-latest
-    needs: lint-chart
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.1.0
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
+        run: ct install --config charts/.ci/ct-config.yaml
