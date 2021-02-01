@@ -202,8 +202,12 @@ pod:
     relay_user:
     relay_password:
 
+    securityContext:
+      runAsUser: 10001
+      runAsGroup: 10001
+
     containerSecurityContext:
-      readOnlyRootFilesystem: true
+      readOnlyRootFilesystem: false # incompatible with the way docker-mailserver works
       privileged: false
 
 service:

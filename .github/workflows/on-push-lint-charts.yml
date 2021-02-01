@@ -43,7 +43,6 @@ jobs:
               --ignore-test pod-probes
               --ignore-test container-image-tag
               --enable-optional-test container-security-context-privileged
-              --enable-optional-test container-security-context-readonlyrootfilesystem
 
       # python is a requirement for the chart-testing action below (supports yamllint among other tests)
       - uses: actions/setup-python@v2

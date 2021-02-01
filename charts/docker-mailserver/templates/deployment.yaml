@@ -30,7 +30,9 @@ spec:
         {{ end }}             
     spec:
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
-      volumes:
+      securityContext:
+{{ toYaml .Values.securityContext | indent 8 }}      
+      volumes:         
          - name: "data"
            persistentVolumeClaim:
              claimName: {{ template "dockermailserver.pvcName" . }}
@@ -80,7 +82,7 @@ spec:
                 - "NET_ADMIN"
             {{ end }}
           securityContext:
-{{ toYaml .Values.initContainer.containerSecurityContext | indent 12 }}            
+{{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}            
           volumeMounts:
             - name: config
               mountPath: /tmp/docker-mailserver
