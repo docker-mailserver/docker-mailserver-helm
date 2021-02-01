@@ -206,7 +206,6 @@ pod:
       readOnlyRootFilesystem: true
       privileged: false
 
-
 service:
   ## What scope the service should be exposed in. One of:
   ## - LoadBalancer (to the world)
