@@ -384,7 +384,3 @@ haproxy:
   # of your HAProxy instance
   # haproxy.trustedNetworks is the list of sources (in CIDR format, space-separated) to permit haproxy PROXY protocol from
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
-
-  # 10 is the default, but explicitly setting this value avoids a CI error when running the generated manifest through kubeval
-  # Will be fixed with an upstream PR
-  revisionHistoryLimit: 10

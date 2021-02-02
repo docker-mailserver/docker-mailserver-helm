@@ -3,4 +3,4 @@ haproxy:
   enabled: true
 
 service:
-  type: ClusterIP  
+  type: ClusterIP
