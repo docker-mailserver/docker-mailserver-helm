@@ -88,7 +88,10 @@ livenessTests:
     - "clamscan /tmp/docker-mailserver/TrustedHosts"
 
 pod:
-  # pod.dockermailserver section refers to the configuration of the docker-mailserver pod itself. Note that teh many environment variables which define the behaviour of docker-mailserver are configured here
+  # pod.dockermailserver section refers to the configuration of the docker-mailserver pod itself. 
+
+  # Note that the many environment variables which define the behaviour of docker-mailserver are configured here
+  # See https://github.com/docker-mailserver/docker-mailserver/blob/master/ENVIRONMENT.md for details
   dockermailserver:
 
     ## Host networking requested for this pod. Use the host’s network namespace. If this option is set, the ports that

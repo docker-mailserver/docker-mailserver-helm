@@ -71,7 +71,7 @@ spec:
       containers:
         - name: dockermailserver
           env:
-          {{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
+{{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
