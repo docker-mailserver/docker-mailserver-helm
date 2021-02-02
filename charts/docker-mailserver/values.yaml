@@ -1,15 +1,15 @@
 ---
 image:
   # image.name is the name of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
-  name: "tvial/docker-mailserver"
+  name: "mailserver/docker-mailserver"
   # image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/tvial/docker-mailserver
-  tag: "release-v7.0.0"
+  tag: "8.0.1"
   pullPolicy: "IfNotPresent"
 
 initContainer:
   image:
     name: "busybox"
-    tag: "1.28"
+    tag: "stable"
     pullPolicy: "IfNotPresent"
 
   # These resources refer specifically to the _init container_, which needs only _puny_ resources,
@@ -21,6 +21,10 @@ initContainer:
     limits:
       cpu: "50m"
       memory: "64Mi"
+
+  containerSecurityContext:
+    readOnlyRootFilesystem: true
+    privileged: false
 
 serviceAccount:
   create: "true"
@@ -70,19 +74,6 @@ spfTestsDisabled: false
 # List extra RBL domains to use for hard reject filtering
 rblRejectDomains: []
 
-# If you're using David's hacked-up automatic external haproxy design, then enable
-# the following to launch the appropriate containers to call back to the haproxy webhook
-# Details at https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/ 
-poorMansK8sLb:
-  # poorMansK8sLb.enabled will include containers to call a webhook on an external HAProxy instance
-  enabled: false
-  # If haproxy is in external-auto mode, specify the webhook URL and secret used to update haproxy config
-  # Example implementation at https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/
-  # poorMansK8sLb.webhookUrl is the URL to call to update a webhook on a remote HAProxy instance
-  webhookUrl: 
-  # poorMansK8sLb.webhookSecret is the secret to be included in the webhook call (above)
-  webhookSecret:
-
 # List all the domains to be used below - this is necessary to correctly configure DKIM keys for email signing
 # domains is the list of domains to be served by your docker-mailserver instance
 domains: []
@@ -97,7 +88,10 @@ livenessTests:
     - "clamscan /tmp/docker-mailserver/TrustedHosts"
 
 pod:
-  # pod.dockermailserver section refers to the configuration of the docker-mailserver pod itself. Note that teh many environment variables which define the behaviour of docker-mailserver are configured here
+  # pod.dockermailserver section refers to the configuration of the docker-mailserver pod itself. 
+
+  # Note that the many environment variables which define the behaviour of docker-mailserver are configured here
+  # See https://github.com/docker-mailserver/docker-mailserver/blob/master/ENVIRONMENT.md for details
   dockermailserver:
 
     ## Host networking requested for this pod. Use the host’s network namespace. If this option is set, the ports that
@@ -214,12 +208,19 @@ pod:
     relay_user:
     relay_password:
 
+    securityContext:
+      runAsUser: 10001
+      runAsGroup: 10001
+
+    containerSecurityContext:
+      readOnlyRootFilesystem: false # incompatible with the way docker-mailserver works
+      privileged: false
+
 service:
   ## What scope the service should be exposed in. One of:
   ## - LoadBalancer (to the world)
   ## - ClusterIP (to the cluster)
-  ## - NodePort (to the world, in a custom way)
-  type: "NodePort"
+  type: "LoadBalancer"
   ## If there is a port associated with a given service, expose it here.
   # port:
   ## If there is a particular IP that should be used for the service, specify it here.
@@ -238,16 +239,6 @@ service:
       - "0.0.0.0/0"
     ## If there is a Hostname associated with this site, add it here and it will be rendered in the documentation.
     # hostName:
-  # service.nodePort is an array of ports exposed if we are using nodeport for our services (an an external, non-cluster LB)
-  nodePort:
-    smtp: 30025
-    pop3: 30110
-    imap: 30143
-    smtps: 30465
-    submission: 30587
-    imaps: 30993
-    pop3s: 30995
-
   annotations: {}
 
 deployment:
@@ -399,7 +390,3 @@ haproxy:
   # of your HAProxy instance
   # haproxy.trustedNetworks is the list of sources (in CIDR format, space-separated) to permit haproxy PROXY protocol from
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
-
-  # 10 is the default, but explicitly setting this value avoids a CI error when running the generated manifest through kubeval
-  # Will be fixed with an upstream PR
-  revisionHistoryLimit: 10

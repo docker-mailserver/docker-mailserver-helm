@@ -1,0 +1,10 @@
+image:
+  tag: "8.0.1"
+  pullPolicy: "Always"
+
+initContainer:
+  image:
+    pullPolicy: "Always"
+
+service:
+  type: ClusterIP

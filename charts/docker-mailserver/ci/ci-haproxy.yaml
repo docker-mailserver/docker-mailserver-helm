@@ -1,0 +1,6 @@
+# This file exists to facilitate testing various install scenarios using ct
+haproxy:
+  enabled: true
+
+service:
+  type: ClusterIP

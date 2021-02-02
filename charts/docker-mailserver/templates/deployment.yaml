@@ -10,15 +10,15 @@ metadata:
   name: {{ template "dockermailserver.fullname" . }}
 {{- if .Values.deployment.annotations }}
   annotations:
-{{ toYaml .Values.deployment.annotations | indent 4 }}  
-{{ end }}        
+{{ toYaml .Values.deployment.annotations | indent 4 }}
+{{ end }}
 spec:
   replicas: {{ default 2 .Values.deployment.replicas }}
   selector:
     matchLabels:
       app: {{ template "dockermailserver.fullname" . }}
       release: "{{ .Release.Name }}"
-  strategy: {{- toYaml .Values.pod.dockermailserver.strategy | nindent 4 }}      
+  strategy: {{- toYaml .Values.pod.dockermailserver.strategy | nindent 4 }}
   template:
     metadata:
       labels:
@@ -26,10 +26,12 @@ spec:
         release: "{{ .Release.Name }}"
         {{- if .Values.pod.dockermailserver.annotations }}
       annotations:
-{{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}  
-        {{ end }}             
+{{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}
+        {{ end }}
     spec:
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
+      securityContext:
+{{ toYaml .Values.securityContext | indent 8 }}
       volumes:
          - name: "data"
            persistentVolumeClaim:
@@ -42,7 +44,7 @@ spec:
          - name: "opendkim-keys"
            secret:
              secretName: {{ template "dockermailserver.fullname" . }}-secrets
-{{ if .Values.pod.dockermailserver.ssl_type }}             
+{{ if .Values.pod.dockermailserver.ssl_type }}
          - name: "ssl-cert"
            secret:
 {{ if .Values.ssl.useExisting }}
@@ -55,19 +57,21 @@ spec:
         - name: prep-config
           image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
           imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
-          command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]        
+          command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]
           volumeMounts:
             - name: configmap
               mountPath: /tmp/configmaps
-              readOnly: true         
+              readOnly: true
             - name: config
-              mountPath: /tmp/docker-mailserver/                   
+              mountPath: /tmp/docker-mailserver/
           resources:
-{{ toYaml .Values.initContainer.resources | indent 12 }}        
-      containers: 
+{{ toYaml .Values.initContainer.resources | indent 12 }}
+          securityContext:
+{{ toYaml .Values.initContainer.containerSecurityContext | indent 12 }}
+      containers:
         - name: dockermailserver
           env:
-          {{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
+{{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
@@ -77,14 +81,16 @@ spec:
               add:
                 - "NET_ADMIN"
             {{ end }}
+          securityContext:
+{{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
           volumeMounts:
             - name: config
               mountPath: /tmp/docker-mailserver
-{{ if .Values.pod.dockermailserver.ssl_type }}              
+{{ if .Values.pod.dockermailserver.ssl_type }}
             - name: ssl-cert
               mountPath: /tmp/ssl
-              readOnly: true              
-{{- end }}              
+              readOnly: true
+{{- end }}
             - name: data
               mountPath: /var/mail
               subPath: mail
@@ -94,63 +100,66 @@ spec:
             - name: configmap
               subPath: dovecot-services.cf
               mountPath: /etc/dovecot/conf.d/services.cf
-              readOnly: true  
+              readOnly: true
             - name: configmap
               subPath: dovecot.cf
               mountPath: /etc/dovecot/conf.d/zz-custom.cf
-              readOnly: true  
+              readOnly: true
             - name: configmap
               subPath: TrustedHosts
               mountPath: /tmp/docker-mailserver/opendkim/TrustedHosts
-              readOnly: true                        
+              readOnly: true
             - name: configmap
               subPath: SigningTable
               mountPath: /tmp/docker-mailserver/opendkim/SigningTable
-              readOnly: true    
+              readOnly: true
             - name: configmap
               subPath: KeyTable
               mountPath: /tmp/docker-mailserver/opendkim/KeyTable
-              readOnly: true   
+              readOnly: true
             {{- if .Values.pod.dockermailserver.enable_dovecot_replication }}
             - name: configmap
               subPath: 80-replication.conf
               mountPath: /etc/dovecot/conf.d/80-replication.conf
-              readOnly: true   
+              readOnly: true
             - name: configmap
               subPath: 91-override-sieve.conf
               mountPath: /etc/dovecot/conf.d/91-override-sieve.conf
-              readOnly: true                 
-            {{ end }}                  
-              {{- if .Values.demoMode.enabled }} 
+              readOnly: true
+            {{ end }}
+              {{- if .Values.demoMode.enabled }}
             - name: opendkim-keys
               mountPath: "/tmp/docker-mailserver/opendkim/keys/example.com/mail.private"
               subPath: "example.com-mail.private"
               readOnly: true
               {{- else -}}
-              {{/* Mount a dkim key for every domain configured */}}               
+              {{/* Mount a dkim key for every domain configured */}}
               {{- range .Values.domains }}
               {{- $path := printf "/tmp/docker-mailserver/opendkim/keys/%s/mail.private" . }}
-              {{- $name := printf "%s-mail.private" . }}              
+              {{- $name := printf "%s-mail.private" . }}
             - name: opendkim-keys
               mountPath: {{ $path }}
               subPath: {{ $name }}
-              readOnly: true              
-              {{- end }}     
-              {{- end }}                                   
+              readOnly: true
+              {{- end }}
+              {{- end }}
           livenessProbe:
             exec:
                command:
                  - /bin/bash
-                 - /tmp/docker-mailserver/am-i-healthy.sh
-            initialDelaySeconds: 60
-            timeoutSeconds: 10
-            failureThreshold: 2
-          readinessProbe:
-            tcpSocket:
-              port: 25
-            initialDelaySeconds: 60
-            periodSeconds: 20              
+                 - -c
+                 - supervisorctl status | grep -E "amavis|clamav|cron|dovecot|mailserver|opendkim|opendmarc|postfix|rsyslog" | grep RUNNING
+            initialDelaySeconds: 10
             timeoutSeconds: 1
-            failureThreshold: 3            
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+               command:
+                 - /bin/bash
+                 - -c
+                 - supervisorctl status | grep -E "mailserver|postfix" | grep RUNNING
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
       restartPolicy: "Always"
 

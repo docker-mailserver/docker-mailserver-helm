@@ -1,0 +1,6 @@
+# This file exists to facilitate testing various install scenarios using ct
+rainloop:
+  enabled: true
+
+service:
+  type: ClusterIP  

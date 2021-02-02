@@ -1,0 +1,95 @@
+name: Lint and Test Charts
+
+on:
+  # push:
+  #   paths:
+  #     - 'charts/**'
+  #     - '.github/**'
+  pull_request:
+    paths:
+      - 'charts/**'   
+      - '.github/**'        
+  workflow_dispatch:
+
+env:
+  KUBE_SCORE_VERSION: 1.10.0
+  HELM_VERSION: v3.4.1
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: Set up kube-score
+        run: |
+          wget https://github.com/zegl/kube-score/releases/download/v${{ env.KUBE_SCORE_VERSION }}/kube-score_${{ env.KUBE_SCORE_VERSION }}_linux_amd64 -O kube-score
+          chmod 755 kube-score
+
+      - name: Kube-score generated manifests
+        run: helm template  --values .ci/values-kube-score.yaml charts/* | ./kube-score score -
+              --ignore-test pod-networkpolicy
+              --ignore-test deployment-has-poddisruptionbudget
+              --ignore-test deployment-has-host-podantiaffinity
+              --ignore-test container-security-context
+              --ignore-test pod-probes
+              --ignore-test container-image-tag
+              --enable-optional-test container-security-context-privileged
+
+      # python is a requirement for the chart-testing action below (supports yamllint among other tests)
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.0.1
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config .ci/ct-config.yaml)
+          if [[ -n "$changed" ]]; then
+            echo "::set-output name=changed::true"
+          fi
+
+      - name: Run chart-testing (lint)
+        run: ct lint --config .ci/ct-config.yaml
+
+      # Refer to https://github.com/kubernetes-sigs/kind/releases when updating the node_images
+      - name: Create 1.20 kind cluster
+        uses: helm/kind-action@v1.1.0
+        with:
+          node_image: kindest/node:v1.20.2@sha256:8f7ea6e7642c0da54f04a7ee10431549c0257315b3a634f6ef2fecaaedb19bab
+          cluster_name: kubernetes-1.20
+        if: steps.list-changed.outputs.changed == 'true'
+
+      - name: Run chart-testing (install) against 1.20
+        run: ct install --config .ci/ct-config.yaml
+
+      - name: Create 1.19 kind cluster
+        uses: helm/kind-action@v1.1.0
+        with:
+          node_image: kindest/node:v1.19.7@sha256:a70639454e97a4b733f9d9b67e12c01f6b0297449d5b9cbbef87473458e26dca
+          cluster_name: kubernetes-1.19
+        if: steps.list-changed.outputs.changed == 'true'
+
+      - name: Run chart-testing (install) against 1.19
+        run: ct install --config .ci/ct-config.yaml        
+
+      - name: Create 1.18 kind cluster
+        uses: helm/kind-action@v1.1.0
+        with:
+          node_image: kindest/node:v1.18.15@sha256:5c1b980c4d0e0e8e7eb9f36f7df525d079a96169c8a8f20d8bd108c0d0889cc4
+          cluster_name: kubernetes-1.18
+        if: steps.list-changed.outputs.changed == 'true'
+
+      - name: Run chart-testing (install) against 1.18
+        run: ct install --config .ci/ct-config.yaml        
