@@ -185,7 +185,7 @@ pod:
     dovecot_default_pass_scheme:
     dovecot_auth_bind:
     dovecot_user_filter:
-    dovecot_user_attr:
+    dovecot_user_attrs:
     dovecot_pass_filter:
     dovecot_pass_attrs:
     enable_postgrey: 0
