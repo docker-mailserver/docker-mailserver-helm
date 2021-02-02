@@ -5,3 +5,6 @@ image:
 initContainer:
   image:
     pullPolicy: "Always"
+
+service:
+  type: ClusterIP
