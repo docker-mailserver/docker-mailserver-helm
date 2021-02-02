@@ -89,6 +89,12 @@ We list them here (and include this template in deployment.yaml) to keep deploym
   value: {{ .Values.pod.dockermailserver.ldap_query_filter_domain | quote }}
 - name: DOVECOT_TLS
   value: {{ .Values.pod.dockermailserver.dovecot_tls | quote }}
+- name: DOVECOT_LDAP_VERSION
+  value: {{ .Values.pod.dockermailserver.dovecot_ldap_version | quote }}
+- name: DOVECOT_DEFAULT_PASS_SCHEME
+  value: {{ .Values.pod.dockermailserver.dovecot_default_pass_scheme | quote }}
+- name: DOVECOT_AUTH_BIND
+  value: {{ .Values.pod.dockermailserver.dovecot_auth_bind | quote }}
 - name: DOVECOT_USER_FILTER
   value: {{ .Values.pod.dockermailserver.dovecot_user_filter | quote }}
 - name: DOVECOT_USER_ATTR
