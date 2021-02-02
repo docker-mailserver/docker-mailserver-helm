@@ -75,7 +75,7 @@ jobs:
         run: ct lint --config .ci/ct-config.yaml
 
   # Now we only run the KinD tests if (a) there are changes, and (b) they passed static linting
-  kind-1.20-test:
+  kind-1_20-test:
     runs-on: ubuntu-latest
     needs: [ list-changed,lint-test ]
     if: ${{needs.changed.outputs.changed}} == 'true'
@@ -94,7 +94,7 @@ jobs:
       - name: Run chart-testing (install) against 1.20
         run: ct install --config .ci/ct-config.yaml
 
-  kind-1.19-test:
+  kind-1_19-test:
     runs-on: ubuntu-latest
     needs: [ list-changed,lint-test ]
     if: ${{needs.changed.outputs.changed}} == 'true'
@@ -111,7 +111,7 @@ jobs:
       - name: Run chart-testing (install) against 1.19
         run: ct install --config .ci/ct-config.yaml        
 
-  kind-1.18-test:
+  kind-1_18-test:
     runs-on: ubuntu-latest
     needs: [ list-changed,lint-test ]
     if: ${{needs.changed.outputs.changed}} == 'true'
