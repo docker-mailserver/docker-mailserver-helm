@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.0.1
 
@@ -94,6 +95,11 @@ jobs:
           node_image: kindest/node:v1.20.2@sha256:8f7ea6e7642c0da54f04a7ee10431549c0257315b3a634f6ef2fecaaedb19bab
           cluster_name: kubernetes-1.20
 
+      # python is a requirement for the chart-testing action below (supports yamllint among other tests)
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.0.1
         
@@ -114,6 +120,11 @@ jobs:
           node_image: kindest/node:v1.19.7@sha256:a70639454e97a4b733f9d9b67e12c01f6b0297449d5b9cbbef87473458e26dca
           cluster_name: kubernetes-1.19
 
+      # python is a requirement for the chart-testing action below (supports yamllint among other tests)
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.0.1
         
@@ -133,6 +144,11 @@ jobs:
         with:
           node_image: kindest/node:v1.18.15@sha256:5c1b980c4d0e0e8e7eb9f36f7df525d079a96169c8a8f20d8bd108c0d0889cc4
           cluster_name: kubernetes-1.18
+
+      # python is a requirement for the chart-testing action below (supports yamllint among other tests)
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.0.1
