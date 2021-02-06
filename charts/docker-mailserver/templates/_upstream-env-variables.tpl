@@ -55,6 +55,10 @@ We list them here (and include this template in deployment.yaml) to keep deploym
   value: {{ .Values.pod.dockermailserver.report_interval | quote }}
 - name: ENABLE_SPAMASSASSIN
   value: {{ .Values.pod.dockermailserver.enable_spamassassin | quote }}
+- name: SPAMASSASSIN_SPAM_TO_INBOX
+  value: {{ .Values.pod.dockermailserver.sa_spam_to_inbox | quote }}
+- name: MOVE_SPAM_TO_JUNK
+  value: {{ .Values.pod.dockermailserver.sa_move_spam_to_junk | quote }}
 - name: SA_TAG
   value: {{ .Values.pod.dockermailserver.sa_tag | quote }}
 - name: SA_TAG2
@@ -103,6 +107,8 @@ We list them here (and include this template in deployment.yaml) to keep deploym
   value: {{ .Values.pod.dockermailserver.dovecot_pass_filter | quote }}
 - name: DOVECOT_PASS_ATTRS
   value: {{ .Values.pod.dockermailserver.dovecot_pass_attrs | quote }}
+- name: DOVECOT_MAILBOX_FORMAT
+  value: {{ .Values.pod.dockermailserver.dovecot_mailbox_format | quote }}
 - name: ENABLE_POSTGREY
   value: {{ .Values.pod.dockermailserver.enable_postgrey | quote }}
 - name: POSTGREY_DELAY

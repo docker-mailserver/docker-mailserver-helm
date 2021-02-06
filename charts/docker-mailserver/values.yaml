@@ -158,6 +158,8 @@ pod:
     report_sender: 
     report_interval: "daily"
     enable_spamassassin: 1
+    sa_spam_to_inbox: 0
+    sa_move_spam_to_junk: 0
     sa_tag: 2.0
     sa_tag2: 6.31
     sa_kill: 6.31
@@ -182,6 +184,7 @@ pod:
     dovecot_user_attrs:
     dovecot_pass_filter:
     dovecot_pass_attrs:
+    dovecot_mailbox_format:
     enable_postgrey: 0
     postgrey_delay: 300
     postgrey_max_age: 35
