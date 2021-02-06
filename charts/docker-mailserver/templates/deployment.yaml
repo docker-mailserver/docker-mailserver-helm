@@ -24,10 +24,11 @@ spec:
       labels:
         app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
         release: "{{ .Release.Name }}"
-        {{- if .Values.pod.dockermailserver.annotations }}
       annotations:
+        {{- if .Values.pod.dockermailserver.annotations }}
 {{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}
         {{ end }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
       runtimeClassName: {{ .Values.runtimeClassName }}
       priorityClassName: {{ .Values.priorityClassName }}
