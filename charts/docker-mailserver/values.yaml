@@ -59,6 +59,15 @@ ssl:
 psp:
   create: true
 
+## Mount additional volumes into the container.  Useful for persistent logs or
+## injecting additional config files.
+#additionalVolumes:
+#  - name: "additional"
+#    emptyDir: {}
+#additionalVolumeMounts:
+#  - name: additional
+#    mountPath: /additional
+
 demoMode:
   # demoMode.enabled ignores the contents of helm-chart/docker-mailserver/config and creates minimal static configuration to be used instead. A single account (user "user@example.com", password "password") will be configured for the purpose of validating core functions and connectivity, before applying user config
   enabled: true

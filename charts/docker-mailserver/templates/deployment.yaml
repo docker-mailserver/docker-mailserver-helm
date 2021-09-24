@@ -53,6 +53,9 @@ spec:
              secretName: {{ template "dockermailserver.fullname" . }}-tls
 {{- end }}
 {{- end }}
+{{ if .Values.additionalVolumes }}
+{{- toYaml .Values.additionalVolumes | indent 9 }}
+{{- end }}
       initContainers:
         - name: prep-config
           image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
@@ -143,6 +146,9 @@ spec:
               readOnly: true
               {{- end }}
               {{- end }}
+{{ if .Values.additionalVolumeMounts }}
+{{ toYaml .Values.additionalVolumeMounts | indent 12 }}
+{{- end }}
           livenessProbe:
             exec:
                command:
