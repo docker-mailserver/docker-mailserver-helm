@@ -23,7 +23,7 @@ We use helm's [chart-testing](https://github.com/helm/chart-testing) tool to lin
 To run in Docker:
 
 1. Have Docker installed
-2. Run `./ci/scripts/local-lint`
+2. Run `.ci/scripts/local-ct-lint.sh`
 
 To run locally:
 
