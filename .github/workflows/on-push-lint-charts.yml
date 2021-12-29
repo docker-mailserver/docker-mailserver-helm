@@ -12,8 +12,12 @@ on:
   workflow_dispatch:
 
 env:
-  KUBE_SCORE_VERSION: 1.10.0
+  KUBE_SCORE_VERSION: 1.12.0
   HELM_VERSION: v3.4.1
+
+concurrency: 
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   lint-test:
@@ -31,18 +35,27 @@ jobs:
 
       - name: Set up kube-score
         run: |
-          wget https://github.com/zegl/kube-score/releases/download/v${{ env.KUBE_SCORE_VERSION }}/kube-score_${{ env.KUBE_SCORE_VERSION }}_linux_amd64 -O kube-score
-          chmod 755 kube-score
+          mkdir /tmp/bin
+          wget https://github.com/zegl/kube-score/releases/download/v${{ env.KUBE_SCORE_VERSION }}/kube-score_${{ env.KUBE_SCORE_VERSION }}_linux_amd64 -O /tmp/bin/kube-score
+          chmod 755 /tmp/bin/kube-score
 
       - name: Kube-score generated manifests
-        run: helm template  --values .ci/values-kube-score.yaml charts/* | ./kube-score score -
-              --ignore-test pod-networkpolicy
-              --ignore-test deployment-has-poddisruptionbudget
-              --ignore-test deployment-has-host-podantiaffinity
-              --ignore-test container-security-context
-              --ignore-test pod-probes
-              --ignore-test container-image-tag
-              --enable-optional-test container-security-context-privileged
+        env:
+          KUBE_SCORE: /tmp/bin/kube-score
+        run: .ci/scripts/kube-score.sh
+
+  chart-testing:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Choose from https://hub.docker.com/r/kindest/node/tags
+        KubeVersion: [1.18.15,1.19.11,1.20.2]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       # python is a requirement for the chart-testing action below (supports yamllint among other tests)
       - uses: actions/setup-python@v2
@@ -50,7 +63,7 @@ jobs:
           python-version: 3.7
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.0.1
+        uses: helm/chart-testing-action@v2.1.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -63,33 +76,12 @@ jobs:
       - name: Run chart-testing (lint)
         run: ct lint --config .ci/ct-config.yaml
 
-      # Refer to https://github.com/kubernetes-sigs/kind/releases when updating the node_images
-      - name: Create 1.20 kind cluster
-        uses: helm/kind-action@v1.1.0
+      - name: Create ${{matrix.KubeVersion}} kind cluster
+        uses: helm/kind-action@v1.2.0
         with:
-          node_image: kindest/node:v1.20.2@sha256:8f7ea6e7642c0da54f04a7ee10431549c0257315b3a634f6ef2fecaaedb19bab
-          cluster_name: kubernetes-1.20
+          node_image: kindest/node:v${{matrix.KubeVersion}}
+          cluster_name: kubernetes-${{matrix.KubeVersion}}
         if: steps.list-changed.outputs.changed == 'true'
 
-      - name: Run chart-testing (install) against 1.20
+      - name: Run chart-testing (install) against ${{matrix.KubeVersion}}
         run: ct install --config .ci/ct-config.yaml
-
-      - name: Create 1.19 kind cluster
-        uses: helm/kind-action@v1.1.0
-        with:
-          node_image: kindest/node:v1.19.7@sha256:a70639454e97a4b733f9d9b67e12c01f6b0297449d5b9cbbef87473458e26dca
-          cluster_name: kubernetes-1.19
-        if: steps.list-changed.outputs.changed == 'true'
-
-      - name: Run chart-testing (install) against 1.19
-        run: ct install --config .ci/ct-config.yaml        
-
-      - name: Create 1.18 kind cluster
-        uses: helm/kind-action@v1.1.0
-        with:
-          node_image: kindest/node:v1.18.15@sha256:5c1b980c4d0e0e8e7eb9f36f7df525d079a96169c8a8f20d8bd108c0d0889cc4
-          cluster_name: kubernetes-1.18
-        if: steps.list-changed.outputs.changed == 'true'
-
-      - name: Run chart-testing (install) against 1.18
-        run: ct install --config .ci/ct-config.yaml        
