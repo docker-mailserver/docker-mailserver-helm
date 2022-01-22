@@ -66,13 +66,15 @@ There are several ways you might deploy docker-mailserver. The most common would
 
 2. Either within a cloud provider, or in a private Kubernetes cluster, behind a non-integrated load-balancer such as haproxy. An example deployment might be something like [Funky Penguin's Poor Man's K8s Load Balancer](https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/), or even a manually configured haproxy instance/pair.
 
-## Installation
+## Prerequsiites
 
-### Install helm and cert-manager
+### 1. Install helm
 
-1. You need helm, obviously.
+You need helm, obviously.   Instructions are [here](https://helm.sh/docs/intro/install/). 
 
-2. You need to install cert-manager, and [setup issuers](https://docs.cert-manager.io/en/latest/index.html). It's easy to install using helm (which you have anyway, right?). Cert-manager is what will request and renew SSL certificates required for `docker-mailserver` to work. The chart will assume that you've configured and tested certmanager.
+### 2. Install cert-manager
+
+You need to install cert-manager, and [setup issuers](https://docs.cert-manager.io/en/latest/index.html). It's easy to install using helm (which you have anyway, right?). Cert-manager is what will request and renew SSL certificates required for `docker-mailserver` to work. The chart will assume that you've configured and tested certmanager.
 
 Here are the TL;DR steps for installing cert-manager:
 
@@ -100,14 +102,23 @@ helm install \
   jetstack/cert-manager
 ```
 
+### Install docker-mailserver
+
+You will either need a local clone of this repository or to add the docker-mailserver-helm helm chart repository to your helm configuration:
+
 ```console
-$ helm install --name docker-mailserver docker-mailserver
-...
+helm repo add docker-mailserver https://docker-mailserver.github.io/docker-mailserver-helm/
 ```
 
-Note: An [issue exists](https://github.com/docker-mailserver/docker-mailserver-helm/issues/4) for the support of deploying to a custom namespace
+## Configuration and Operation
 
-## Operation
+### Install
+
+This command will install Docker Mailserver with default values.  You probably want to read the below section for how to configure it before doing this.
+
+```console
+helm install --name docker-mailserver docker-mailserver
+```
 
 ### Download setup.sh
 
@@ -159,19 +170,19 @@ If employing HAProxy with RainLoop, use port 10993 for your IMAPS server, as ill
 
 ![Rainloop with HAProxy screenshot](rainloop_with_haproxy.png)
 
-### Configuration
+### Docker Mailserver Configuration
 
 All configuration values are documented in values.yaml. Check that for references, default values etc. To modify a
 configuration value for a chart, you can either supply your own values.yaml overriding the default one in the repo:
 
 ```console
-$ helm upgrade --install path/to/docker-mailserver docker-mailserver --values path/to/custom/values/file.yaml
+$ helm upgrade --install docker-mailserver docker-mailserver --values path/to/custom/values/file.yaml
 ```
 
 Or, you can override an individual configuration setting with `helm upgrade --set`, specifying each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
 ```console
-$ helm upgrade --install path/to/docker-mailserver docker-mailserver --set pod.dockermailserver.image="your/image:1.0.0"
+$ helm upgrade --install docker-mailserver docker-mailserver --set pod.dockermailserver.image="your/image:1.0.0"
 ```
 
 #### Minimal configuration
