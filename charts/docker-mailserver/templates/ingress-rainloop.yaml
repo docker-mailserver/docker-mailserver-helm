@@ -32,10 +32,13 @@ spec:
     - host: {{ . }}
       http:
         paths:
-          - path: {{ $ingressPath }}
+          - pathType: Prefix
+            path: {{ $ingressPath }}
             backend:
-              serviceName: {{ $fullName }}-rainloop
-              servicePort: {{ $servicePort }}
+              service:
+                name: {{ $fullName }}-rainloop
+                port:
+                  number: {{ $servicePort }}
   {{- end }}
 {{- end }}
 {{- end }}
