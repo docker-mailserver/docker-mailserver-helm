@@ -15,7 +15,7 @@ metadata:
   {{ toYaml .Values.service.annotations | indent 2 }}  
   {{ end }}    
   labels:
-    app: {{ template "dockermailserver.fullname" . }}
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
@@ -29,7 +29,7 @@ spec:
   externalTrafficPolicy: Cluster
   {{ end }}
   selector:
-    app: {{ template "dockermailserver.fullname" . }}
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
     release: "{{ .Release.Name }}"
   ports:
     - protocol: "TCP"
