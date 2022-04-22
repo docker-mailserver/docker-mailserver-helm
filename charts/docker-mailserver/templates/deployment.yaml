@@ -30,6 +30,7 @@ spec:
 {{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}
         {{ end }}
     spec:
+      runtimeClassName: {{ .Values.runtimeClassName }}
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
