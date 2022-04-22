@@ -26,6 +26,9 @@ initContainer:
     readOnlyRootFilesystem: true
     privileged: false
 
+## Optionally specify a runtimeClassName for the deployment
+runtimeClassName: 
+
 serviceAccount:
   create: "true"
 
