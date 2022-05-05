@@ -99,7 +99,7 @@ spec:
               readOnly: true
 {{- end }}
             - name: tmp
-              mountpath: /var/tmp
+              mountPath: /var/tmp
             - name: data
               mountPath: /var/mail
               subPath: mail
