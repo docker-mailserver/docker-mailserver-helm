@@ -110,6 +110,9 @@ spec:
               mountPath: /var/mail
               subPath: mail      
             - name: data
+              mountPath: /var/log
+              subPath: logs              
+            - name: data
               mountPath: /var/mail-state
               subPath: mail-state
             - name: configmap
