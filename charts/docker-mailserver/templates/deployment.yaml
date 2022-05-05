@@ -35,29 +35,31 @@ spec:
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
       volumes:
-         - name: "data"
-           persistentVolumeClaim:
-             claimName: {{ template "dockermailserver.pvcName" . }}
-         - name: "config"
-           emptyDir: {}
-         - name: "configmap"
-           configMap:
-             name: {{ template "dockermailserver.fullname" . }}-configs
-         - name: "opendkim-keys"
-           secret:
-             secretName: {{ template "dockermailserver.fullname" . }}-secrets
+        - name: "data"
+          persistentVolumeClaim:
+            claimName: {{ template "dockermailserver.pvcName" . }}
+        - name: "config"
+          emptyDir: {}
+        - name: "configmap"
+          configMap:
+            name: {{ template "dockermailserver.fullname" . }}-configs
+        - name: "opendkim-keys"
+          secret:
+            secretName: {{ template "dockermailserver.fullname" . }}-secrets
 {{ if .Values.pod.dockermailserver.ssl_type }}
-         - name: "ssl-cert"
-           secret:
+        - name: "ssl-cert"
+          secret:
 {{ if .Values.ssl.useExisting }}
-             secretName: {{ .Values.ssl.existingName }}
+            secretName: {{ .Values.ssl.existingName }}
 {{- else }}
-             secretName: {{ template "dockermailserver.fullname" . }}-tls
+            secretName: {{ template "dockermailserver.fullname" . }}-tls
 {{- end }}
 {{- end }}
 {{ if .Values.additionalVolumes }}
 {{- toYaml .Values.additionalVolumes | indent 9 }}
 {{- end }}
+        - name: tmp
+          emptyDir: {}
       initContainers:
         - name: prep-config
           image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
@@ -96,9 +98,14 @@ spec:
               mountPath: /tmp/ssl
               readOnly: true
 {{- end }}
+            - name: tmp
+              mountpath: /var/tmp
             - name: data
               mountPath: /var/mail
               subPath: mail
+            - name: data
+              mountPath: /var/log
+              subPath: logs              
             - name: data
               mountPath: /var/mail-state
               subPath: mail-state
