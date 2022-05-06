@@ -29,6 +29,9 @@ initContainer:
 ## Optionally specify a runtimeClassName for the deployment
 runtimeClassName: 
 
+## Optionally specify a priorityClassName for the deployment
+priorityClassName:
+
 serviceAccount:
   create: "true"
 
