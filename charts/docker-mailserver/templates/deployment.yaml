@@ -29,7 +29,7 @@ spec:
 {{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}
         {{ end }}
     spec:
-      runtimeClassName: {{ .Values.runtimeClassName }}
+      # runtimeClassName: {{ .Values.runtimeClassName }}
       priorityClassName: {{ .Values.priorityClassName }}
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       securityContext:
