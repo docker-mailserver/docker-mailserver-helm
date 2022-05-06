@@ -142,6 +142,8 @@ pod:
       FAIL2BAN_BLOCKTYPE: drop
       SMTP_ONLY:
       SSL_TYPE:
+      SSL_CERT_PATH:
+      SSL_KEY_PATH:
       TLS_LEVEL: 
       SPOOF_PROTECTION:
       ENABLE_SRS: 0
