@@ -15,14 +15,14 @@ metadata:
     ##  
     {{- if eq .Values.service.type "LoadBalancer" }}service.beta.kubernetes.io/external-traffic: "OnlyLocal"{{ end }}
   labels:
-    app: {{ template "dockermailserver.fullname" . }}
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
   name: {{ template "dockermailserver.fullname" . }}-rainloop
 spec:
   selector:
-    app: {{ template "dockermailserver.fullname" . }}-rainloop
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}-rainloop
     release: "{{ .Release.Name }}"
   ports:
     - port: {{ .Values.rainloop.service.port }}

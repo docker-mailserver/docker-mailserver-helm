@@ -3,7 +3,7 @@ apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
   labels:
-    app: {{ template "dockermailserver.fullname" . }}
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
@@ -16,19 +16,20 @@ spec:
   replicas: {{ default 2 .Values.deployment.replicas }}
   selector:
     matchLabels:
-      app: {{ template "dockermailserver.fullname" . }}
+      app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
       release: "{{ .Release.Name }}"
   strategy: {{- toYaml .Values.pod.dockermailserver.strategy | nindent 4 }}
   template:
     metadata:
       labels:
-        app: {{ template "dockermailserver.fullname" . }}
+        app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
         release: "{{ .Release.Name }}"
         {{- if .Values.pod.dockermailserver.annotations }}
       annotations:
 {{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}
         {{ end }}
     spec:
+      runtimeClassName: {{ .Values.runtimeClassName }}
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
