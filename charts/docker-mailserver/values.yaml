@@ -3,7 +3,7 @@ image:
   # image.name is the name of the container image to use. Refer to https://hub.docker.com/r/mailserver/docker-mailserver
   name: "mailserver/docker-mailserver"
   # image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/mailserver/docker-mailserver
-  tag: "10.5.0"
+  tag: "11.0.0"
   pullPolicy: "IfNotPresent"
 
 initContainer:

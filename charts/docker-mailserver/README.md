@@ -1,12 +1,13 @@
-# Docker-mailserver
+# docker-mailserver-helm
 
-[Docker-mailserver ](https://github.com/tomav/docker-mailserver)is fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker. See the author's motivations for creating it, [here](https://tvi.al/simple-mail-server-with-docker/).
+This helm chart deploys [Docker
+Mailserver](https://github.com/docker-mailserver/docker-mailserver) into a
+Kubernetes cluster, in a manner which retains compatibility with the upstream,
+docker-specific version.
 
-While the stack is intended to be run with Docker or Docker Compose, it's been adapted to [Docker Swarm](https://geek-cookbook.funkypenguin.co.nz/recipes/mail/), and to [Kubernetes](https://github.com/tomav/docker-mailserver/wiki/Using-in-Kubernetes).
-
-## Introduction
-
-This helm chart deploys docker-mailserver into a Kubernetes cluster, in a manner which retains compatibility with the upstream, docker-specific version. 
+Docker Mailserver was originally intended to be run with Docker or Docker
+Compose, it's been [adapted to
+Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in-Kubernetes).
 
 ## Contents
 
@@ -35,27 +36,27 @@ This helm chart deploys docker-mailserver into a Kubernetes cluster, in a manner
 
 (Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc.go))
 
-## Features 
+## Features
 
 The chart includes the following features:
 
-* All configuration is done in values.yaml, or using the native "setup.sh" script (to create mailboxes or DKIM keys)
-* Avoids the [common problem of masking of source IP](https://kubernetes.io/docs/tutorials/services/source-ip/) by supporting haproxy's PROXY protocol (enabled by default)
-* Supports integration with external HAProxy, HAProxy Ingress Controller, or [poor-mans-k8s-lb](https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/)
-* Employs [cert-manager](https://github.com/jetstack/cert-manager) to automatically provide/renew SSL certificates
-* Bundles in [RainLoop](https://www.rainloop.net) for webmail access (enabled by default)
-* Starts in "demo" mode, allowing the user to test core functionality before configuring for specific domains
+- All configuration is done in values.yaml, or using the native "setup.sh" script (to create mailboxes or DKIM keys)
+- Avoids the [common problem of masking of source IP](https://kubernetes.io/docs/tutorials/services/source-ip/) by supporting haproxy's PROXY protocol (enabled by default)
+- Employs [cert-manager](https://github.com/jetstack/cert-manager) to automatically provide/renew SSL certificates
+- Bundles in [RainLoop](https://www.rainloop.net) for webmail access (disabled by default)
+- Starts in "demo" mode, allowing the user to test core functionality before configuring for specific domains
+- CI/CD tested against Kubernetes 1.18,1.19, and 1.20 : ![Lint and Test Charts](https://github.com/funkypenguin/helm-docker-mailserver/workflows/Lint%20and%20Test%20Charts/badge.svg)
 
 ## Prerequisites
 
-- Kubernetes 1.5+ (*CI validates against 1.12.0*)
+- Kubernetes 1.16+ (*CI validates against > 1.18.0*)
 - To use HAProxy ingress, you'll need to deploying the chart to a cluster with a cloud provider capable of provisioning an
 external load balancer (e.g. AWS, DO or GKE). (There is an [update planned](https://github.com/funkypenguin/docker-mailserver/issues/5) to support HA ingress on bare-metal deployments)
 - You control DNS for the domain(s) you intend to route through Traefik
 - __Suggested:__ PV provisioner support in the underlying infrastructure
 - [Cert-manager](https://github.com/jetstack/cert-manager/tree/master/deploy/charts/cert-manager) requires manual deployment into your cluster (details below)
 - [Helm](https://helm.sh) >= 2.13.0 (*errors were encountered when testing with 2.11.0, so the chart has a minimum requirement of 2.13.0*)
-- Access to a platform with Docker installed, in order to run [docker-mailserver's setup.sh binary](https://github.com/tomav/docker-mailserver/blob/master/setup.sh), which uses a docker container to setup dovecot password hashes and OpenDKIM keys
+- Access to a platform with Docker installed, in order to run [docker-mailserver's setup.sh binary](https://github.com/docker-mailserver/docker-mailserver/blob/master/setup.sh), which uses a docker container to setup dovecot password hashes and OpenDKIM keys
 
 ## Architecture
 
@@ -65,17 +66,19 @@ There are several ways you might deploy docker-mailserver. The most common would
 
 2. Either within a cloud provider, or in a private Kubernetes cluster, behind a non-integrated load-balancer such as haproxy. An example deployment might be something like [Funky Penguin's Poor Man's K8s Load Balancer](https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/), or even a manually configured haproxy instance/pair.
 
-## Installation
+## Prerequsiites
 
-### Install helm and cert-manager
+### 1. Install helm
 
-1. You need helm, obviously.
+You need helm, obviously.   Instructions are [here](https://helm.sh/docs/intro/install/). 
 
-2. You need to install cert-manager, and setup issuers (https://docs.cert-manager.io/en/latest/index.html). It's easy to install using helm (which you have anyway, right?). Cert-manager is what will request and renew SSL certificates required for docker-mailserver to work. The chart will assume that you've configured and tested certmanager.
+### 2. Install cert-manager
+
+You need to install cert-manager, and [setup issuers](https://docs.cert-manager.io/en/latest/index.html). It's easy to install using helm (which you have anyway, right?). Cert-manager is what will request and renew SSL certificates required for `docker-mailserver` to work. The chart will assume that you've configured and tested certmanager.
 
 Here are the TL;DR steps for installing cert-manager:
 
-```
+```console
 # Install the CustomResourceDefinition resources separately
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.7/deploy/manifests/00-crds.yaml
 
@@ -99,19 +102,27 @@ helm install \
   jetstack/cert-manager
 ```
 
+### Install docker-mailserver
 
-## Installation
+You will either need a local clone of this repository or to add the docker-mailserver-helm helm chart repository to your helm configuration:
 
-```bash
-$ helm install --name docker-mailserver docker-mailserver
+```console
+helm repo add docker-mailserver https://docker-mailserver.github.io/docker-mailserver-helm/
 ```
-(Note: An [issues exists](https://github.com/funkypenguin/docker-mailserver/issues/4) for the support of deploying to a custom namespace)
 
-## Operation
+## Configuration and Operation
+
+### Install
+
+This command will install Docker Mailserver with default values.  You probably want to read the below section for how to configure it before doing this.
+
+```console
+helm install --name docker-mailserver docker-mailserver
+```
 
 ### Download setup.sh
 
-Download the [upstream setup.sh](https://raw.githubusercontent.com/tomav/docker-mailserver/master/setup.sh) to a local folder (*ideally the same location you store your custom values.yaml*)
+Download the [upstream setup.sh](https://raw.githubusercontent.com/docker-mailserver/docker-mailserver/master/setup.sh) to a local folder (*ideally the same location you store your custom values.yaml*)
 
 Run `./setup.sh` without arguments for a list of full options
 
@@ -120,7 +131,8 @@ Run `./setup.sh` without arguments for a list of full options
 Run `./setup.sh <email address>` to create the email addresses in `$PWD/config`
 
 Example output:
-```
+
+```console
 [funkypenguin:~/demo] ./setup.sh email add david@kowalski.elpenguino.net
 "docker inspect" requires at least 1 argument.
 See 'docker inspect --help'.
@@ -134,9 +146,9 @@ Enter Password:
 
 ### Setup OpenDKIM
 
-
 Example output:
-```
+
+```console
 [funkypenguin:~/demo] ./setup.sh config dkim
 "docker inspect" requires at least 1 argument.
 See 'docker inspect --help'.
@@ -149,7 +161,7 @@ Creating DKIM KeyTable
 Creating DKIM SigningTable
 Creating DKIM private key /tmp/docker-mailserver/opendkim/keys/example.com/mail.private
 Creating DKIM TrustedHosts
-[funkypenguin:~/demo] 
+[funkypenguin:~/demo]
 ```
 
 ### Setup RainLoop
@@ -158,20 +170,21 @@ If employing HAProxy with RainLoop, use port 10993 for your IMAPS server, as ill
 
 ![Rainloop with HAProxy screenshot](rainloop_with_haproxy.png)
 
-### Configuration
+### Docker Mailserver Configuration
 
 All configuration values are documented in values.yaml. Check that for references, default values etc. To modify a
 configuration value for a chart, you can either supply your own values.yaml overriding the default one in the repo:
 
-```bash
-$ helm upgrade --install path/to/docker-mailserver docker-mailserver --values path/to/custom/values/file.yaml
+```console
+$ helm upgrade --install docker-mailserver docker-mailserver --values path/to/custom/values/file.yaml
 ```
 
 Or, you can override an individual configuration setting with `helm upgrade --set`, specifying each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
 
-```bash
-$ helm upgrade --install path/to/docker-mailserver docker-mailserver --set pod.dockermailserver.image="your/image:1.0.0"
+```console
+$ helm upgrade --install docker-mailserver docker-mailserver --set pod.dockermailserver.image="your/image:1.0.0"
 ```
+
 #### Minimal configuration
 
 Most of the values recorded belowe are set to sensible default, butyou'll definately want to pay attention to at least the following:
@@ -186,9 +199,6 @@ Most of the values recorded belowe are set to sensible default, butyou'll defina
 | `ssl.issuer.kind`                        | Whether the issuer is namespaced (`Issuer`) on cluster-wide (`ClusterIssuer`)                                         | `ClusterIssuer`        |
 | `ssl.dnsname`                            | DNS domain used for DNS01 validation                                                                                  | `example.com`          |
 | `ssl.dns01provider`                      | The cert-manager DNS01 provider (*more details [coming](https://github.com/funkypenguin/docker-mailserver/issues/6)*) | `cloudflare`           |
-
-
-
 
 #### Chart Configuration
 
@@ -205,10 +215,9 @@ The following table lists the configurable parameters of the docker-mailserver c
 | `domains`                                         | List of domains to be served                                                                                                                                                         | `[]`                                                 |
 | `livenessTests.enabled`                          | Whether to execute liveness tests by running (arbitrary) commands in the docker-mailserver container. Useful to detect component failure (*i.e., clamd dies due to memory pressure*) | `true`                                               |
 | `livenessTests.enabled`                          | Array of commands to execute in sequence, to determine container health. A non-zero exit of any command is considered a failure                                                      | `[ "clamscan /tmp/docker-mailserver/TrustedHosts" ]` |
-| `pod.dockermailserver.hostNetwork`                | Whether the pod should be connected to the "host" network (a primitive solution to ingress NAT problem)                                                                              | `false`                                              |
-| `pod.dockermailserver.hostPID`                    | Not really sure. TBD.                                                                                                                                                                | `None`                                               |
-| `pod.dockermailserver.hostPID`                    | Not really sure. TBD.                                                                                                                                                                | `None`                                               |
-| `pod.dockermailserver.securityContext.privileged` | Whether to run this pod in "privileged" mode.                                                                                                                                        | `false`                                              |
+| `pod.dockermailserver.hostNetwork`                | Whether the pod should be connected to the "host" network (a primitive solution to ingress NAT problem)                                                                              | `false`                                              |                                              |
+| `pod.dockermailserver.hostPID`                    | Not really sure. TBD.                                                                                                                                                                | `None`                                               |                                           |
+| `pod.dockermailserver.securityContext.privileged` | Whether to run this pod in "privileged" mode.                                                                                                                                        | `false`
 | `service.type`                                    | What scope the service should be exposed in  (*LoadBalancer/NodePort/ClusterIP*)                                                                                                     | `NodePort`                                           |
 | `service.loadBalancer.publicIp`                   | The public IP to assign to the service (*if LoadBalancer*) scope selected above                                                                                                      | `None`                                               |
 | `service.loadBalancer.allowedIps`                 | The IPs allowed to access the sevice, in CIDR format (*if LoadBalancer*) scope selected above                                                                                        | `[ "0.0.0.0/0" ]`                                    |
@@ -233,12 +242,11 @@ The following table lists the configurable parameters of the docker-mailserver c
 | `runtimeClassName`                                | Optionally, set the pod's [runtimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) | `""`
 | `priorityClassName`                               | Optionally, set the pod's [priorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) | `""`
 
-
 #### docker-mailserver Configuration
 
-There are **many** environment variables which allow you to customize the behaviour of docker-mailserver. The function of each variable is described at https://github.com/tomav/docker-mailserver#environment-variables
+There are **many** environment variables which allow you to customize the behaviour of docker-mailserver. The function of each variable is described at https://github.com/docker-mailserver/docker-mailserver#environment-variables
 
-Every variable can be set using `values.yaml`, but note that docker-mailserver expects any true/false values to be set as binary numbers (1/0), rather than boolean (true/false). BadThings(tm) will happen if you try to pass an environment variable as "true" when [`start-mailserver.sh`](https://github.com/tomav/docker-mailserver/blob/master/target/start-mailserver.sh) is expecting a 1 or a 0!
+Every variable can be set using `values.yaml`, but note that docker-mailserver expects any true/false values to be set as binary numbers (1/0), rather than boolean (true/false). BadThings(tm) will happen if you try to pass an environment variable as "true" when [`start-mailserver.sh`](https://github.com/docker-mailserver/docker-mailserver/blob/master/target/start-mailserver.sh) is expecting a 1 or a 0!
 
 #### Rainloop Configuration
 
@@ -247,8 +255,6 @@ Values you'll definately want to pay attention to:
 | Parameter                              | Description                                                                                                                  | Default                                           |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | `rainloop.ingress.hosts` | The hostname(s) to be used via your ingress to access RainLoop | `rainloop.example.com` |
-
-
 
 #### HA Proxy-Ingress Configuration
 
@@ -266,16 +272,6 @@ Values you'll definately want to pay attention to:
 | `haproxy.tcp.995`                       | How to forward inbound TCP connections on port 995. Use syntax described above.                                                                   | `default/docker-mailserver:995::PROXY-V1` |
 | `haproxy.service.externalTrafficPolicy` | Used to preserve source IP per [this doc](https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-type-loadbalancer) | `Local`                                   |
 
-
-
-
-
-
-
-
-
-
-
 ## Development
 
 ### Testing
@@ -288,8 +284,7 @@ matches exactly the previous snapshot. If a template change is made, or legit va
 
 If you're comfortable with the changes to the saved snapshot, then regenerate the snapshots, by running the following from the root of the repo
 
+```console
+$ helm plugin install https://github.com/lrills/helm-unittest
+$ helm unittest helm-chart/docker-mailserver
 ```
-helm plugin install https://github.com/lrills/helm-unittest
-helm unittest helm-chart/docker-mailserver 
-```
-

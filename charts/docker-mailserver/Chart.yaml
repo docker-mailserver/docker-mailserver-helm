@@ -1,10 +1,10 @@
 apiVersion: v2
-appVersion: "10.5.0"
+appVersion: "11.0.0"
 description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
 name: docker-mailserver
-version: 0.4.0-pre-11
+version: 1.0.0
 sources:
-- https://github.com/funkypenguin/helm-docker-mailserver
+- https://github.com/docker-mailserver/docker-mailserver-helm
 maintainers:
 - name: funkypenguin
   email: davidy@funkypenguin.co.nz
@@ -17,6 +17,10 @@ keywords:
 home: https://github.com/funkypenguin/helm-docker-mailserver
 icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
 
+annotations:
+  artifacthub.io/changes: |
+    - Breaking : Standardized app labels to app.kubernetes.io/name for Istio workload/Cilium compatibility
+    
 dependencies:
   - name: "kubernetes-ingress"
     version: "1.21.1"
