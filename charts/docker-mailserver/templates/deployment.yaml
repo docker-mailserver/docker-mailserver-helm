@@ -78,7 +78,7 @@ spec:
       containers:
         - name: docker-mailserver
           env:
-          {{- range $pkey, $pval := .Values.pod.env }}
+          {{- range $pkey, $pval := .Values.pod.dockermailserver.env }}
           - name: {{ $pkey }}
             value: {{ quote $pval }}
           {{- end }}          
