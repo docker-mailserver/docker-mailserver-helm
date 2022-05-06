@@ -76,20 +76,22 @@ spec:
           securityContext:
 {{ toYaml .Values.initContainer.containerSecurityContext | indent 12 }}
       containers:
-
-        - name: dockermailserver
+        - name: docker-mailserver
           env:
-{{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
+          {{- range $pkey, $pval := .Values.pod.env }}
+          - name: {{ $pkey }}
+            value: {{ quote $pval }}
+          {{- end }}          
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-            {{- if eq .Values.pod.dockermailserver.enable_fail2ban 1.0 }}
+          securityContext:
+            {{- if eq .Values.pod.env.ENABLE_FAIL2BAN 1.0 }}
             capabilities:
               add:
                 - "NET_ADMIN"
             {{ end }}
-          securityContext:
 {{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
           volumeMounts:
             - name: config

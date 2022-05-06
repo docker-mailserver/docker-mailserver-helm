@@ -124,102 +124,128 @@ pod:
       type: "Recreate"
 
     ## The following variables affect the behaviour of docker-mailserver
-    ## See https://github.com/tomav/docker-mailserver#environment-variables for details
-    ## Note that docker-mailserver expects most true/false values to present as 0 or 1, so that's how you should adjust the values below
-    ## Although it's inconsistent with the way the rest of values.yaml is structured, this has
-    ## been intentionally to maintain consistency with dockrer-mailserver scripts and documentation
-
-    # pod.dockermailserver.override_hostname sets the hostname (and therefore the SMTP banner) of the docker-mailserver pod
-    override_hostname: "mail.batcave.org"
-    dms_debug: 0
-    enable_clamav: 1
-    one_dir: 1
-    enable_pop3: 0
-
-    ## Whether to enable fail2ban. Only makes sense if you're running services in host mode without haproxy.
-    ## Default false
-    enable_fail2ban: 0
-
-    # Whether to enable dovecot replication. Allows the syncronization of a pair of dovecot servers
-    # https://wiki.dovecot.org/Replication
-    enable_dovecot_replication: true
-
-    smtp_only: 0
-
-    # Set this to "manual" or "letsencrypt". Leaving it set empty will disable SSL support
-    ssl_type:
-
-    # ssl_cert_path: "/tmp/ssl/tls.crt"
-    # ssl_key_path: "/tmp/ssl/tls.key"
-    tls_level:
-    spoof_protection:
-    enable_srs: 0
-    permit_docker: 
-    virusmails_delete_delay:
-    enable_postfix_virtual_transport:
-    postfix_dagent:
-    postfix_mailbox_size_limit:
-    postfix_message_size_limit:
-    enable_managesieve:
-    postmaster_address: "postmaster@domain.com"
-    postscreen_action: "enforce"
-    report_recipient: 0
-    report_sender: 
-    report_interval: "daily"
-    enable_spamassassin: 1
-    sa_spam_to_inbox: 1
-    sa_move_spam_to_junk: 0
-    sa_tag: 2.0
-    sa_tag2: 6.31
-    sa_kill: 6.31
-    sa_spam_subject: "*** spam ***"
-    enable_fetchmail: 0
-    fetchmail_poll: 300
-    enable_ldap:
-    log_level: warn
-    ldap_start_tls: # MUST BE "yes" or "no" - quoted strings
-    ldap_server_host: 
-    ldap_search_base:
-    ldap_bind_dn:
-    ldap_bind_pw:
-    ldap_query_filter_user:
-    ldap_query_filter_group:
-    ldap_query_filter_alias:
-    ldap_query_filter_domain:
-    dovecot_tls:
-    dovecot_ldap_version: 3
-    dovecot_default_pass_scheme:
-    dovecot_auth_bind:
-    dovecot_user_filter:
-    dovecot_user_attrs:
-    dovecot_pass_filter:
-    dovecot_pass_attrs:
-    dovecot_mailbox_format:
-    enable_postgrey: 0
-    postgrey_delay: 300
-    postgrey_max_age: 35
-    postgrey_auto_whitelist_clients: 5
-    postgrey_text: "delayed by postgrey"
-    pflogsumm_trigger:
-    pflogsumm_recipient:
-    enable_saslauthd: 0
-    saslauthd_mechanisms: 
-    saslauthd_mech_options:
-    saslauthd_ldap_server:
-    saslauthd_ldap_ssl:
-    saslauthd_ldap_bind_dn:
-    saslauthd_ldap_password:
-    saslauthd_ldap_search_base:
-    saslauthd_ldap_filter:
-    sasl_passwd:
-    srs_exclude_domains:
-    srs_secret:
-    srs_domainname:
-    default_relay_host:
-    relay_host:
-    relay_port: 25
-    relay_user:
-    relay_password:
+    ## See https://docker-mailserver.github.io/docker-mailserver/v11.0/config/environment/ for details
+    ## Note that an empty value indicates the default as described in the docs above
+    env:
+      # General
+      OVERRIDE_HOSTNAME: "mail.batcave.org"
+      LOG_LEVEL: info
+      ONE_DIR: 1
+      PERMIT_DOCKER:
+      TZ: 
+      ENABLE_AMAVIS: 1
+      AMAVIS_LOGLEVEL: 0
+      ENABLE_DNSBL: 0
+      ENABLE_CLAMAV: 0
+      ENABLE_POP3:
+      ENABLE_FAIL2BAN: 0 # Setting this to 1 will add the NET_ADMIN cap to the deployment
+      FAIL2BAN_BLOCKTYPE: drop
+      SMTP_ONLY:
+      SSL_TYPE:
+      TLS_LEVEL: 
+      SPOOF_PROTECTION:
+      ENABLE_SRS: 0
+      NETWORK_INTERFACE: 
+      VIRUSMAILS_DELETE_DELAY:
+      ENABLE_POSTFIX_VIRTUAL_TRANSPORT:
+      POSTFIX_DAGENT: 
+      POSTFIX_MAILBOX_SIZE_LIMIT:
+      ENABLE_QUOTAS: 1
+      POSTFIX_MESSAGE_SIZE_LIMIT:
+      CLAMAV_MESSAGE_SIZE_LIMIT:
+      ENABLE_MANAGESIEVE:
+      POSTMASTER_ADDRESS:
+      ENABLE_UPDATE_CHECK: 1
+      UPDATE_CHECK_INTERVAL: 1d
+      POSTSCREEN_ACTION: enforce
+      DOVECOT_MAILBOX_FORMAT: maildir
+      POSTFIX_INET_PROTOCOLS: all
+      DOVECOT_INET_PROTOCOLS: all
+      # Reports
+      PFLOGSUMM_TRIGGER:
+      PFLOGSUMM_RECIPIENT: 
+      PFLOGSUMM_SENDER:
+      LOGWATCH_INTERVAL: 
+      LOGWATCH_RECIPIENT:
+      LOGWATCH_SENDER:
+      REPORT_RECIPIENT:
+      REPORT_SENDER:
+      LOGROTATE_INTERVAL: weekly
+      # SpamAssassin
+      ENABLE_SPAMASSASSIN: 0
+      SPAMASSASSIN_SPAM_TO_INBOX: 1
+      ENABLE_SPAMASSASSIN_KAM: 0
+      MOVE_SPAM_TO_JUNK: 1
+      SA_TAG: 2.0
+      SA_TAG2: 6.31
+      SA_KILL: 6.31
+      SA_SPAM_SUBJECT: "**SPAM**"
+      SA_SHORTCIRCUIT_BAYES_SPAM: 1
+      SA_SHORTCIRCUIT_BAYES_HAM: 1
+      # Fetchmail
+      ENABLE_FETCHMAIL: 0
+      FETCHMAIL_POLL: 300
+      FETCHMAIL_PARALLEL: 0
+      # LDAP
+      ENABLE_LDAP: 
+      LDAP_START_TLS: 
+      LDAP_SERVER_HOST: 
+      LDAP_SEARCH_BASE:
+      LDAP_BIND_DN:
+      LDAP_BIND_PW:
+      LDAP_QUERY_FILTER_USER:
+      LDAP_QUERY_FILTER_GROUP:
+      LDAP_QUERY_FILTER_ALIAS:
+      LDAP_QUERY_FILTER_DOMAIN:
+      LDAP_QUERY_FILTER_SENDERS:
+      DOVECOT_TLS:
+      # Dovecot
+      DOVECOT_BASE:
+      DOVECOT_DEFAULT_PASS_SCHEME:
+      DOVECOT_DN:
+      DOVECOT_DNPASS:
+      DOVECOT_URIS:
+      DOVECOT_LDAP_VERSION:
+      DOVECOT_AUTH_BIND:
+      DOVECOT_USER_FILTER:
+      DOVECOT_USER_ATTRS:
+      DOVECOT_PASS_FILTER:
+      DOVECOT_PASS_ATTRS:
+      # Postgrey
+      ENABLE_POSTGREY:
+      POSTGREY_DELAY: 300
+      POSTGREY_MAX_AGE: 35
+      POSTGREY_AUTO_WHITELIST_CLIENTS: 5
+      POSTGREY_TEXT: Delayed by Postgrey
+      # SASL Auth
+      ENABLE_SASLAUTHD:
+      SASLAUTHD_MECHANISMS:
+      SASLAUTHD_MECH_OPTIONS:
+      SASLAUTHD_LDAP_SERVER:
+      SASLAUTHD_LDAP_START_TLS:
+      SASLAUTHD_LDAP_TLS_CHECK_PEER:
+      SASLAUTHD_LDAP_TLS_CACERT_DIR:
+      SASLAUTHD_LDAP_TLS_CACERT_FILE:
+      SASLAUTHD_LDAP_BIND_DN:
+      SASLAUTHD_LDAP_PASSWORD:
+      SASLAUTHD_LDAP_SEARCH_BASE:
+      SASLAUTHD_LDAP_FILTER:
+      SASLAUTHD_LDAP_PASSWORD_ATTR:
+      SASL_PASSWD:
+      SASLAUTHD_LDAP_AUTH_METHOD:
+      SASLAUTHD_LDAP_MECH:
+      # SRS (Sender Rewriting Scheme)
+      SRS_SENDER_CLASSES: envelope_sender
+      SRS_EXCLUDE_DOMAINS:
+      SRS_SECRET:
+      SRS_DOMAINNAME:
+      # Default Relay Host
+      DEFAULT_RELAY_HOST:
+      # Multi-domain Relay Hosts
+      RELAY_HOST:
+      RELAY_PORT:
+      RELAY_USER:
+      RELAY_PASSWORD:
 
     securityContext:
       runAsUser: 10001
