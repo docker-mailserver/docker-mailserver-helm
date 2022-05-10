@@ -46,7 +46,7 @@ spec:
         - name: "opendkim-keys"
           secret:
             secretName: {{ template "dockermailserver.fullname" . }}-secrets
-{{ if .Values.pod.dockermailserver.ssl_type }}
+{{ if .Values.pod.dockermailserver.env.SSL_TYPE }}
         - name: "ssl-cert"
           secret:
 {{ if .Values.ssl.useExisting }}
