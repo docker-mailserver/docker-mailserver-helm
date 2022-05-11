@@ -141,7 +141,7 @@ pod:
       ENABLE_FAIL2BAN: 0 # Setting this to 1 will add the NET_ADMIN cap to the deployment
       FAIL2BAN_BLOCKTYPE: drop
       SMTP_ONLY:
-      SSL_TYPE:
+      SSL_TYPE: manual
       SSL_CERT_PATH:
       SSL_KEY_PATH:
       TLS_LEVEL: 

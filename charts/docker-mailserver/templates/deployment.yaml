@@ -29,7 +29,7 @@ spec:
 {{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}
         {{ end }}
     spec:
-      # runtimeClassName: {{ .Values.runtimeClassName }}
+      runtimeClassName: {{ .Values.runtimeClassName }}
       priorityClassName: {{ .Values.priorityClassName }}
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       securityContext:
@@ -46,16 +46,16 @@ spec:
         - name: "opendkim-keys"
           secret:
             secretName: {{ template "dockermailserver.fullname" . }}-secrets
-{{ if eq .Values.pod.dockermailserver.env.SSL_TYPE "manual" }}
+{{- if .Values.pod.dockermailserver.env.SSL_TYPE }}
         - name: "ssl-cert"
           secret:
-{{ if .Values.ssl.useExisting }}
+{{- if .Values.ssl.useExisting }}
             secretName: {{ .Values.ssl.existingName }}
 {{- else }}
             secretName: {{ template "dockermailserver.fullname" . }}-tls
 {{- end }}
 {{- end }}
-{{ if .Values.additionalVolumes }}
+{{- if .Values.additionalVolumes }}
 {{- toYaml .Values.additionalVolumes | indent 8 }}
 {{- end }}
         - name: tmp
@@ -96,7 +96,7 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /tmp/docker-mailserver
-{{ if .Values.pod.dockermailserver.ssl_type }}
+{{- if .Values.pod.dockermailserver.env.SSL_TYPE }}
             - name: ssl-cert
               mountPath: /tmp/ssl
               readOnly: true
@@ -143,8 +143,8 @@ spec:
               subPath: 91-override-sieve.conf
               mountPath: /etc/dovecot/conf.d/91-override-sieve.conf
               readOnly: true
-            {{ end }}
-              {{- if .Values.demoMode.enabled }}
+            {{- end }}
+            {{- if .Values.demoMode.enabled }}
             - name: opendkim-keys
               mountPath: "/tmp/docker-mailserver/opendkim/keys/example.com/mail.private"
               subPath: "example.com-mail.private"
@@ -160,7 +160,7 @@ spec:
               readOnly: true
               {{- end }}
               {{- end }}
-{{ if .Values.additionalVolumeMounts }}
+{{- if .Values.additionalVolumeMounts }}
 {{ toYaml .Values.additionalVolumeMounts | indent 12 }}
 {{- end }}
           livenessProbe:
