@@ -54,7 +54,6 @@ ssl:
     name: letsencrypt-staging
     kind: ClusterIssuer
   dnsname: example.com
-  dns01provider: cloudflare
 
   # Set this to false to let the chart try to assemble a CR for you. This feature will be deprecated soon, and users will 
   # need to manage cert-manager outside of this chart (the dependencies involved make it fragile)
