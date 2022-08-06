@@ -49,13 +49,13 @@ The chart includes the following features:
 ## Prerequisites
 
 - Kubernetes 1.16+ (*CI validates against > 1.18.0*)
-- To use HAProxy ingress, you'll need to deploying the chart to a cluster with a cloud provider capable of provisioning an
+- To use HAProxy ingress, you'll need to deploy the chart to a cluster with a cloud provider capable of provisioning an
 external load balancer (e.g. AWS, DO or GKE). (There is an [update planned](https://github.com/funkypenguin/docker-mailserver/issues/5) to support HA ingress on bare-metal deployments)
 - You control DNS for the domain(s) you intend to route through Traefik
 - __Suggested:__ PV provisioner support in the underlying infrastructure
 - [Cert-manager](https://github.com/jetstack/cert-manager/tree/master/deploy/charts/cert-manager) => 1.0 requires manual deployment into your cluster (details below)
 - [Helm](https://helm.sh) >= 2.13.0 (*errors were encountered when testing with 2.11.0, so the chart has a minimum requirement of 2.13.0*)
-- Access to a platform with Docker installed, in order to run [docker-mailserver's setup.sh binary](https://github.com/docker-mailserver/docker-mailserver/blob/master/setup.sh), which uses a docker container to setup dovecot password hashes and OpenDKIM keys
+- Access to a platform with Docker installed, in order to run [docker-mailserver's setup.sh binary](https://github.com/docker-mailserver/docker-mailserver/blob/master/setup.sh), which uses a docker container to set up dovecot password hashes and OpenDKIM keys
 
 ## Architecture
 
@@ -73,7 +73,7 @@ You need helm, obviously.   Instructions are [here](https://helm.sh/docs/intro/i
 
 ### 2. Install cert-manager
 
-You need to install cert-manager, and [setup issuers](https://docs.cert-manager.io/en/latest/index.html). It's easy to install using helm (which you have anyway, right?). Cert-manager is what will request and renew SSL certificates required for `docker-mailserver` to work. The chart will assume that you've configured and tested certmanager.
+You need to install cert-manager, and [setup issuers](https://docs.cert-manager.io/en/latest/index.html). It's easy to install using helm (which you have anyway, right?). Cert-manager is what will request and renew SSL certificates required for `docker-mailserver` to work. The chart will assume that you've configured and tested cert-manager.
 
 Here are the TL;DR steps for installing cert-manager:
 
@@ -186,7 +186,7 @@ $ helm upgrade --install docker-mailserver docker-mailserver --set pod.dockermai
 
 #### Minimal configuration
 
-Most of the values recorded belowe are set to sensible default, butyou'll definately want to pay attention to at least the following:
+Most of the values recorded below are set to sensible default, but you'll definitely want to pay attention to at least the following:
 
 | Parameter                                | Description                                                                                                           | Default                |
 |------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|------------------------|
@@ -248,17 +248,17 @@ Every variable can be set using `values.yaml`, but note that docker-mailserver e
 
 #### Rainloop Configuration
 
-Values you'll definately want to pay attention to:
+Values you'll definitely want to pay attention to:
 
-| Parameter                              | Description                                                                                                                  | Default                                           |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| Parameter                | Description                                                    | Default                |
+|--------------------------|----------------------------------------------------------------|------------------------|
 | `rainloop.ingress.hosts` | The hostname(s) to be used via your ingress to access RainLoop | `rainloop.example.com` |
 
 #### HA Proxy-Ingress Configuration
 
-| Parameter                                       | Description                                                                                                                                       | Default                                   |
-|-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
-| `haproxy.deploy_chart`                  | Whether to deploy the HAProxy Ingress Controller (recomended)                                                                                     | `true`                                    |
+| Parameter                               | Description                                                                                                                                       | Default                                   |
+|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
+| `haproxy.deploy_chart`                  | Whether to deploy the HAProxy Ingress Controller (recommended)                                                                                    | `true`                                    |
 | `haproxy.controller.kind`               | Whether your controller is a `DaemonSet` or a `Deployment`                                                                                        | `Deployment`                              |
 | `haproxy.enableStaticPorts`             | Whether to enable ports 80 and 443 in addition to the TCP ports we're using below                                                                 | `false`                                   |
 | `haproxy.tcp.25`                        | How to forward inbound TCP connections on port 25. Use syntax `<namespace>/<service name>:<target port>[<optional proxy protocol>]`               | `default/docker-mailserver:25::PROXY-V1`  |
