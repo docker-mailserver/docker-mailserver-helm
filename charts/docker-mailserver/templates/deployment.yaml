@@ -83,12 +83,12 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
+          securityContext:
             {{- if eq .Values.pod.dockermailserver.enable_fail2ban 1.0 }}
             capabilities:
               add:
                 - "NET_ADMIN"
             {{ end }}
-          securityContext:
 {{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
           volumeMounts:
             - name: config
