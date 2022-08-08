@@ -80,9 +80,9 @@ spec:
     - protocol: "TCP"
       name: "tcp-dsync"
       port: 4711        
-  {{- if .Values.rainloop.enabled }}
+  {{- if or .Values.service.behind_proxy .Values.rainloop.enabled }}
     - protocol: "TCP"
-      name: "tcp-imaps-rainloop"
+      name: "tcp-imaps-proxy"
       port: 10993        
   {{ end }}  
   type: {{ default "ClusterIP" .Values.service.type }}
