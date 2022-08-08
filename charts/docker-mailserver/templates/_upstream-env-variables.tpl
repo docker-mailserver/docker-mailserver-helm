@@ -87,6 +87,8 @@ We list them here (and include this template in deployment.yaml) to keep deploym
   value: {{ .Values.pod.dockermailserver.ldap_query_filter_alias | quote }}
 - name: LDAP_QUERY_FILTER_DOMAIN
   value: {{ .Values.pod.dockermailserver.ldap_query_filter_domain | quote }}
+- name: LOG_LEVEL
+  value: {{ .Values.pod.dockermailserver.log_level | quote }}
 - name: DOVECOT_TLS
   value: {{ .Values.pod.dockermailserver.dovecot_tls | quote }}
 - name: DOVECOT_LDAP_VERSION

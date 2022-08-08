@@ -173,7 +173,8 @@ pod:
     sa_spam_subject: "*** spam ***"
     enable_fetchmail: 0
     fetchmail_poll: 300
-    enable_ldap: 
+    enable_ldap:
+    log_level: warn
     ldap_start_tls: # MUST BE "yes" or "no" - quoted strings
     ldap_server_host: 
     ldap_search_base:
