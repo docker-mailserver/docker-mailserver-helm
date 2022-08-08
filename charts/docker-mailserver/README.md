@@ -30,6 +30,7 @@ Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in
       - [Chart Configuration](#chart-configuration)
       - [docker-mailserver Configuration](#docker-mailserver-configuration)
       - [Rainloop Configuration](#rainloop-configuration)
+      - [Traefik as proxy](TRAEFIK_AS_PROXY.md)
       - [HA Proxy-Ingress Configuration](#ha-proxy-ingress-configuration)
   - [Development](#development)
     - [Testing](#testing)
@@ -257,6 +258,8 @@ Values you'll definately want to pay attention to:
 | `rainloop.ingress.hosts` | The hostname(s) to be used via your ingress to access RainLoop | `rainloop.example.com` |
 
 #### HA Proxy-Ingress Configuration
+
+Besides the built-in support for ha-proxy, you can also use [traefik as reverse proxy](TRAEFIK_AS_PROXY.md)
 
 | Parameter                                       | Description                                                                                                                                       | Default                                   |
 |-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
