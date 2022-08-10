@@ -18,11 +18,6 @@ data:
     # A sample user - the password is "password"
     user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
   postfix-virtual.cf: "# Intentionally left empty"
-  SigningTable: "*@example.com mail._domainkey.example.com"
-  KeyTable: "mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private"
-  TrustedHosts: |
-    127.0.0.1
-    localhost
   ### End demo mode data
   {{/* Use real data from "config" subdirectory if user is _not_ running in demo mode */}}  
   {{ else -}}
@@ -114,4 +109,18 @@ data:
     {{ . }} && \
     {{- end }}
     echo "All healthy"
+---
+{{- end -}}
+{{- if .Values.openDKIM.configMap -}}
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+  name: {{ template "dockermailserver.fullname" . }}-dkim-configs
+data:
+{{ toYaml .Values.openDKIM.configMap | indent 2 }}
 {{- end -}}

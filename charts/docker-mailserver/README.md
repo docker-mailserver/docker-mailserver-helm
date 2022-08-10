@@ -146,22 +146,54 @@ Enter Password:
 
 ### Setup OpenDKIM
 
-Example output:
+Create the initial configuration:
 
 ```console
 [funkypenguin:~/demo] ./setup.sh config dkim
-"docker inspect" requires at least 1 argument.
-See 'docker inspect --help'.
-
-Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
-
-Return low-level information on Docker objects
 Creating DKIM private key /tmp/docker-mailserver/opendkim/keys/bob.com/mail.private
 Creating DKIM KeyTable
 Creating DKIM SigningTable
 Creating DKIM private key /tmp/docker-mailserver/opendkim/keys/example.com/mail.private
 Creating DKIM TrustedHosts
 [funkypenguin:~/demo]
+```
+
+Get the configuration:
+
+`kubectl exec -n ${NAMESPACE} -i -t deploy/${RELEASE_NAME}-docker-mailserver -c dockermailserver -- cat /etc/opendkim/TrustedHosts`
+`kubectl exec -n ${NAMESPACE} -i -t deploy/${RELEASE_NAME}-docker-mailserver -c dockermailserver -- cat /etc/opendkim/SigningTable`
+`kubectl exec -n ${NAMESPACE} -i -t deploy/${RELEASE_NAME}-docker-mailserver -c dockermailserver -- cat /etc/opendkim/KeyTable`
+
+Example `values`:
+
+```yaml
+openDKIM:
+  configMap:
+    TrustedHosts: |
+      127.0.0.1
+      localhost
+    SigningTable: |
+      *@example.com mail._domainkey.example.com
+    KeyTable: |
+      mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private
+```
+
+This requires the private key to be provided as secret with name `<release-fullname>-dkim-secrets`:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mail-docker-mailserver-dkim-secrets
+  namespace: mail
+  labels:
+    app.kubernetes.io/name: mail
+type: Opaque
+stringData:
+  'example.com-mail.private': |
+    -----BEGIN RSA PRIVATE KEY-----
+    ...
+    -----END RSA PRIVATE KEY-----
 ```
 
 ### Setup RainLoop
@@ -218,6 +250,7 @@ The following table lists the configurable parameters of the docker-mailserver c
 | `pod.dockermailserver.hostPID`                    | Not really sure. TBD.                                                                                                                                                                | `None`                                               |                                           |
 | `pod.dockermailserver.securityContext.privileged` | Whether to run this pod in "privileged" mode.                                                                                                                                        | `false`                                              |
 | `service.type`                                    | What scope the service should be exposed in  (*LoadBalancer/NodePort/ClusterIP*)                                                                                                     | `NodePort`                                           |
+ | `openDKIM.configMap`                              | Provide openDKIM configuration. See [openDKIM example config](#setup-opendkim)                                                                                                       |
 | `service.loadBalancer.publicIp`                   | The public IP to assign to the service (*if LoadBalancer*) scope selected above                                                                                                      | `None`                                               |
 | `service.loadBalancer.allowedIps`                 | The IPs allowed to access the sevice, in CIDR format (*if LoadBalancer*) scope selected above                                                                                        | `[ "0.0.0.0/0" ]`                                    |
 | `service.nodeport.smtp`                           | The port exposed on the node the container is running on, which will be forwarded to docker-mailserver's SMTP port (25)                                                              | `30025`                                              |
