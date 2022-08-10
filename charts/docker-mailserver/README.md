@@ -20,7 +20,7 @@ Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in
   - [Install Cert-manager](#2-install-cert-manager)
   - [Install Docker Mailserver](#install-docker-mailserver)
 - [Configuration and Operation](#configuration-and-operation)
-  - [Download setup.sh](#download-setupsh)
+  - [Download setup.sh](#create-setup)
   - [Create / Update / Delete users](#create--update--delete-users)
   - [Setup OpenDKIM](#setup-opendkim)
   - [Setup RainLoop](#setup-rainloop)
@@ -120,48 +120,91 @@ This command will install Docker Mailserver with default values.  You probably w
 helm install --name docker-mailserver docker-mailserver
 ```
 
-### Download setup.sh
+### Create setup
 
-Download the [upstream setup.sh](https://raw.githubusercontent.com/docker-mailserver/docker-mailserver/master/setup.sh) to a local folder (*ideally the same location you store your custom values.yaml*)
+The provided [upstream setup.sh](https://raw.githubusercontent.com/docker-mailserver/docker-mailserver/master/setup.sh) doesn't support k8s installations, yet. Fortunately there is a handy workaround. Just create this script called `setup.sh`:
 
-Run `./setup.sh` without arguments for a list of full options
+```shell
+#!/usr/bin/env bash
+NAMESPACE=mail
+RELEASE_NAME=mail
+kubectl exec -n ${NAMESPACE} -i -t deploy/${RELEASE_NAME}-docker-mailserver -c dockermailserver -- sh -c "/usr/local/bin/setup $*"
+```
+
+and make it executable `chmod +x ./setup.sh`
+
+Run `./setup.sh` without arguments for a list of full options.
 
 ### Create / Update / Delete users
 
-Run `./setup.sh <email address>` to create the email addresses in `$PWD/config`
+Accounts are managed in the secret `<release-fullname>-accounts`. This file will be copied to a local version in the pod.
 
-Example output:
+Run `./setup.sh <email address>` to create the email addresses in the cluster. This user will disappear after restart. To make it permanent you'll have to update the secret, too:
 
-```console
-[funkypenguin:~/demo] ./setup.sh email add david@kowalski.elpenguino.net
-"docker inspect" requires at least 1 argument.
-See 'docker inspect --help'.
-
-Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
-
-Return low-level information on Docker objects
-Enter Password:
-[funkypenguin:~/demo] %
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mail-docker-mailserver-accounts
+  namespace: mail
+  labels:
+    app.kubernetes.io/name: mail
+type: Opaque
+stringData:
+  postfix-accounts.cf: |
+    david@kowalski.elpenguino.net|CRYPT....
 ```
 
 ### Setup OpenDKIM
 
-Example output:
+Create the initial configuration:
 
 ```console
 [funkypenguin:~/demo] ./setup.sh config dkim
-"docker inspect" requires at least 1 argument.
-See 'docker inspect --help'.
-
-Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
-
-Return low-level information on Docker objects
 Creating DKIM private key /tmp/docker-mailserver/opendkim/keys/bob.com/mail.private
 Creating DKIM KeyTable
 Creating DKIM SigningTable
 Creating DKIM private key /tmp/docker-mailserver/opendkim/keys/example.com/mail.private
 Creating DKIM TrustedHosts
 [funkypenguin:~/demo]
+```
+
+Get the configuration:
+
+`kubectl exec -n ${NAMESPACE} -i -t deploy/${RELEASE_NAME}-docker-mailserver -c dockermailserver -- cat /etc/opendkim/TrustedHosts`
+`kubectl exec -n ${NAMESPACE} -i -t deploy/${RELEASE_NAME}-docker-mailserver -c dockermailserver -- cat /etc/opendkim/SigningTable`
+`kubectl exec -n ${NAMESPACE} -i -t deploy/${RELEASE_NAME}-docker-mailserver -c dockermailserver -- cat /etc/opendkim/KeyTable`
+
+Example `values`:
+
+```yaml
+openDKIM:
+  configMap:
+    TrustedHosts: |
+      127.0.0.1
+      localhost
+    SigningTable: |
+      *@example.com mail._domainkey.example.com
+    KeyTable: |
+      mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private
+```
+
+This requires the private key to be provided as secret with name `<release-fullname>-dkim-secrets`:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mail-docker-mailserver-dkim-secrets
+  namespace: mail
+  labels:
+    app.kubernetes.io/name: mail
+type: Opaque
+stringData:
+  'example.com-mail.private': |
+    -----BEGIN RSA PRIVATE KEY-----
+    ...
+    -----END RSA PRIVATE KEY-----
 ```
 
 ### Setup RainLoop
@@ -217,7 +260,10 @@ The following table lists the configurable parameters of the docker-mailserver c
 | `pod.dockermailserver.hostNetwork`                | Whether the pod should be connected to the "host" network (a primitive solution to ingress NAT problem)                                                                              | `false`                                              |                                              |
 | `pod.dockermailserver.hostPID`                    | Not really sure. TBD.                                                                                                                                                                | `None`                                               |                                           |
 | `pod.dockermailserver.securityContext.privileged` | Whether to run this pod in "privileged" mode.                                                                                                                                        | `false`                                              |
+ | `secret.useExisting`                              | Use existing secret for *accounts*: `<release-fullname>-accounts` and *dkim*: `<release-fullname>-dkim-secrets`                                                                      | `false`                                              |
+ | `configMap.useExisting`                           | Use existing configmap for [additional optional configuration files](https://docker-mailserver.github.io/docker-mailserver/edge/config/advanced/optional-config/)                    | `false`                                              |
 | `service.type`                                    | What scope the service should be exposed in  (*LoadBalancer/NodePort/ClusterIP*)                                                                                                     | `NodePort`                                           |
+ | `openDKIM.configMap`                              | Provide openDKIM configuration. See [openDKIM example config](#setup-opendkim)                                                                                                       |
 | `service.loadBalancer.publicIp`                   | The public IP to assign to the service (*if LoadBalancer*) scope selected above                                                                                                      | `None`                                               |
 | `service.loadBalancer.allowedIps`                 | The IPs allowed to access the sevice, in CIDR format (*if LoadBalancer*) scope selected above                                                                                        | `[ "0.0.0.0/0" ]`                                    |
 | `service.nodeport.smtp`                           | The port exposed on the node the container is running on, which will be forwarded to docker-mailserver's SMTP port (25)                                                              | `30025`                                              |

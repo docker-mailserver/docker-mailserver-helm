@@ -23,4 +23,12 @@ tests:
 
   - it: manifest should match snapshot
     asserts:
-      - matchSnapshot: {}          
+      - matchSnapshot: {}
+
+  - it: configures openDKIM
+    set:
+      openDKIM.TrustedHosts: something
+    asserts:
+      matchRegex:
+        path: data.TrustedHosts
+        pattern: something
