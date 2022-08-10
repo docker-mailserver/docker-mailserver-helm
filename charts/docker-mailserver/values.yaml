@@ -90,6 +90,17 @@ domains: []
 #  - your-first-domain.com
 #  - your-second-domain.com
 
+# configmap of the openDKIM setup. Secrets have to be provided in '<release-fullname>-dkim-secrets'
+#openDKIM:
+#  configMap:
+#    TrustedHosts: |
+#      127.0.0.1
+#      localhost
+#    SigningTable: |
+#      *@<domain.tld> mail._domainkey.domain.tld
+#    KeyTable: |
+#      mail._domainkey.domain.tld domain.tld:mail:/etc/opendkim/keys/domain.tld/mail.private
+
 livenessTests:
   # livenessTests.enabled will add a liveness test, which will classify a pod as 'unhealthy' if any livenessTests.commands (below) return non-zero
   enabled: true
