@@ -42,9 +42,24 @@ serviceAccount:
 ##
 configMap:
   useExisting: false
+  # if set to true, the following configmap should be pre-existing:
+  # name: <release-fullname>-configs
+  # data:
+  #  <filename>: as in https://docker-mailserver.github.io/docker-mailserver/edge/config/advanced/optional-config/
 
 secret:
-  useExisting: false  
+  useExisting: false
+  # if set to true, the following secrets are expected to exist:
+  #
+  # name: <release-fullname>-dkim-secrets
+  # data:
+  #   <domain.tld>-mail.private: <private key>
+  #
+  # ----
+  # name: <release-fullname>-accounts
+  # data:
+  #   postfix-accounts.cf: >
+  #   <email>|{SHA512-CRYPT}...
 
 ## These values define how the certificate created by the chart is processed by cert-manager
 ## Ensure you've setup your ClusterIssuers (letsencrypt-staging and letsencrypt-prod) and DNS provider

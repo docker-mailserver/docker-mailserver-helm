@@ -38,8 +38,6 @@ spec:
         - name: "data"
           persistentVolumeClaim:
             claimName: {{ template "dockermailserver.pvcName" . }}
-        - name: "config"
-          emptyDir: {}
         - name: "configmap"
           configMap:
             name: {{ template "dockermailserver.fullname" . }}-configs
@@ -50,42 +48,40 @@ spec:
 {{- end }}
         - name: "opendkim-keys"
           secret:
-            secretName: {{ template "dockermailserver.fullname" . }}-secrets
-{{ if .Values.pod.dockermailserver.ssl_type }}
+            secretName: {{ template "dockermailserver.fullname" . }}-dkim-secrets
+{{- if .Values.pod.dockermailserver.ssl_type }}
         - name: "ssl-cert"
           secret:
-{{ if .Values.ssl.useExisting }}
+{{- if .Values.ssl.useExisting }}
             secretName: {{ .Values.ssl.existingName }}
 {{- else }}
             secretName: {{ template "dockermailserver.fullname" . }}-tls
 {{- end }}
+        - name: accounts
+          secret:
+            secretName: {{ template "dockermailserver.fullname" . }}-accounts
 {{- end }}
-{{ if .Values.additionalVolumes }}
+{{- if .Values.additionalVolumes }}
 {{- toYaml .Values.additionalVolumes | indent 9 }}
 {{- end }}
         - name: tmp
           emptyDir: {}
-      initContainers:
-        - name: prep-config
-          image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
-          imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
-          command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]
-          volumeMounts:
-            - name: configmap
-              mountPath: /tmp/configmaps
-              readOnly: true
-            - name: config
-              mountPath: /tmp/docker-mailserver/
-          resources:
-{{ toYaml .Values.initContainer.resources | indent 12 }}
-          securityContext:
-{{ toYaml .Values.initContainer.containerSecurityContext | indent 12 }}
       containers:
         - name: dockermailserver
           env:
 {{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - >
+              mkdir -p /tmp/docker-mailserver/opendkim/keys
+              && ln -s /tmp/docker-mailserver-configs/* /tmp/docker-mailserver
+              && ln -s /tmp/docker-mailserver-accounts/* /tmp/docker-mailserver
+              && ln -s /tmp/docker-mailserver-opendkim/* /tmp/docker-mailserver
+              && ln -s /tmp/docker-mailserver-opendkim-keys/* /tmp/docker-mailserver/opendkim/keys
+              && supervisord -c /etc/supervisor/supervisord.conf
           resources:
 {{ toYaml .Values.resources | indent 12 }}
             {{- if eq .Values.pod.dockermailserver.enable_fail2ban 1.0 }}
@@ -96,9 +92,11 @@ spec:
           securityContext:
 {{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
           volumeMounts:
-            - name: config
-              mountPath: /tmp/docker-mailserver
-{{ if .Values.pod.dockermailserver.ssl_type }}
+            - name: configmap
+              mountPath: /tmp/docker-mailserver-configs
+            - name: accounts
+              mountPath: /tmp/docker-mailserver-accounts
+{{- if .Values.pod.dockermailserver.ssl_type }}
             - name: ssl-cert
               mountPath: /tmp/ssl
               readOnly: true

@@ -21,7 +21,7 @@ Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in
     - [Install helm and cert-manager](#install-helm-and-cert-manager)
   - [Installation](#installation-1)
   - [Operation](#operation)
-    - [Download setup.sh](#download-setupsh)
+    - [Download setup.sh](#create-setup)
     - [Create / Update / Delete users](#create--update--delete-users)
     - [Setup OpenDKIM](#setup-opendkim)
     - [Setup RainLoop](#setup-rainloop)
@@ -120,28 +120,39 @@ This command will install Docker Mailserver with default values.  You probably w
 helm install --name docker-mailserver docker-mailserver
 ```
 
-### Download setup.sh
+### Create setup
 
-Download the [upstream setup.sh](https://raw.githubusercontent.com/docker-mailserver/docker-mailserver/master/setup.sh) to a local folder (*ideally the same location you store your custom values.yaml*)
+The provided [upstream setup.sh](https://raw.githubusercontent.com/docker-mailserver/docker-mailserver/master/setup.sh) doesn't support k8s installations, yet. Fortunately there is a handy workaround. Just create this script called `setup.sh`:
 
-Run `./setup.sh` without arguments for a list of full options
+```shell
+#!/usr/bin/env bash
+NAMESPACE=mail
+RELEASE_NAME=mail
+kubectl exec -n ${NAMESPACE} -i -t deploy/${RELEASE_NAME}-docker-mailserver -c dockermailserver -- sh -c "/usr/local/bin/setup $*"
+```
+
+and make it executable `chmod +x ./setup.sh`
+
+Run `./setup.sh` without arguments for a list of full options.
 
 ### Create / Update / Delete users
 
-Run `./setup.sh <email address>` to create the email addresses in `$PWD/config`
+Accounts are managed in the secret `<release-fullname>-accounts`. This file will be copied to a local version in the pod.
 
-Example output:
+Run `./setup.sh <email address>` to create the email addresses in the cluster. This user will disappear after restart. To make it permanent you'll have to update the secret, too:
 
-```console
-[funkypenguin:~/demo] ./setup.sh email add david@kowalski.elpenguino.net
-"docker inspect" requires at least 1 argument.
-See 'docker inspect --help'.
-
-Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
-
-Return low-level information on Docker objects
-Enter Password:
-[funkypenguin:~/demo] %
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mail-docker-mailserver-accounts
+  namespace: mail
+  labels:
+    app.kubernetes.io/name: mail
+type: Opaque
+stringData:
+  postfix-accounts.cf: |
+    david@kowalski.elpenguino.net|CRYPT....
 ```
 
 ### Setup OpenDKIM
@@ -238,20 +249,22 @@ The following table lists the configurable parameters of the docker-mailserver c
 
 | Parameter                                         | Description                                                                                                                                                                          | Default                                              |
 |---------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------|
-| `image.name`                                      | The name of the container image to use                                                                                                                                               | `mailserver/docker-mailserver`                            |
+| `image.name`                                      | The name of the container image to use                                                                                                                                               | `mailserver/docker-mailserver`                       |
 | `image.tag`                                       | The image tag to use (You may prefer "latest" over "v6.1.0", for example)                                                                                                            | `release-v6.1.0`                                     |
-| `demoMode.enabled`                               | Start the container with a demo "user@example.com" user (password is "password")                                                                                                     | `true`                                               |
+| `demoMode.enabled`                                | Start the container with a demo "user@example.com" user (password is "password")                                                                                                     | `true`                                               |
 | `haproxy.enabled`                                 | Support HAProxy PROXY protocol on SMTP, IMAP(S), and POP3(S) connections. Provides real source IP instead of load balancer IP                                                        | `true`                                               |
-| `haproxy.trustedNetworks`                        | The IPs (*in space-separated CIDR format*) from which to trust inbound HAProxy-enabled connections                                                                                   | `"10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"`          |
-| `spfTestsDisabled`                              | Disable all SPF-related spam checks (*if source IP of inbound connections is a problem, and you're not using haproxy*)                                                               | `false`                                              |
+| `haproxy.trustedNetworks`                         | The IPs (*in space-separated CIDR format*) from which to trust inbound HAProxy-enabled connections                                                                                   | `"10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"`          |
+| `spfTestsDisabled`                                | Disable all SPF-related spam checks (*if source IP of inbound connections is a problem, and you're not using haproxy*)                                                               | `false`                                              |
 | `domains`                                         | List of domains to be served                                                                                                                                                         | `[]`                                                 |
-| `livenessTests.enabled`                          | Whether to execute liveness tests by running (arbitrary) commands in the docker-mailserver container. Useful to detect component failure (*i.e., clamd dies due to memory pressure*) | `true`                                               |
-| `livenessTests.enabled`                          | Array of commands to execute in sequence, to determine container health. A non-zero exit of any command is considered a failure                                                      | `[ "clamscan /tmp/docker-mailserver/TrustedHosts" ]` |
+| `livenessTests.enabled`                           | Whether to execute liveness tests by running (arbitrary) commands in the docker-mailserver container. Useful to detect component failure (*i.e., clamd dies due to memory pressure*) | `true`                                               |
+| `livenessTests.enabled`                           | Array of commands to execute in sequence, to determine container health. A non-zero exit of any command is considered a failure                                                      | `[ "clamscan /tmp/docker-mailserver/TrustedHosts" ]` |
 | `pod.dockermailserver.hostNetwork`                | Whether the pod should be connected to the "host" network (a primitive solution to ingress NAT problem)                                                                              | `false`                                              |                                              |
 | `pod.dockermailserver.hostPID`                    | Not really sure. TBD.                                                                                                                                                                | `None`                                               |                                           |
-| `pod.dockermailserver.securityContext.privileged` | Whether to run this pod in "privileged" mode.                                                                                                                                        | `false`
+| `pod.dockermailserver.securityContext.privileged` | Whether to run this pod in "privileged" mode.                                                                                                                                        | `false`                                              |
+ | `secret.useExisting`                              | Use existing secret for *accounts*: `<release-fullname>-accounts` and *dkim*: `<release-fullname>-dkim-secrets`                                                                      | `false`                                              |
+ | `configMap.useExisting`                           | Use existing configmap for [additional optional configuration files](https://docker-mailserver.github.io/docker-mailserver/edge/config/advanced/optional-config/)                    | `false`                                              |
 | `service.type`                                    | What scope the service should be exposed in  (*LoadBalancer/NodePort/ClusterIP*)                                                                                                     | `NodePort`                                           |
- | `openDKIM.configMap`                              | Provide openDKIM configuration. See [openDKIM example config](#setup-opendkim)                                                                                                       |
+ | `openDKIM.configMap`                              | Provide openDKIM configuration. See [openDKIM example config](#setup-opendkim)                                                                                                       |                                                      |
 | `service.loadBalancer.publicIp`                   | The public IP to assign to the service (*if LoadBalancer*) scope selected above                                                                                                      | `None`                                               |
 | `service.loadBalancer.allowedIps`                 | The IPs allowed to access the sevice, in CIDR format (*if LoadBalancer*) scope selected above                                                                                        | `[ "0.0.0.0/0" ]`                                    |
 | `service.nodeport.smtp`                           | The port exposed on the node the container is running on, which will be forwarded to docker-mailserver's SMTP port (25)                                                              | `30025`                                              |
@@ -272,8 +285,8 @@ The following table lists the configurable parameters of the docker-mailserver c
 | `ssl.issuer.kind`                                 | Whether the issuer is namespaced (`Issuer`) on cluster-wide (`ClusterIssuer`)                                                                                                        | `ClusterIssuer`                                      |
 | `ssl.dnsname`                                     | DNS domain used for DNS01 validation                                                                                                                                                 | `example.com`                                        |
 | `ssl.dns01provider`                               | The cert-manager DNS01 provider (*more details [coming](https://github.com/funkypenguin/docker-mailserver/issues/6)*)                                                                | `cloudflare`                                         |
-| `runtimeClassName`                                | Optionally, set the pod's [runtimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) | `""`
-| `priorityClassName`                               | Optionally, set the pod's [priorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) | `""`
+| `runtimeClassName`                                | Optionally, set the pod's [runtimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/)                                                                              | `""`                                                 |
+| `priorityClassName`                               | Optionally, set the pod's [priorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)                                                          | `""`                                                 |
 
 #### docker-mailserver Configuration
 
