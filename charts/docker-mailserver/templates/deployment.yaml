@@ -45,10 +45,12 @@ spec:
         - name: configmap-dkim
           configMap:
             name: {{ template "dockermailserver.fullname" . }}-dkim-configs
+            defaultMode: 384
 {{- end }}
         - name: "opendkim-keys"
           secret:
             secretName: {{ template "dockermailserver.fullname" . }}-dkim-secrets
+            defaultMode: 384
 {{- if .Values.pod.dockermailserver.ssl_type }}
         - name: "ssl-cert"
           secret:
@@ -79,9 +81,11 @@ spec:
               mkdir -p /tmp/docker-mailserver/opendkim/keys
               && ln -s /tmp/docker-mailserver-configs/* /tmp/docker-mailserver
               && ln -s /tmp/docker-mailserver-accounts/* /tmp/docker-mailserver
-              && ln -s /tmp/docker-mailserver-opendkim/* /tmp/docker-mailserver
-              && ln -s /tmp/docker-mailserver-opendkim-keys/* /tmp/docker-mailserver/opendkim/keys
+              && cp /tmp/docker-mailserver-opendkim/* /tmp/docker-mailserver/opendkim/
+              && cp -r /tmp/docker-mailserver-opendkim-keys/* /tmp/docker-mailserver/opendkim/keys
+              && chown -R opendkim:opendkim /tmp/docker-mailserver/opendkim/*
               && supervisord -c /etc/supervisor/supervisord.conf
+          # TrustedHosts might be modified by PERMIT_DOCKER and cannot be mounted as symlink
           resources:
 {{ toYaml .Values.resources | indent 12 }}
           securityContext:
