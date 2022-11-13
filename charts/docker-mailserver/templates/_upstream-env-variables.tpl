@@ -127,6 +127,8 @@ We list them here (and include this template in deployment.yaml) to keep deploym
   value: {{ .Values.pod.dockermailserver.saslauthd_mechanisms | quote }}
 - name: SASLAUTHD_MECH_OPTIONS
   value: {{ .Values.pod.dockermailserver.saslauthd_mech_options | quote }}
+- name: SASLAUTHD_LDAP_START_TLS
+  value: {{ .Values.pod.dockermailserver.saslauthd_ldap_start_tls | quote }}
 - name: SASLAUTHD_LDAP_SERVER
   value: {{ .Values.pod.dockermailserver.saslauthd_ldap_server | quote }}
 - name: SASLAUTHD_LDAP_SSL
