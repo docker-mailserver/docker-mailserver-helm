@@ -17,9 +17,6 @@ data:
   ### End demo mode data
   {{/* Use real data from "config" subdirectory if user is _not_ running in demo mode */}}  
   {{ else -}}
-  {{- (.Files.Glob "config/*").AsConfig | nindent 2 }}
-  {{- (.Files.Glob "config/opendkim/*").AsConfig | nindent 2 }} 
-  {{- end }}
   postfix-main.cf: |
   {{/* Enable proxy protocol for postscreen / dovecot */}}
   {{- if or .Values.service.behind_proxy .Values.rainloop.enabled }}  # Necessary to permit proxy protocol from haproxy to postscreen
@@ -28,6 +25,9 @@ data:
   {{ if not .Values.spfTestsDisabled }}
     smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination, reject_unauth_pipelining, reject_invalid_helo_hostname, reject_non_fqdn_helo_hostname, reject_unknown_recipient_domain, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net{{ range .Values.rblRejectDomains }}, reject_rbl_client {{ . }}{{ end }}
   {{ end -}}
+  {{- (.Files.Glob "config/*").AsConfig | nindent 2 }}
+  {{- (.Files.Glob "config/opendkim/*").AsConfig | nindent 2 }}
+  {{- end }}
   dovecot-services.cf: |
   {{- if or .Values.service.behind_proxy .Values.rainloop.enabled }}
     haproxy_trusted_networks = {{ .Values.service.proxy_trusted_networks }}
