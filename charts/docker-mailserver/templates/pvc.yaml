@@ -12,7 +12,7 @@ spec:
   accessModes:
     - {{ default "ReadWriteOnce" .Values.persistence.accessMode | quote }}
   {{- if .Values.persistence.storageClass }}
-  storageClass: {{ .Values.persistence.storageClass | quote }}
+  storageClassName: {{ .Values.persistence.storageClass | quote }}
   {{- end }}    
   resources:
     requests:
