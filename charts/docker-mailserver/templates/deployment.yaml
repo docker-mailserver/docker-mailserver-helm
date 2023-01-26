@@ -170,7 +170,7 @@ spec:
                  - -c
                  - supervisorctl status | grep -E "amavis|clamav|cron|dovecot|mailserver|opendkim|opendmarc|postfix|rsyslog" | grep RUNNING
             initialDelaySeconds: 10
-            timeoutSeconds: 1
+            timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
             exec:
@@ -179,7 +179,7 @@ spec:
                  - -c
                  - supervisorctl status | grep -E "mailserver|postfix" | grep RUNNING
             initialDelaySeconds: 10
-            timeoutSeconds: 1
+            timeoutSeconds: 5
             failureThreshold: 3
 
 {{ if .Values.metrics.enabled }}
