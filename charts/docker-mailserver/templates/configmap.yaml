@@ -34,8 +34,10 @@ data:
   {{ if not .Values.spfTestsDisabled }}
     smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination, reject_unauth_pipelining, reject_invalid_helo_hostname, reject_non_fqdn_helo_hostname, reject_unknown_recipient_domain, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net{{ range .Values.rblRejectDomains }}, reject_rbl_client {{ . }}{{ end }}
   {{ end -}}
-  {{- (.Files.Glob "config/*").AsConfig | nindent 2 }}
-  {{- (.Files.Glob "config/opendkim/*").AsConfig | nindent 2 }}
+  {{- (.Files.Glob "config/*.cf").AsConfig | nindent 2 }}
+  {{- (.Files.Glob "config/opendkim/TrustedHosts").AsConfig | nindent 2 }}
+  {{- (.Files.Glob "config/opendkim/SigningTable").AsConfig | nindent 2 }}
+  {{- (.Files.Glob "config/opendkim/KeyTable").AsConfig | nindent 2 }}
   {{- end }}
   dovecot-services.cf: |
   {{- if .Values.haproxy.enabled }}
