@@ -11,29 +11,28 @@ Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in
 
 ## Contents
 
-- [Docker-mailserver](#docker-mailserver)
-  - [Introduction](#introduction)
-  - [Contents](#contents)
-  - [Features](#features)
-  - [Prerequisites](#prerequisites)
-  - [Architecture](#architecture)
-  - [Installation](#installation)
-    - [Install helm and cert-manager](#install-helm-and-cert-manager)
-  - [Installation](#installation-1)
-  - [Operation](#operation)
-    - [Download setup.sh](#download-setupsh)
-    - [Create / Update / Delete users](#create--update--delete-users)
-    - [Setup OpenDKIM](#setup-opendkim)
-    - [Setup RainLoop](#setup-rainloop)
-    - [Configuration](#configuration)
-      - [Minimal configuration](#minimal-configuration)
-      - [Chart Configuration](#chart-configuration)
-      - [docker-mailserver Configuration](#docker-mailserver-configuration)
-      - [Rainloop Configuration](#rainloop-configuration)
-      - [Traefik as proxy](TRAEFIK_AS_PROXY.md)
+- [Contents](#contents)
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+  - [Install Helm](#1-install-helm)
+  - [Install Cert-manager](#2-install-cert-manager)
+  - [Install Docker Mailserver](#install-docker-mailserver)
+- [Configuration and Operation](#configuration-and-operation)
+  - [Download setup.sh](#download-setupsh)
+  - [Create / Update / Delete users](#create--update--delete-users)
+  - [Setup OpenDKIM](#setup-opendkim)
+  - [Setup RainLoop](#setup-rainloop)
+  - [Configuration](#docker-mailserver-configuration)
+    - [Minimal configuration](#minimal-configuration)
+    - [Chart Configuration](#chart-configuration)
+    - [docker-mailserver Configuration](#docker-mailserver-configuration)
+    - [Rainloop Configuration](#rainloop-configuration)
+    - [Traefik as proxy](TRAEFIK_AS_PROXY.md)
       - [HA Proxy-Ingress Configuration](#ha-proxy-ingress-configuration)
-  - [Development](#development)
-    - [Testing](#testing)
+- [Development](#development)
+  - [Testing](#testing)
 
 (Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc.go))
 
@@ -55,7 +54,7 @@ The chart includes the following features:
 external load balancer (e.g. AWS, DO or GKE). (There is an [update planned](https://github.com/funkypenguin/docker-mailserver/issues/5) to support HA ingress on bare-metal deployments)
 - You control DNS for the domain(s) you intend to route through Traefik
 - __Suggested:__ PV provisioner support in the underlying infrastructure
-- [Cert-manager](https://github.com/jetstack/cert-manager/tree/master/deploy/charts/cert-manager) requires manual deployment into your cluster (details below)
+- [Cert-manager](https://github.com/jetstack/cert-manager/tree/master/deploy/charts/cert-manager) => 1.0 requires manual deployment into your cluster (details below)
 - [Helm](https://helm.sh) >= 2.13.0 (*errors were encountered when testing with 2.11.0, so the chart has a minimum requirement of 2.13.0*)
 - Access to a platform with Docker installed, in order to run [docker-mailserver's setup.sh binary](https://github.com/docker-mailserver/docker-mailserver/blob/master/setup.sh), which uses a docker container to setup dovecot password hashes and OpenDKIM keys
 
@@ -67,7 +66,7 @@ There are several ways you might deploy docker-mailserver. The most common would
 
 2. Either within a cloud provider, or in a private Kubernetes cluster, behind a non-integrated load-balancer such as haproxy. An example deployment might be something like [Funky Penguin's Poor Man's K8s Load Balancer](https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/), or even a manually configured haproxy instance/pair.
 
-## Prerequsiites
+## Getting Started
 
 ### 1. Install helm
 
@@ -81,7 +80,7 @@ Here are the TL;DR steps for installing cert-manager:
 
 ```console
 # Install the CustomResourceDefinition resources separately
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.7/deploy/manifests/00-crds.yaml
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.yaml
 
 # Create the namespace for cert-manager
 kubectl create namespace cert-manager
@@ -99,7 +98,7 @@ helm repo update
 helm install \
   --name cert-manager \
   --namespace cert-manager \
-  --version v0.7.0 \
+  --version v1.9.1 \
   jetstack/cert-manager
 ```
 
@@ -194,12 +193,11 @@ Most of the values recorded belowe are set to sensible default, butyou'll defina
 |------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|------------------------|
 | `pod.dockermailserver.override_hostname` | The hostname to be presented on SMTP banners                                                                          | `mail.batcave.org`     |
 | `rainloop.ingress.hosts`                 | The hostname(s) to be used via your ingress to access RainLoop                                                        | `rainloop.example.com` |
-| `demoMode.enabled`                      | Start the container with a demo "user@example.com" user (password is "password")                                      | `true`                 |
+| `demoMode.enabled`                       | Start the container with a demo "user@example.com" user (password is "password")                                      | `true`                 |
 | `domains`                                | List of domains to be served                                                                                          | `[]`                   |
 | `ssl.issuer.name`                        | The name of the cert-manager issuer expected to issue certs                                                           | `letsencrypt-staging`  |
 | `ssl.issuer.kind`                        | Whether the issuer is namespaced (`Issuer`) on cluster-wide (`ClusterIssuer`)                                         | `ClusterIssuer`        |
 | `ssl.dnsname`                            | DNS domain used for DNS01 validation                                                                                  | `example.com`          |
-| `ssl.dns01provider`                      | The cert-manager DNS01 provider (*more details [coming](https://github.com/funkypenguin/docker-mailserver/issues/6)*) | `cloudflare`           |
 
 #### Chart Configuration
 
@@ -207,18 +205,18 @@ The following table lists the configurable parameters of the docker-mailserver c
 
 | Parameter                                         | Description                                                                                                                                                                          | Default                                              |
 |---------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------|
-| `image.name`                                      | The name of the container image to use                                                                                                                                               | `mailserver/docker-mailserver`                            |
+| `image.name`                                      | The name of the container image to use                                                                                                                                               | `mailserver/docker-mailserver`                       |
 | `image.tag`                                       | The image tag to use (You may prefer "latest" over "v6.1.0", for example)                                                                                                            | `release-v6.1.0`                                     |
-| `demoMode.enabled`                               | Start the container with a demo "user@example.com" user (password is "password")                                                                                                     | `true`                                               |
+| `demoMode.enabled`                                | Start the container with a demo "user@example.com" user (password is "password")                                                                                                     | `true`                                               |
 | `haproxy.enabled`                                 | Support HAProxy PROXY protocol on SMTP, IMAP(S), and POP3(S) connections. Provides real source IP instead of load balancer IP                                                        | `true`                                               |
-| `haproxy.trustedNetworks`                        | The IPs (*in space-separated CIDR format*) from which to trust inbound HAProxy-enabled connections                                                                                   | `"10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"`          |
-| `spfTestsDisabled`                              | Disable all SPF-related spam checks (*if source IP of inbound connections is a problem, and you're not using haproxy*)                                                               | `false`                                              |
+| `haproxy.trustedNetworks`                         | The IPs (*in space-separated CIDR format*) from which to trust inbound HAProxy-enabled connections                                                                                   | `"10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"`          |
+| `spfTestsDisabled`                                | Disable all SPF-related spam checks (*if source IP of inbound connections is a problem, and you're not using haproxy*)                                                               | `false`                                              |
 | `domains`                                         | List of domains to be served                                                                                                                                                         | `[]`                                                 |
-| `livenessTests.enabled`                          | Whether to execute liveness tests by running (arbitrary) commands in the docker-mailserver container. Useful to detect component failure (*i.e., clamd dies due to memory pressure*) | `true`                                               |
-| `livenessTests.enabled`                          | Array of commands to execute in sequence, to determine container health. A non-zero exit of any command is considered a failure                                                      | `[ "clamscan /tmp/docker-mailserver/TrustedHosts" ]` |
+| `livenessTests.enabled`                           | Whether to execute liveness tests by running (arbitrary) commands in the docker-mailserver container. Useful to detect component failure (*i.e., clamd dies due to memory pressure*) | `true`                                               |
+| `livenessTests.enabled`                           | Array of commands to execute in sequence, to determine container health. A non-zero exit of any command is considered a failure                                                      | `[ "clamscan /tmp/docker-mailserver/TrustedHosts" ]` |
 | `pod.dockermailserver.hostNetwork`                | Whether the pod should be connected to the "host" network (a primitive solution to ingress NAT problem)                                                                              | `false`                                              |                                              |
 | `pod.dockermailserver.hostPID`                    | Not really sure. TBD.                                                                                                                                                                | `None`                                               |                                           |
-| `pod.dockermailserver.securityContext.privileged` | Whether to run this pod in "privileged" mode.                                                                                                                                        | `false`
+| `pod.dockermailserver.securityContext.privileged` | Whether to run this pod in "privileged" mode.                                                                                                                                        | `false`                                              |
 | `service.type`                                    | What scope the service should be exposed in  (*LoadBalancer/NodePort/ClusterIP*)                                                                                                     | `NodePort`                                           |
 | `service.loadBalancer.publicIp`                   | The public IP to assign to the service (*if LoadBalancer*) scope selected above                                                                                                      | `None`                                               |
 | `service.loadBalancer.allowedIps`                 | The IPs allowed to access the sevice, in CIDR format (*if LoadBalancer*) scope selected above                                                                                        | `[ "0.0.0.0/0" ]`                                    |
@@ -240,8 +238,8 @@ The following table lists the configurable parameters of the docker-mailserver c
 | `ssl.issuer.kind`                                 | Whether the issuer is namespaced (`Issuer`) on cluster-wide (`ClusterIssuer`)                                                                                                        | `ClusterIssuer`                                      |
 | `ssl.dnsname`                                     | DNS domain used for DNS01 validation                                                                                                                                                 | `example.com`                                        |
 | `ssl.dns01provider`                               | The cert-manager DNS01 provider (*more details [coming](https://github.com/funkypenguin/docker-mailserver/issues/6)*)                                                                | `cloudflare`                                         |
-| `runtimeClassName`                                | Optionally, set the pod's [runtimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) | `""`
-| `priorityClassName`                               | Optionally, set the pod's [priorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) | `""`
+| `runtimeClassName`                                | Optionally, set the pod's [runtimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/)                                                                              | `""`                                                 |
+| `priorityClassName`                               | Optionally, set the pod's [priorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)                                                          | `""`                                                 |
 
 #### docker-mailserver Configuration
 
