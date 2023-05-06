@@ -14,3 +14,4 @@ config/opendkim/
 helm-chart/docker-mailserver/config/opendkim
 myvalues.yml
 helm-chart/manifests
+charts/docker-mailserver/charts

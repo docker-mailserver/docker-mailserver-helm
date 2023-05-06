@@ -107,7 +107,8 @@ data:
     echo "All healthy"
 ---
 {{- end -}}
-{{- if .Values.openDKIM.configMap -}}
+{{- $openDKIM := .Values.openDKIM | default dict }}
+{{- if $openDKIM.configMap -}}
 apiVersion: "v1"
 kind: "ConfigMap"
 metadata:

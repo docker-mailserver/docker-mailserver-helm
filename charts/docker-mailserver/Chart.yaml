@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "11.3.1"
 description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
 name: docker-mailserver
-version: 1.0.10
+version: 2.0.1
 sources:
 - https://github.com/docker-mailserver/docker-mailserver-helm
 maintainers:
@@ -23,7 +23,7 @@ annotations:
     
 dependencies:
   - name: "kubernetes-ingress"
-    version: "1.22.4"
+    version: "1.30.4"
     repository: "https://haproxytech.github.io/helm-charts"
     condition: haproxy.enabled
     alias: "haproxy"
