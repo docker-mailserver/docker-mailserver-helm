@@ -106,7 +106,7 @@ domains: [ ]
 #  - your-second-domain.com
 
 # configmap of the openDKIM setup. Secrets have to be provided in '<release-fullname>-dkim-secrets'
-openDKIM:
+#openDKIM:
 #  configMap:
 #    TrustedHosts: |
 #      127.0.0.1
