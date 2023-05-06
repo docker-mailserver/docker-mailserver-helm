@@ -106,7 +106,7 @@ domains: [ ]
 #  - your-second-domain.com
 
 # configmap of the openDKIM setup. Secrets have to be provided in '<release-fullname>-dkim-secrets'
-#openDKIM:
+openDKIM:
 #  configMap:
 #    TrustedHosts: |
 #      127.0.0.1
@@ -291,7 +291,6 @@ service:
   # of your HAProxy instance
   # service.proxy_trusted_networks is the list of sources (in CIDR format, space-separated) to permit haproxy PROXY protocol from
   proxy_trusted_networks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
-
 
 deployment:
 

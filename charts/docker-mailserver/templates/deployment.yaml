@@ -41,7 +41,8 @@ spec:
         - name: "configmap"
           configMap:
             name: {{ template "dockermailserver.fullname" . }}-configs
-{{- if .Values.openDKIM.configMap }}
+{{- $openDKIM := .Values.openDKIM | default dict }}
+{{- if $openDKIM.configMap }}
         - name: configmap-dkim
           configMap:
             name: {{ template "dockermailserver.fullname" . }}-dkim-configs
@@ -121,7 +122,7 @@ spec:
               subPath: dovecot.cf
               mountPath: /etc/dovecot/conf.d/zz-custom.cf
               readOnly: true
-{{- if .Values.openDKIM.configMap }}
+{{- if $openDKIM.configMap }}
             - name: configmap-dkim
               mountPath: /tmp/docker-mailserver-opendkim
               readOnly: true
