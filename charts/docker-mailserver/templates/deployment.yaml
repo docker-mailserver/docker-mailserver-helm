@@ -60,10 +60,10 @@ spec:
 {{- else }}
             secretName: {{ template "dockermailserver.fullname" . }}-tls
 {{- end }}
+{{- end }}
         - name: accounts
           secret:
             secretName: {{ template "dockermailserver.fullname" . }}-accounts
-{{- end }}
 {{- if .Values.additionalVolumes }}
 {{- toYaml .Values.additionalVolumes | indent 8 }}
 {{- end }}
