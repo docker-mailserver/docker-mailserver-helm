@@ -68,20 +68,22 @@ jobs:
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed --config .ci/ct-config.yaml)
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
           if [[ -n "$changed" ]]; then
-            echo "::set-output name=changed::true"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Run chart-testing (lint)
-        run: ct lint --config .ci/ct-config.yaml
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --config .ci/ct-config.yaml
 
       - name: Create ${{matrix.KubeVersion}} kind cluster
         uses: helm/kind-action@v1.5.0
+        if: steps.list-changed.outputs.changed == 'true'
         with:
           node_image: kindest/node:v${{matrix.KubeVersion}}
           cluster_name: kubernetes-${{matrix.KubeVersion}}
-        if: steps.list-changed.outputs.changed == 'true'
 
       - name: Run chart-testing (install) against ${{matrix.KubeVersion}}
-        run: ct install --config .ci/ct-config.yaml
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct install --target-branch ${{ github.event.repository.default_branch }} --config .ci/ct-config.yaml
