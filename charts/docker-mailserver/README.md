@@ -30,7 +30,7 @@ Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in
     - [docker-mailserver Configuration](#docker-mailserver-configuration)
     - [Rainloop Configuration](#rainloop-configuration)
     - [Traefik as proxy](TRAEFIK_AS_PROXY.md)
-      - [HA Proxy-Ingress Configuration](#ha-proxy-ingress-configuration)
+    - [HA Proxy-Ingress Configuration](#ha-proxy-ingress-configuration)
 - [Development](#development)
   - [Testing](#testing)
 
