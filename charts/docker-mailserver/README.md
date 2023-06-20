@@ -280,7 +280,7 @@ Values you'll definately want to pay attention to:
 | `metrics.resource.limits.memory`        | Maximum share of RAM for metrics sidecar                                                      | `null`                                                             |
 | `metrics.resource.limits.cpu`           | Maximum share of CPU available for metrics                                                    | `null`                                                             |
 | `metrics.resource.requests.cpu`         | Iniyial share of CPU available per-pod                                                        | `null`                                                             |
-| `metrics.image.name`                    | The name of the container image to use                                                        | `mblackflysolutions/postfix-exporter@sha256`                       |
+| `metrics.image.name`                    | The name of the container image to use                                                        | `blackflysolutions/postfix-exporter@sha256`                       |
 | `metrics.image.tag`                     | The image tag. If use named tag, then remove @sha256 from name, else put sha256 signed value  | `7ed7c0534112aff5b44757ae84a206bf659171631edfc325c3c1638d78e74f73` |
 | `metrics.image.pullPolicy`              | pullPolicy                                                                                    | `IfNotPresent`                                                     |
 | `metrics.serviceMonitor.enabled`        | generate serviceMonitor for metrics                                                           | `false`                                                            |
