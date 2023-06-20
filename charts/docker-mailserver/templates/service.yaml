@@ -84,7 +84,17 @@ spec:
     - protocol: "TCP"
       name: "tcp-imaps-rainloop"
       port: 10993        
-  {{ end }}  
+  {{ end }}
+
+  {{- if .Values.metrics.enabled }}
+    - name: tcp-metrics
+      port: 9154
+      protocol: TCP
+      targetPort: 9154       
+  {{ end }}
+
+
+
   type: {{ default "ClusterIP" .Values.service.type }}
   {{ if eq .Values.service.type "LoadBalancer" -}}
   {{ if .Values.service.loadBalancer.publicIp -}}
