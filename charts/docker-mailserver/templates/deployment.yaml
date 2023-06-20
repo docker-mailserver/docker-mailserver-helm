@@ -186,8 +186,10 @@ spec:
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
           command: ["/bin/postfix_exporter"]
           args: 
-            - "--postfix.showq_path /var/mail-state/spool-postfix/public/showq"
-            - "--postfix.logfile_path /var/log/mail/mail.log"
+            - "--postfix.showq_path"
+            - "/var/mail-state/spool-postfix/public/showq"
+            - "--postfix.logfile_path"
+            - "/var/log/mail/mail.log"
 
           ports:
             - containerPort: 9154
