@@ -272,6 +272,7 @@ Values you'll definately want to pay attention to:
 
 
 #### postfix exporter metrics
+* use dashboard :  https://grafana.com/grafana/dashboards/10013-postfix/
 
 | Parameter                               | Description                                                                                   | Default                                                            |
 |-----------------------------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
