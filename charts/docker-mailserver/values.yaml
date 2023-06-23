@@ -427,5 +427,18 @@ metrics:
     scrapeInterval: 15s
 
 
-      
+# when logging flow for kube-logging operator 
+logging:
+  enable: false
+  clusterTag: demo
+
+  # put debug=true to send result into fluentd logging pod /fluentd/log/out
+  debug: false
+  
+  # otherwise flow is send to global or local output
+  outputMode: global
+  output: logging-output-opensearch-postfix
+
+
+
 

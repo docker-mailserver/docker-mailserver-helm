@@ -1,0 +1,61 @@
+{{- if .Values.logging.enable -}}
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+  name: logging-flow-postfix-k8s
+
+spec:
+  filters:
+    - dedot:
+        de_dot_nested: true
+        de_dot_separator: '-'
+    - grep:
+        regexp:
+          - key: log
+            pattern: /.+ postfix\/smtp\u005B[0-9]+\u005D\u003A [0-9A-F]+\u003A to=/
+    - record_modifier:
+        records:
+          - cluster:  {{ .Values.logging.clusterTag }}
+          - service: "postfix/smtp"
+          - time: ${require 'time'; Time.parse(record['time'].to_s).utc.iso8601(3)}
+          - postfix_time: ${record['log'].match(/([A-Za-z]{3} [0-9]{1,2} [0-9]{2}\:[0-9]{2}\:[0-9]{2}) /).captures[0]}
+          - log: ${record['log'].gsub(/\n/, '')}          
+    - record_modifier:
+        records:
+          - postfix_time: ${require 'time'; Time.parse(record['postfix_time']).utc.iso8601(3)}
+          - time: ${require 'time'; Time.parse(record['postfix_time']).utc.iso8601(3)}         
+          - hostname:  ${record['log'].match(/.+ (.+) postfix\/smtp\u005B/).captures[0]}
+          - process: ${record['log'].match(/.+ (postfix\/smtp\u005B[0-9]+\u005D)/).captures[0]}
+          - queue_id: ${record['log'].match(/.+ postfix\/smtp\u005B[0-9]+\u005D\u003A ([0-9A-F]+)\u003A to=/).captures[0]}
+          - to: ${record['log'].match(/.+ to=<(.+)>,/).captures[0]}
+          - domain: ${record['log'].match(/.+ to=<[^@].+@([^@].+)>,/).captures[0]}
+          - relay: ${record['log'].match(/.+ to=<.+>, relay=(.+), delay=/).captures[0]}
+          - delays: ${record['log'].match(/.+, delays=(.+), dsn=/).captures[0]}
+          - dsn: ${record['log'].match(/.+, dsn=(.+), status=/).captures[0]}
+          - status: ${record['log'].match(/.+, status=([^ ]+) /).captures[0]}
+          - status_detail: ${record['log'].match(/.+, status=[^ ]+ \((.+)\)$/).captures[0]}
+
+  {{ if .Values.logging.debug -}}
+    - stdout:
+        output_type: json
+  {{- end }}
+
+
+  {{ if eq .Values.logging.outputMode "global" -}}
+  globalOutputRefs:
+    - {{ .Values.logging.output }}
+  {{ else if eq .Values.logging.outputMode "local" -}}
+  localOutputRefs:
+    - {{ .Values.logging.output }}
+  {{- end }}
+
+  match:
+    - select:
+        container_names:
+          - dockermailserver
+{{- end -}}

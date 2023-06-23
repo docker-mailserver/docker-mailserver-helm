@@ -30,6 +30,8 @@ Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in
     - [docker-mailserver Configuration](#docker-mailserver-configuration)
     - [Rainloop Configuration](#rainloop-configuration)
     - [HA Proxy-Ingress Configuration](#ha-proxy-ingress-configuration)
+    - [Metrics Configuration](#postfix-exporter-metrics)
+    - [Logging Configuration](#logging-flow-for-kubbe-logging-operator)
 - [Development](#development)
   - [Testing](#testing)
 
@@ -273,6 +275,7 @@ Values you'll definately want to pay attention to:
 
 #### postfix exporter metrics
 * use dashboard :  https://grafana.com/grafana/dashboards/10013-postfix/
+* given dashboard in samples/grafana
 
 | Parameter                               | Description                                                                                   | Default                                                            |
 |-----------------------------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
@@ -286,6 +289,18 @@ Values you'll definately want to pay attention to:
 | `metrics.image.pullPolicy`              | pullPolicy                                                                                    | `IfNotPresent`                                                     |
 | `metrics.serviceMonitor.enabled`        | generate serviceMonitor for metrics                                                           | `false`                                                            |
 | `metrics.serviceMonitor.scrapeInterval` | default scrape interval                                                                       | `15s`                                                              |
+
+
+#### logging flow for kubbe-logging operator
+* see  flow example in samples/kube-logging
+
+| Parameter            | Description                                                                | Default                             |
+|----------------------|----------------------------------------------------------------------------|-------------------------------------|
+| `logging.enabled`    | enable flow logging for kube-logging                                       | `false`                             |
+| `logging.clusterTag` | add clustername filed to logging flow                                      | `demo`                              |
+| `logging.outputMode` | global or local kube-logging output                                        | `global`                            |
+| `logging.output`     | name of kube-logging output                                                | `logging-output-opensearch-postfix` |
+| `logging.debug`      | send flow result to stdout on fluentd (/fluentd/log/out) instead of output | `false`                             |
 
 
 
