@@ -41,8 +41,8 @@ spec:
           - status_detail: ${record['log'].match(/.+, status=[^ ]+ \((.+)\)$/).captures[0]}
 
   {{ if .Values.logging.debug -}}
-    - stdout:
-        output_type: json
+      - stdout:
+          output_type: json
   {{- end }}
 
 
