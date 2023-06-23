@@ -4,7 +4,7 @@ see  https://github.com/winebarrel/fluent-plugin-filter-parse-postfix
 
 * sample log accepted
 ```
-Jun 22 04:00:28 smtp-docker-mailserver-7d69ff5b88-qrwqn postfix/smtp[312720]: A18EE1005090: to=<frederic.gourlin@bnpparibas.com>, relay=smtp-in-internet-usr-m.gslb.srv.bnpparibas[155.140.74.36]:25, delay=2.3, delays=0.29/0.06/0.74/1.2, dsn=2.0.0, status=sent (250 ok:  Message 256429218 accepted)
+Jun 22 04:00:28 smtp-docker-mailserver-7d69ff5b88-qrwqn postfix/smtp[312720]: A18EE1005090: to=<frederic.gourlinxxxxxx.com>, relay=smtp-in-internet-usr-m.xxxx.srv.ttttttt[88.999.77.36]:25, delay=2.3, delays=0.29/0.06/0.74/1.2, dsn=2.0.0, status=sent (250 ok:  Message 256429218 accepted)
 ```
 
 
