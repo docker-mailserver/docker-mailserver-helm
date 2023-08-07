@@ -33,7 +33,7 @@ spec:
           - process: ${record['log'].match(/.+ (postfix\/smtp\u005B[0-9]+\u005D)/).captures[0]}
           - queue_id: ${record['log'].match(/postfix\/smtp\u005B[0-9]+\u005D\u003A ([0-9A-F]+)\u003A to=/).captures[0]}
           - to: ${record['log'].match(/postfix\/smtp\u005B[0-9]+\u005D\u003A [0-9A-F]+\u003A to=<([^<>]+)>,/).captures[0]}
-          - orig_to: ${record['log'].match(/postfix\/smtp\u005B[0-9]+\u005D\u003A [0-9A-F]+\u003A to=<[^<>]+>, orig_to=<([^<>]+)>,/).captures[0]}
+          - orig_to: ${origto=record['log'].match(/postfix\/smtp\u005B[0-9]+\u005D\u003A [0-9A-F]+\u003A to=<[^<>]+>, orig_to=<([^<>]+)>,/); if origto.nil? then origto else origto.captures[0] end}
           - domain: ${record['log'].match(/.+ to=<[^@<]+@([^@>]+)>,/).captures[0]}
           - relay: ${record['log'].match(/.+, relay=(.+), delay=/).captures[0]}
           - delays: ${record['log'].match(/.+, delays=(.+), dsn=/).captures[0]}
