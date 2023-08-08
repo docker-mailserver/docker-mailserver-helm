@@ -1,7 +1,14 @@
+{{- if and .Values.logging.enable .Values.logging.smtp -}}
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow
 metadata:
-  name: logging-flow-postfix-k8s
+  labels:
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+  name: logging-flow-postfix-smtp-k8s
+
 spec:
   filters:
     - dedot:
@@ -33,11 +40,23 @@ spec:
           - dsn: ${record['log'].match(/.+, dsn=(.+), status=/).captures[0]}
           - status: ${record['log'].match(/.+, status=([^ ]+) /).captures[0]}
           - status_detail: ${record['log'].match(/.+, status=[^ ]+ \((.+)\)$/).captures[0]}
+
+    {{ if .Values.logging.debug -}}
     - stdout:
         output_type: json
+    {{- end }}
+
+
+  {{ if eq .Values.logging.outputMode "global" -}}
   globalOutputRefs:
-    - logging-output-null
+    - {{ .Values.logging.output }}
+  {{ else if eq .Values.logging.outputMode "local" -}}
+  localOutputRefs:
+    - {{ .Values.logging.output }}
+  {{- end }}
+
   match:
     - select:
         container_names:
           - dockermailserver
+{{- end -}}

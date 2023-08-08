@@ -301,6 +301,8 @@ Values you'll definately want to pay attention to:
 | `logging.outputMode` | global or local kube-logging output                                        | `global`                            |
 | `logging.output`     | name of kube-logging output                                                | `logging-output-opensearch-postfix` |
 | `logging.debug`      | send flow result to stdout on fluentd (/fluentd/log/out) instead of output | `false`                             |
+| `logging.smtp`       | create a flow for postfix/smtp logs                                        | `true`                              |
+| `logging.qmgr`       | create a flow for postfix/qmgr logs                                        | `false                              |
 
 
 

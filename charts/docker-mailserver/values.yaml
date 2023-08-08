@@ -432,6 +432,9 @@ logging:
   enable: false
   clusterTag: demo
 
+  smtp: true
+  qmgr: false
+
   # put debug=true to send result into fluentd logging pod /fluentd/log/out
   debug: false
   
