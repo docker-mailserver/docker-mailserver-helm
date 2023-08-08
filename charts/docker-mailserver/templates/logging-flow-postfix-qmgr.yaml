@@ -17,7 +17,7 @@ spec:
     - grep:
         regexp:
           - key: log
-            pattern: /.+ postfix\/qmgr\u005B[0-9]+\u005D\u003A [0-9A-F]+\u003A to=/
+            pattern: /.+ postfix\/qmgr\u005B[0-9]+\u005D\u003A [0-9A-F]+\u003A from=/
     - record_modifier:
         records:
           - cluster:  {{ .Values.logging.clusterTag }}

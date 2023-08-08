@@ -104,3 +104,16 @@ Jul  6 04:34:50 smtp-docker-mailserver-74b4c647c4-hgq8z postfix/qmgr[1248]: 5B16
 Jul  6 07:06:39 smtp-docker-mailserver-74b4c647c4-hgq8z postfix/qmgr[1248]: 614B41E0008A: from=<root@fr1-prod-mailer.mydomain.com>, size=2413, nrcpt=1 (queue active)
 Jul  6 07:06:39 smtp-docker-mailserver-74b4c647c4-hgq8z postfix/qmgr[1248]: 6AB311E0008B: from=<root@fr1-prod-mailer.mydomain.com>, size=2582, nrcpt=1 (queue active)
 ```
+
+
+## complete sequence
+
+```
+Aug  8 07:39:58 smtp-docker-mailserver-564985fc8f-hm2vx postfix/qmgr[1226]: 921FB96: from=<shuttle-customer1-test@mydomain.com>, size=1010, nrcpt=1 (queue active)
+Aug  8 07:39:58 smtp-docker-mailserver-564985fc8f-hm2vx amavis[2052448]: (2052448-01) Passed CLEAN {RelayedOpenRelay}, [127.0.0.1]:39368 <shuttle-customer1-test@mydomain.com> -> <mytargetemail@mycompany.com>, Queue-ID: 83A6F93, Message-ID: <20230808073957.83A6F93@mailer.lab-l8s.shuttle-cloud.com>, mail_id: kAtvsdIZhwAr, Hits: -0.202, size: 778, queued_as: 921FB96, 1005 ms
+Aug  8 07:39:58 smtp-docker-mailserver-564985fc8f-hm2vx postfix/smtp-amavis/smtp[2065579]: 83A6F93: to=<mytargetemail@mycompany.com>, relay=127.0.0.1[127.0.0.1]:10024, delay=1.1, delays=0.05/0.05/0.01/1, dsn=2.0.0, status=sent (250 2.0.0 from MTA(smtp:[127.0.0.1]:10025): 250 2.0.0 Ok: queued as 921FB96)
+Aug  8 07:39:58 smtp-docker-mailserver-564985fc8f-hm2vx postfix/qmgr[1226]: 83A6F93: removed
+Aug  8 07:39:58 smtp-docker-mailserver-564985fc8f-hm2vx postfix/smtp[2065583]: Trusted TLS connection established to mycompany-com.mail.protection.outlook.com[52.101.73.6]:25: TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits)
+Aug  8 07:39:59 smtp-docker-mailserver-564985fc8f-hm2vx postfix/smtp[2065583]: 921FB96: to=<mytargetemail@mycompany.com>, relay=mycompany-com.mail.protection.outlook.com[52.101.73.6]:25, delay=0.78, delays=0.02/0.01/0.19/0.56, dsn=2.6.0, status=sent (250 2.6.0 <20230808073957.83A6F93@mailer.lab-l8s.shuttle-cloud.com> [InternalId=92874372828858, Hostname=AS8PR07MB7783.eurprd07.prod.outlook.com] 9946 bytes in 0.083, 115.708 KB/sec Queued mail for delivery)
+Aug  8 07:39:59 smtp-docker-mailserver-564985fc8f-hm2vx postfix/qmgr[1226]: 921FB96: removed
+```
