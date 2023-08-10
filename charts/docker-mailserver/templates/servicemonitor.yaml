@@ -1,0 +1,25 @@
+{{- if  .Values.metrics.serviceMonitor.enabled }}
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+  name: {{ template "dockermailserver.fullname" . }}
+spec:
+  endpoints:
+    - interval: {{ .Values.metrics.serviceMonitor.scrapeInterval }}
+      path: /metrics
+      port: tcp-metrics
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
+      release: "{{ .Release.Name }}"
+
+{{- end }}
