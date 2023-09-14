@@ -60,6 +60,7 @@ spec:
 {{- end }}
         - name: tmp
           emptyDir: {}
+      affinity: {{- toYaml .Values.affinity | nindent 8 }}              
       initContainers:
         - name: prep-config
           image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}

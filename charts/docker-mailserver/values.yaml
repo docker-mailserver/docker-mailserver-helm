@@ -26,6 +26,16 @@ initContainer:
     readOnlyRootFilesystem: true
     privileged: false
 
+affinity: {}
+##  nodeAffinity:
+##    requiredDuringSchedulingIgnoredDuringExecution:
+##      nodeSelectorTerms:
+##        - matchExpressions:
+##            - key: <your key>
+##              operator: In
+##              values:
+##                - 'true'
+
 ## Optionally specify a runtimeClassName for the deployment
 runtimeClassName: 
 
