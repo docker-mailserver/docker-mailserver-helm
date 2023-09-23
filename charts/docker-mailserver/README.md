@@ -274,10 +274,10 @@ The following table lists the configurable parameters of the docker-mailserver c
 | `service.nodeport.imaps`                          | The port exposed on the node the container is running on, which will be forwarded to docker-mailserver's IMAPS port (993)                                                            | `30993`                                              |
 | `service.nodeport.pop3s`                          | The port exposed on the node the container is running on, which will be forwarded to docker-mailserver's IMAPS port (993)                                                            | `30995`                                              |
 | `deployment.replicas`                             | How many instances of the container to deploy (*only 1 supported currently*)                                                                                                         | `1`                                                  |
-| `resource.requests.cpu`                           | Initial share of CPU requested per-pod                                                                                                                                               | `1`                                                  |
-| `resource.requests.memory`                        | Initial share of RAM requested per-pod (*Initial testing showed clamd would fail due to memory pressure with less than 1.5GB RAM*)                                                   | `1536Mi`                                             |
-| `resource.limits.cpu`                             | Maximum share of CPU available per-pod                                                                                                                                               | `2`                                                  |
-| `resource.limits.memory`                          | Maximum share of RAM available per-pod                                                                                                                                               | `2048Mi`                                             |
+| `resource.requests.cpu`                           | Initial share of CPU requested for dockermailserver                                                                                                                                  | `1`                                                  |
+| `resource.requests.memory`                        | Initial share of RAM requested dockermailserver (*Initial testing showed clamd would fail due to memory pressure with less than 1.5GB                                               | `1536Mi`                                             |
+| `resource.limits.cpu`                             | Maximum share of CPU available dockermailserver                                                                                                                                     | `2`                                                  |
+| `resource.limits.memory`                          | Maximum share of RAM available dockermailserverv                                                                                                                                    | `2048Mi`                                             |
 | `persistence.size`                                | How much space to provision for persistent storage                                                                                                                                   | `10Gi`                                               |
 | `persistence.annotations`                         | Annotations to add to the persistent storage (*for example, to support [k8s-snapshots](https://github.com/miracle2k/k8s-snapshots)*)                                                 | `{}`                                                 |
 | `ssl.issuer.name`                                 | The name of the cert-manager issuer expected to issue certs                                                                                                                          | `letsencrypt-staging`                                |
@@ -318,6 +318,27 @@ Besides the built-in support for ha-proxy, you can also use [traefik as reverse 
 | `haproxy.tcp.993`                       | How to forward inbound TCP connections on port 993. Use syntax described above.                                                                   | `default/docker-mailserver:993::PROXY-V1` |
 | `haproxy.tcp.995`                       | How to forward inbound TCP connections on port 995. Use syntax described above.                                                                   | `default/docker-mailserver:995::PROXY-V1` |
 | `haproxy.service.externalTrafficPolicy` | Used to preserve source IP per [this doc](https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-type-loadbalancer) | `Local`                                   |
+
+
+#### postfix exporter metrics
+* use dashboard :  https://grafana.com/grafana/dashboards/10013-postfix/
+
+| Parameter                               | Description                                                                                   | Default                                                            |
+|-----------------------------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| `metrics.enabled`                       | enable postfix exporter metrics for prometheus                                                | `false`                                                            |
+| `metrics.resource.requests.memory`      | Initial share of RAM for metrics sidecar                                                      | `256Mi`                                                            |
+| `metrics.resource.limits.memory`        | Maximum share of RAM for metrics sidecar                                                      | `null`                                                             |
+| `metrics.resource.limits.cpu`           | Maximum share of CPU available for metrics                                                    | `null`                                                             |
+| `metrics.resource.requests.cpu`         | Iniyial share of CPU available per-pod                                                        | `null`                                                             |
+| `metrics.image.name`                    | The name of the container image to use                                                        | `blackflysolutions/postfix-exporter@sha256`                       |
+| `metrics.image.tag`                     | The image tag. If use named tag, then remove @sha256 from name, else put sha256 signed value  | `7ed7c0534112aff5b44757ae84a206bf659171631edfc325c3c1638d78e74f73` |
+| `metrics.image.pullPolicy`              | pullPolicy                                                                                    | `IfNotPresent`                                                     |
+| `metrics.serviceMonitor.enabled`        | generate serviceMonitor for metrics                                                           | `false`                                                            |
+| `metrics.serviceMonitor.scrapeInterval` | default scrape interval                                                                       | `15s`                                                              |
+
+
+
+
 
 ## Development
 

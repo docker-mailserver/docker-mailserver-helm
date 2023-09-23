@@ -70,6 +70,7 @@ spec:
         - name: tmp
           emptyDir: {}
       containers:
+
         - name: dockermailserver
           env:
 {{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
@@ -108,6 +109,11 @@ spec:
 {{- end }}
             - name: tmp
               mountPath: /var/tmp
+{{ if .Values.metrics.enabled }}
+            - name: data
+              mountPath: /var/log/mail
+              subPath: log
+{{- end }}
             - name: data
               mountPath: /var/mail
               subPath: mail      
@@ -174,5 +180,37 @@ spec:
             initialDelaySeconds: 10
             timeoutSeconds: 1
             failureThreshold: 3
-      restartPolicy: "Always"
 
+{{ if .Values.metrics.enabled }}
+        - name: metrics-exporter
+          image: {{ .Values.metrics.image.name }}:{{ .Values.metrics.image.tag }}
+          imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
+          command: ["/bin/postfix_exporter"]
+          args:
+            - "--postfix.showq_path"
+            - "/var/mail-state/spool-postfix/public/showq"
+            - "--postfix.logfile_path"
+            - "/var/log/mail/mail.log"
+
+          ports:
+            - containerPort: 9154
+              name: http
+              protocol: TCP
+          resources:
+{{ toYaml .Values.metrics.resources | indent 12 }}
+          securityContext:
+{{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
+
+          volumeMounts:
+            - name: data
+              mountPath: /var/log/mail
+              subPath: log
+              readOnly: true
+            - name: data
+              mountPath: /var/mail-state
+              subPath: mail-state
+              readOnly: true
+{{- end }}
+
+
+      restartPolicy: "Always"
