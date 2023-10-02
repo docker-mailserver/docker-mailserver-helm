@@ -5,6 +5,37 @@ entries:
       artifacthub.io/changes: |
         - Breaking : Standardized app labels to app.kubernetes.io/name for Istio workload/Cilium compatibility
     apiVersion: v2
+    appVersion: 12.1.0
+    created: "2023-10-02T20:27:02.499532509Z"
+    dependencies:
+    - alias: haproxy
+      condition: haproxy.enabled
+      name: kubernetes-ingress
+      repository: https://haproxytech.github.io/helm-charts
+      version: 1.21.1
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    digest: 0b22172f827d510037acabf3ec96b8ccaddc31ca05c0cec1cb822ccf55652fee
+    home: https://github.com/funkypenguin/helm-docker-mailserver
+    icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
+    keywords:
+    - mailserver
+    - postfix
+    - dovecot
+    - amavis
+    - imap
+    maintainers:
+    - email: davidy@funkypenguin.co.nz
+      name: funkypenguin
+    name: docker-mailserver
+    sources:
+    - https://github.com/docker-mailserver/docker-mailserver-helm
+    urls:
+    - https://github.com/docker-mailserver/docker-mailserver-helm/releases/download/docker-mailserver-2.1.0/docker-mailserver-2.1.0.tgz
+    version: 2.1.0
+  - annotations:
+      artifacthub.io/changes: |
+        - Breaking : Standardized app labels to app.kubernetes.io/name for Istio workload/Cilium compatibility
+    apiVersion: v2
     appVersion: 11.3.1
     created: "2023-08-10T10:37:05.862264646Z"
     dependencies:
