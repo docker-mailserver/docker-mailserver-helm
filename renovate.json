@@ -3,6 +3,9 @@
   "extends": [
     "config:base"
   ],
+  "postUpdateOptions": [
+    "helmUpdateSubChartArchives"
+  ],
   "regexManagers": [
     {
       "description": "Update docker-mailserver docker image references in appVersion",
