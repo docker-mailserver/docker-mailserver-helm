@@ -458,11 +458,6 @@ metrics:
     #  memory: "256Mi"
     #  cpu: "500M"
 
-
   serviceMonitor:
     enabled: false
     scrapeInterval: 15s
-
-
-
-
