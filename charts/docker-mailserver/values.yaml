@@ -3,7 +3,7 @@ image:
   # image.name is the name of the container image to use. Refer to https://hub.docker.com/r/mailserver/docker-mailserver
   name: "mailserver/docker-mailserver"
   # image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/mailserver/docker-mailserver
-  tag: "12.0.0"
+  tag: "13.2.0"
   pullPolicy: "IfNotPresent"
 
 initContainer:
@@ -445,7 +445,6 @@ haproxy:
   # haproxy.trustedNetworks is the list of sources (in CIDR format, space-separated) to permit haproxy PROXY protocol from
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
 
-
 # when metrics is enabled, we mount subpath log from pvc into /var/log/mail
 metrics:
   enabled: false
@@ -462,11 +461,6 @@ metrics:
     #  memory: "256Mi"
     #  cpu: "500M"
 
-
   serviceMonitor:
     enabled: false
     scrapeInterval: 15s
-
-
-      
-
