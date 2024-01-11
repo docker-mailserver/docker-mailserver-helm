@@ -1,4 +1,25 @@
-# File for additional dovecot configurations.
-# For more informations read http://wiki.dovecot.org/BasicConfiguration
-
-#mail_max_userip_connections = 50
+{{- if .Values.haproxy.enabled }}
+haproxy_trusted_networks = {{ .Values.haproxy.trustedNetworks }}
+{{- end -}}
+service imap-login {
+    inet_listener imap {
+    {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
+    }  
+    inet_listener imaps {
+    {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
+    }
+{{- if .Values.rainloop.enabled }}
+    inet_listener imaps-rainloop {
+    port = 10993
+    ssl = yes
+    }
+{{- end }}      
+}    
+service pop3-login {
+    inet_listener pop3 {
+    {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
+    }
+    inet_listener pop3s {
+    {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
+    }                        
+}

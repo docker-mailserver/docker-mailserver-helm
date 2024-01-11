@@ -37,13 +37,13 @@ spec:
       volumes:
         - name: "data"
           persistentVolumeClaim:
-            claimName: {{ template "dockermailserver.pvcName" . }}
+            claimName: {{ template "dockermailserver.fullname" . }}
         - name: "config"
           emptyDir: {}
         - name: "configmap"
           configMap:
             name: {{ template "dockermailserver.fullname" . }}-configs
-        - name: "opendkim-keys"
+        - name: "secrets"
           secret:
             secretName: {{ template "dockermailserver.fullname" . }}-secrets
 {{- if and .Values.pod.dockermailserver.env.SSL_TYPE .Values.ssl.useExisting }}
@@ -56,28 +56,21 @@ spec:
 {{- end }}
         - name: tmp
           emptyDir: {}
-      initContainers:
-        - name: prep-config
-          image: {{ .Values.initContainer.image.name }}:{{ .Values.initContainer.image.tag }}
-          imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
-          command: [ 'sh','-c', 'cp /tmp/configmaps/* /tmp/docker-mailserver -rfpvL' ]
-          volumeMounts:
-            - name: configmap
-              mountPath: /tmp/configmaps
-              readOnly: true
-            - name: config
-              mountPath: /tmp/docker-mailserver/
-          resources:
-{{ toYaml .Values.initContainer.resources | indent 12 }}
-          securityContext:
-{{ toYaml .Values.initContainer.containerSecurityContext | indent 12 }}
       containers:
         - name: docker-mailserver
           env:
           {{- range $pkey, $pval := .Values.pod.dockermailserver.env }}
           - name: {{ $pkey }}
             value: {{ quote $pval }}
-          {{- end }}          
+          {{- end }} 
+
+          {{- if .Values.pod.dockermailserver.env.SSL_TYPE }}
+          - name: SSL_CERT_PATH
+            value: /tmp/dms/custom-certs/tls.crt
+          - name: SSL_KEY_PATH
+            value: /tmp/dms/custom-certs/tls.key
+          {{- end }}
+
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
@@ -94,7 +87,7 @@ spec:
               mountPath: /tmp/docker-mailserver
 {{- if and .Values.pod.dockermailserver.env.SSL_TYPE .Values.ssl.useExisting }}
             - name: ssl-cert
-              mountPath: /tmp/ssl
+              mountPath: /tmp/dms/custom-certs
               readOnly: true
 {{- end }}
             - name: tmp
@@ -110,52 +103,31 @@ spec:
             - name: data
               mountPath: /var/mail-state
               subPath: mail-state
+
+        {{- range $path, $content := .Files.Glob  "config/**" }}
+          {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
             - name: configmap
-              subPath: dovecot-services.cf
-              mountPath: /etc/dovecot/conf.d/services.cf
+              subPath: {{ $path | replace "/" "." }}
+              mountPath: /tmp/docker-mailserver/{{ $path | trimPrefix  "config/" }}
               readOnly: true
-            - name: configmap
-              subPath: dovecot.cf
-              mountPath: /etc/dovecot/conf.d/zz-custom.cf
+          {{- end }}
+       {{- end }}
+            
+        {{- range $path, $content := .Files.Glob  "config/**" }}
+          {{- if and (gt (len $content) 0) (or (contains "private" $path) (contains "public" $path)) }}
+            - name: secrets
+              subPath: {{ $path | replace "/" "." }}
+              mountPath: /tmp/docker-mailserver/{{ $path | trimPrefix  "config/" }}
               readOnly: true
-            - name: configmap
-              subPath: TrustedHosts
-              mountPath: /tmp/docker-mailserver/opendkim/TrustedHosts
-              readOnly: true
-            - name: configmap
-              subPath: SigningTable
-              mountPath: /tmp/docker-mailserver/opendkim/SigningTable
-              readOnly: true
-            - name: configmap
-              subPath: KeyTable
-              mountPath: /tmp/docker-mailserver/opendkim/KeyTable
-              readOnly: true
-            {{- if .Values.pod.dockermailserver.enable_dovecot_replication }}
-            - name: configmap
-              subPath: 80-replication.conf
-              mountPath: /etc/dovecot/conf.d/80-replication.conf
-              readOnly: true
-            - name: configmap
-              subPath: 91-override-sieve.conf
-              mountPath: /etc/dovecot/conf.d/91-override-sieve.conf
-              readOnly: true
-            {{- end }}
+          {{- end }}
+       {{- end }}
+
             {{- if .Values.demoMode.enabled }}
             - name: opendkim-keys
               mountPath: "/tmp/docker-mailserver/opendkim/keys/example.com/mail.private"
               subPath: "example.com-mail.private"
               readOnly: true
-              {{- else -}}
-              {{/* Mount a dkim key for every domain configured */}}
-              {{- range .Values.domains }}
-              {{- $path := printf "/tmp/docker-mailserver/opendkim/keys/%s/mail.private" . }}
-              {{- $name := printf "%s-mail.private" . }}
-            - name: opendkim-keys
-              mountPath: {{ $path }}
-              subPath: {{ $name }}
-              readOnly: true
-              {{- end }}
-              {{- end }}
+            {{- end }}
 {{- if .Values.additionalVolumeMounts }}
 {{ toYaml .Values.additionalVolumeMounts | indent 12 }}
 {{- end }}
@@ -177,8 +149,7 @@ spec:
             initialDelaySeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
-
-{{ if .Values.metrics.enabled }}
+{{- if .Values.metrics.enabled }}
         - name: metrics-exporter
           image: {{ .Values.metrics.image.name }}:{{ .Values.metrics.image.tag }}
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
@@ -208,6 +179,5 @@ spec:
               subPath: mail-state
               readOnly: true
 {{- end }}
-
 
       restartPolicy: "Always"

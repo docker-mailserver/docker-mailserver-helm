@@ -6,28 +6,6 @@ image:
   tag: "13.2.0"
   pullPolicy: "IfNotPresent"
 
-initContainer:
-  image:
-    name: "busybox"
-    tag: "stable"
-    pullPolicy: "IfNotPresent"
-
-  # These resources refer specifically to the _init container_, which needs only _puny_ resources,
-  # since all it does is copy the config into place
-  resources:
-    requests:
-      cpu: "10m"
-      memory: "32Mi"
-      ephemeral-storage: "100Mi"
-    limits:
-      cpu: "50m"
-      memory: "64Mi"
-      ephemeral-storage: "100Mi"
-
-  containerSecurityContext:
-    readOnlyRootFilesystem: true
-    privileged: false
-
 ## Optionally specify a runtimeClassName for the deployment
 runtimeClassName: 
 
