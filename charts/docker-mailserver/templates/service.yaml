@@ -32,71 +32,74 @@ spec:
     app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
     release: "{{ .Release.Name }}"
   ports:
-    - protocol: "TCP"
-      name: "tcp-smtp"
+    - name: smtp
       port: 25
-  {{- if eq .Values.service.type "NodePort" }}    
+      targetPort: smtp
+      {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30025" .Values.service.nodePort.smtp }}
-  {{ end }}  
-    - protocol: "TCP"
-      name: "tcp-pop3"
-      port: 110
-  {{- if eq .Values.service.type "NodePort" }}    
-      nodePort: {{ default "30110" .Values.service.nodePort.pop3 }}
-  {{ end }}   
-    - protocol: "TCP"
-      name: "tcp-imap"
-      port: 143
-  {{- if eq .Values.service.type "NodePort" }}    
-      nodePort: {{ default "30143" .Values.service.nodePort.imap }}
-  {{ end }}       
-    - protocol: "TCP"
-      name: "tcp-smtps"
+      {{- end }}
+    - name: smtps
+      targetPort: smtps
       port: 465
-  {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30465" .Values.service.nodePort.smtps }}
-  {{ end }}    
-    - protocol: "TCP"
-      name: "tcp-submission"
+      {{- end }}    
+    - name: submission
+      targetPort: submission
       port: 587
-  {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30587" .Values.service.nodePort.submission }}
-  {{ end }}   
-    - protocol: "TCP"
-      name: "tcp-imaps"
+      {{ end }}   
+ 
+    {{- if and (.Values.pod.dockermailserver.env.ENABLE_IMAP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+    - name: imap
+      targetPort: imap
+      port: 143
+      {{- if eq .Values.service.type "NodePort" }}    
+      nodePort: {{ default "30143" .Values.service.nodePort.imap }}
+      {{- end }}       
+    - name: imaps
+      targetPort: imaps
       port: 993
-  {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30993" .Values.service.nodePort.imaps }}
-  {{ end }}   
-    - protocol: "TCP"
-      name: "tcp-pop3s"
+      {{- end }}   
+    {{- end }}   
+
+    {{- if and (.Values.pod.dockermailserver.env.ENABLE_POP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+    - name: pop3
+      targetPort: pop3
+      port: 110
+      {{- if eq .Values.service.type "NodePort" }}    
+      nodePort: {{ default "30110" .Values.service.nodePort.pop3 }}
+      {{- end }}   
+    - name: pop3s
+      targetPort: pop3s
       port: 995
-  {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30995" .Values.service.nodePort.pop3s }}
-  {{ end }}    
-    - protocol: "TCP"
-      name: "tcp-managesieve"
+      {{- end }}    
+    {{- end }}   
+ 
+    {{- if and (.Values.pod.dockermailserver.env.ENABLE_MANAGESIEVE) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+    - name: managesieve
+      targetPort: managesieve
       port: 4190  
-    - protocol: "TCP"
-      name: "tcp-dsync"
-      port: 4711        
-
-  {{- if .Values.metrics.enabled }}
-    - name: tcp-metrics
+    {{- end }}   
+ 
+    {{- if .Values.metrics.enabled }}
+    - name: metrics
       port: 9154
-      protocol: TCP
       targetPort: 9154       
-  {{ end }}
-
-
+    {{- end }}
 
   type: {{ default "ClusterIP" .Values.service.type }}
   {{ if eq .Values.service.type "LoadBalancer" -}}
-  {{ if .Values.service.loadBalancer.publicIp -}}
+    {{ if .Values.service.loadBalancer.publicIp -}}
   loadBalancerIP: {{ .Values.service.loadBalancer.publicIp }}
-  {{ if .Values.service.loadBalancer.allowedIps -}}
+      {{ if .Values.service.loadBalancer.allowedIps -}}
   loadBalancerSourceRanges:
   {{ .Values.service.loadBalancer.allowedIps | toYaml | indent 4 }}
-  {{ end -}}
-  {{ end -}}
-  {{ end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}

@@ -149,6 +149,38 @@ spec:
             initialDelaySeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
+          ports:
+            - name: "smtp"
+              containerPort: 25
+            - name: "smtps"
+              containerPort: 465
+            - name: "submission"
+              containerPort: 587
+
+            {{- if and (.Values.pod.dockermailserver.env.ENABLE_IMAP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+            - name: "imap"
+              containerPort: 143
+            - name: "imaps"
+              containerPort: 993
+            {{- end }}  
+
+            {{- if and (.Values.pod.dockermailserver.env.ENABLE_POP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+            - name: "pop3"
+              containerPort: 110
+            - name: "pop3s"
+              containerPort: 995
+            {{- end }}  
+
+            {{- if and (.Values.pod.dockermailserver.env.ENABLE_RSPAMD) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+            - name: "rspamd"
+              containerPort: 11334  
+            {{- end }}  
+
+            {{- if and (.Values.pod.dockermailserver.env.ENABLE_MANAGESIEVE) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+            - name: "managesieve"
+              containerPort: 4190  
+            {{- end }}  
+
 {{- if .Values.metrics.enabled }}
         - name: metrics-exporter
           image: {{ .Values.metrics.image.name }}:{{ .Values.metrics.image.tag }}
