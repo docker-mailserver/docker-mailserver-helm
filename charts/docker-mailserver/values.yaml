@@ -386,6 +386,17 @@ monitoring:
     ## Port on which HTTP server is served
     port: "9102"
 
+rspamd:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations: {}
+    host: rspamd.example.com
+    path: /
+    tls:
+      enabled: false
+      secret:
+
 ## These values are for the haproxy sub-chart
 haproxy:
   # haproxy.enabled will deploy an haproxy sub-chart, configured for the TCP ports used by docker-mailserver
