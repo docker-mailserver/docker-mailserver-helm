@@ -80,11 +80,6 @@ spec:
     - protocol: "TCP"
       name: "tcp-dsync"
       port: 4711        
-  {{- if .Values.rainloop.enabled }}
-    - protocol: "TCP"
-      name: "tcp-imaps-rainloop"
-      port: 10993        
-  {{ end }}
 
   {{- if .Values.metrics.enabled }}
     - name: tcp-metrics

@@ -46,14 +46,3 @@ Create the name of the controller service account to use
     {{ default "docker-mailserver" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
-
-{{/*
-Create the name of the controller service account to use
-*/}}
-{{- define "dockermailserver.rainloop.serviceAccountName" -}}
-{{- if .Values.rainloop.serviceAccount.create -}}
-    {{ default (include "dockermailserver.fullname" .) .Values.rainloop.serviceAccount.name }}
-{{- else -}}
-    {{ default "rainloop" .Values.rainloop.serviceAccount.name }}
-{{- end -}}
-{{- end -}}

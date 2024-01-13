@@ -23,12 +23,10 @@ Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in
   - [Download setup.sh](#download-setupsh)
   - [Create / Update / Delete users](#create--update--delete-users)
   - [Setup OpenDKIM](#setup-opendkim)
-  - [Setup RainLoop](#setup-rainloop)
   - [Configuration](#docker-mailserver-configuration)
     - [Minimal configuration](#minimal-configuration)
     - [Chart Configuration](#chart-configuration)
     - [docker-mailserver Configuration](#docker-mailserver-configuration)
-    - [Rainloop Configuration](#rainloop-configuration)
     - [HA Proxy-Ingress Configuration](#ha-proxy-ingress-configuration)
 - [Development](#development)
   - [Testing](#testing)
@@ -42,7 +40,6 @@ The chart includes the following features:
 - All configuration is done in values.yaml, or using the native "setup.sh" script (to create mailboxes or DKIM keys)
 - Avoids the [common problem of masking of source IP](https://kubernetes.io/docs/tutorials/services/source-ip/) by supporting haproxy's PROXY protocol (enabled by default)
 - Employs [cert-manager](https://github.com/jetstack/cert-manager) to automatically provide/renew SSL certificates
-- Bundles in [RainLoop](https://www.rainloop.net) for webmail access (disabled by default)
 - Starts in "demo" mode, allowing the user to test core functionality before configuring for specific domains
 - CI/CD tested against Kubernetes 1.18,1.19, and 1.20 : ![Lint and Test Charts](https://github.com/funkypenguin/helm-docker-mailserver/workflows/Lint%20and%20Test%20Charts/badge.svg)
 
@@ -163,12 +160,6 @@ Creating DKIM TrustedHosts
 [funkypenguin:~/demo]
 ```
 
-### Setup RainLoop
-
-If employing HAProxy with RainLoop, use port 10993 for your IMAPS server, as illustrated below:
-
-![Rainloop with HAProxy screenshot](rainloop_with_haproxy.png)
-
 ### Docker Mailserver Configuration
 
 All configuration values are documented in values.yaml. Check that for references, default values etc. To modify a
@@ -191,7 +182,6 @@ Most of the values recorded belowe are set to sensible default, butyou'll defina
 | Parameter                                | Description                                                                                                           | Default                |
 |------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|------------------------|
 | `pod.dockermailserver.override_hostname` | The hostname to be presented on SMTP banners                                                                          | `mail.batcave.org`     |
-| `rainloop.ingress.hosts`                 | The hostname(s) to be used via your ingress to access RainLoop                                                        | `rainloop.example.com` |
 | `demoMode.enabled`                       | Start the container with a demo "user@example.com" user (password is "password")                                      | `true`                 |
 | `domains`                                | List of domains to be served                                                                                          | `[]`                   |
 | `ssl.issuer.name`                        | The name of the cert-manager issuer expected to issue certs                                                           | `letsencrypt-staging`  |
@@ -245,14 +235,6 @@ The following table lists the configurable parameters of the docker-mailserver c
 There are **many** environment variables which allow you to customize the behaviour of docker-mailserver. The function of each variable is described at https://github.com/docker-mailserver/docker-mailserver#environment-variables
 
 Every variable can be set using `values.yaml`, but note that docker-mailserver expects any true/false values to be set as binary numbers (1/0), rather than boolean (true/false). BadThings(tm) will happen if you try to pass an environment variable as "true" when [`start-mailserver.sh`](https://github.com/docker-mailserver/docker-mailserver/blob/master/target/start-mailserver.sh) is expecting a 1 or a 0!
-
-#### Rainloop Configuration
-
-Values you'll definately want to pay attention to:
-
-| Parameter                              | Description                                                                                                                  | Default                                           |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `rainloop.ingress.hosts` | The hostname(s) to be used via your ingress to access RainLoop | `rainloop.example.com` |
 
 #### HA Proxy-Ingress Configuration
 

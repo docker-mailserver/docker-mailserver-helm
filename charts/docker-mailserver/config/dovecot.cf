@@ -8,12 +8,6 @@ service imap-login {
     inet_listener imaps {
     {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
     }
-{{- if .Values.rainloop.enabled }}
-    inet_listener imaps-rainloop {
-    port = 10993
-    ssl = yes
-    }
-{{- end }}      
 }    
 service pop3-login {
     inet_listener pop3 {
