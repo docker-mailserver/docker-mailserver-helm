@@ -1,77 +1,49 @@
-                                                                        
-                                        ^                                 
-                              (CCCC%((((((((((%(/                         
-                        (GG@#O(%77777(((t((((/  //                        
-                       G@#%%%77777ttttttttt(((////^                       
-                     %OOO77777ttttttttttttt(((((///                       
-               /CG##@#O776tt((t6#66##6tttttt(((((//^                      
-              CGC%%7777tt666ttt6###666tttttt(((////^                      
-           (CGOO#####66#67(7#@##66667(tttttt((((//(                       
-          CC//((O######O/   (O###O6777ttttt(((((//^                       
-         ((/(GGC/(C((GC/^/((^/C%(%OO77tttt((((///(                        
-         C((GGC//(GGG@C^/CC(^^CC((CO%(7((((((///(                         
-         C^ %%((CGGCCGG/^(C/^^(C((COO7tttt((((/(                          
-          /(/(OOO%(((%G%/ ^ ^((((C######6t((/(%                           
-            #O(77((7(((CCC(G@GG##O7777(76#####/                           
-            O7(7(((777((%CGGGC%%%777((((76O#@@G                           
-          ^#676ttttt6#6666666777tttt((/(77OO(/%                           
-          (//7766####6t666tttttt((((((tt7666(7                            
-          (/(66##O6677tt666tt(ttttttttttt6677%                            
-           ###6tttttttttt6#6ttttttttttt(767OO                             
-         (#7(t6tttttttttttt66ttttttttt(((6O%                              
-        C@O((tttttttttttttt6#6ttttttttttt6O(                              
-     (O#67(7ttt(((t6######66##6tt((((777667                               
-    #OO###66tt66##66677tt666667((((((t#6(6O                               
-      ^/(((%O###67777((t((ttt(((((((((#%                                  
-               /####6(tttttttttt6t(t676@@(                                
-                   ^O#7tttt6ttt666((66O##OO/                              
-                    /%#67tt#6ttt66(7#####77%                              
-                       #@#(##ttt####O%OO(  ((                             
-                       /@@#@@####O%%%OG/    %^                            
-                       G@@###OOO%(%%%G%    /#%                            
-                      /#@C((((/((((G#C     (%GO                           
-                      /GGC((((((CG#@#/    // /O(                          
-                     ^CG@#GGGGGGCCGC     ^/^   (G                         
-                     CCGC%((((((CGC     /(      /#(                       
-                     CCGC(((((((GG/     (^       %G                       
+GOOD NEWS!
+====================
 
+You've successfully launched the docker-mailserver helm chart!
 
-          GOOD NEWS, EVERYONE!
+{{- if not .Values.configs -}}  
 
-You've successfully launched docker-mailserver helm chart!
+Initial Setup
+------------
 
-{{- if .Values.demoMode.enabled -}}  
+But wait, dear reader! You haven't configured your mail server yet! You'll need to quickly open a command
+prompt into the running container (you have two minutes) and setup a first email account.
 
-But wait, dear reader. You're still running in DEMO MODE.
+    kubectl exec -it --namespace mail deploy/docker-mailserver -- bash
 
-What does this mean? We set you up a demo user (user is "user@example.com", password is "password"), so that
-you can confirm your services are setup correctly. Once you're ready to configure docker-mailserver _for realz_
-here's what you need to do:
+    setup email add user@example.com password
 
-1. Update values.yaml, and set pod.demoMode.enabled to "false". Also set your domains under "domains", removing "example.com"
-2. Download https://raw.githubusercontent.com/tomav/docker-mailserver/master/setup.sh to your current working directory
-3. From your current working directory, use ./setup.sh to create your users and setup your DKIM key(s), as follows:
+This will create a file:
 
-   ./setup.sh email add <email address> [password]
-   ./setup.sh config dkim
+    cat /tmp/docker-mailserver/postfix-accounts.cf
 
-NOTE: The above step is mandatory if you disable demo mode. Without valid DKIM keys, the chart WON'T DEPLOY
+Next, run the setup command to see your other options:
 
-4. Upgrade the helm chart to apply your changes, by running:
+    setup
 
-   helm upgrade {{ .Release.Namespace }} docker-mailserver
+As you run various setup commands, additional files will be generated in `/tmp/docker-mailserver`.
 
-{{- else }}
+Once you are done, you will want to copy them to your local machine (remember when the pod is terminated all of
+these files will be deleted!)
 
-You're not in demo mode! Assuming all has gone well, execute the commands below to retrieve the TXT records
-to add to your DNS zones, to finish setting up DKIM:
-{{/* Mount a dkim key for every domain configured */}}
----               
-{{ range .Values.domains }}
-{{- $path := printf "cat config/opendkim/keys/%s/mail.txt" . }}
-    {{ $path }}
-{{ end }}
----
+    exit # To exit the bash prompt in the container
+
+     mdkir /tmp/config
+     
+     cd /tmp/config
+     
+     podname=$(kubectl get pod --namespace mail -l app.kubernetes.io/name=docker-mailserver  -o jsonpath="{.items[0].metadata.name}")
+     
+     kubectl cp mail/$podname:tmp/docker-mailserver /tmp/test
+
+Once you have copied these files locally, you then need to save them into configmaps or 
+secrets. Please see the `configs` and `secrets` key in the values.yaml file for more information. Once you have created your custom values.yaml file you
+can then redeploy the chart 
+
+   helm upgrade --namespace mail {{ .Release.Namespace }} docker-mailserver --values <path_to_your_values.yaml>
+
 {{ end }}
 
 {{ if .Values.haproxy.enabled -}}  

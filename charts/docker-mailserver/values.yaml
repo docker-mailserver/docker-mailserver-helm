@@ -15,9 +15,6 @@ priorityClassName:
 serviceAccount:
   create: "true"
 
-demoMode:
-  enabled: true # You must OVERRIDE this!
-
 ## ConfigMaps (and Secrets) are used to copy docker-mailserver configuration files 
 ## into running containers. This chart automatically sets up any config files that 
 ## are stored in its chart/config directory. 
@@ -30,25 +27,24 @@ demoMode:
 ## files by either referencing existing ConfigMaps (that you create before installing the Chart)
 ## or by creating new ones (set the create key to true).
 ##
-## This is a DEMO mode configuration - You must OVERRIDE this!
-configs:
-- name: dovecot.example.com                     # Name of the ConfigMap
-  create: true                                  # Whether to create the ConfigMap (if true, content must be specified)
-  data:
-    - subPath: dovecot-masters.cf
-      mountPath: dovecot-masters.cf             # Relative path to /tmp/docker-mailserver/
-      content: |
-        # A sample user - the password is "password"
-        user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
-
-- name: postfix.example.com
-  create: true
-  data:
-    - subPath: postfix-accounts.cf
-      mountPath: postfix-accounts.cf
-      content: |
-        # A sample user - the password is "password"
-        user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
+## configs:
+## - name: postfix.example.com
+##   create: true
+##   data:
+##     - subPath: postfix-accounts.cf
+##       mountPath: postfix-accounts.cf
+##       content: |
+##         # A sample user - the password is "password"
+##         user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
+##
+## - name: dovecot.example.com                     # Name of the ConfigMap
+##   create: true                                  # Whether to create the ConfigMap (if true, content must be specified)
+##   data:
+##     - subPath: dovecot-masters.cf
+##       mountPath: dovecot-masters.cf             # Relative path to /tmp/docker-mailserver/
+##       content: |
+##         # A sample user - the password is "password"
+##         user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
 
 ## The secrets key is similar section allows you to add additional secrets
 ##
@@ -171,7 +167,7 @@ pod:
       RSPAMD_GREYLISTING: 0
       RSPAMD_HFILTER: 1
       RSPAMD_HFILTER_HOSTNAME_UNKNOWN_SCORE: 6
-      ENABLE_AMAVIS: 1
+      ENABLE_AMAVIS: 0
       AMAVIS_LOGLEVEL: 0
       ENABLE_DNSBL: 0
       ENABLE_FAIL2BAN: 0
