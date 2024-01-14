@@ -23,9 +23,11 @@
           major=$(echo $version | cut -d. -f1)
           minor=$(echo $version | cut -d. -f2)
           patch=$(echo $version | cut -d. -f3)
-          minor=$(expr $minor + 1)
-          echo "Replacing $version with $major.$minor.$patch"
-          sed -i "s/^version:.*/version: $\{major\}.$\{minor\}.$\{patch\}/g" {{{parentDir}}}/Chart.yaml
+          p=$(echo $version | cut -d- -f2)
+          p=${p#patch}
+          p=$(expr $p + 1)
+          echo "Replacing $version with $major.$minor.$patch-patch${p}"
+          sed -i "s/^version:.*/version: $\{major\}.$\{minor\}.$\{patch\}-patch${p}/g" {{{parentDir}}}/Chart.yaml
           cat {{{parentDir}}}/Chart.yaml
           `,
         ],
