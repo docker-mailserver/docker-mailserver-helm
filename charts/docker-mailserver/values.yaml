@@ -15,6 +15,9 @@ priorityClassName:
 serviceAccount:
   create: "true"
 
+demoMode:
+  enabled: true # You must OVERRIDE this!
+
 ## ConfigMaps (and Secrets) are used to copy docker-mailserver configuration files 
 ## into running containers. This chart automatically sets up any config files that 
 ## are stored in its chart/config directory. 
@@ -27,23 +30,25 @@ serviceAccount:
 ## files by either referencing existing ConfigMaps (that you create before installing the Chart)
 ## or by creating new ones (set the create key to true).
 ##
-##  configs:
-##  - name: dovecot.example.com                      # This is the name of the ConfigMap
-##    create: true                                   # If true, create a new ConfigMap
-##    data:
-##      - subPath: dovecot-masters.cf
-##        mountPath: dovecot-masters.cf              # This is relative path to /tmp/docker-mailserver/
-##        content: |                                 # If create is true, then you must specify content
-##          someuser|{SHA512-CRYPT}...
-##
-##  - name: postfix.example.com
-##    create: true
-##    data:
-##      - subPath: postfix-accounts.cf
-##        mountPath: postfix-accounts.cf
-##        content: |
-##          someuser|{SHA512-CRYPT}...
-configs: []
+## This is a DEMO mode configuration - You must OVERRIDE this!
+configs:
+- name: dovecot.example.com                     # Name of the ConfigMap
+  create: true                                  # Whether to create the ConfigMap (if true, content must be specified)
+  data:
+    - subPath: dovecot-masters.cf
+      mountPath: dovecot-masters.cf             # Relative path to /tmp/docker-mailserver/
+      content: |
+        # A sample user - the password is "password"
+        user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
+
+- name: postfix.example.com
+  create: true
+  data:
+    - subPath: postfix-accounts.cf
+      mountPath: postfix-accounts.cf
+      content: |
+        # A sample user - the password is "password"
+        user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
 
 ## The secrets key is similar section allows you to add additional secrets
 ##
@@ -74,10 +79,6 @@ ssl:
 #additionalVolumeMounts:
 #  - name: additional
 #    mountPath: /additional
-
-demoMode:
-  # demoMode.enabled ignores the contents of helm-chart/docker-mailserver/config and creates minimal static configuration to be used instead. A single account (user "user@example.com", password "password") will be configured for the purpose of validating core functions and connectivity, before applying user config
-  enabled: true
 
 # If you choose _not_ to use haproxy, and you're not exposing your services with a load-balanced service
 # with an external traffic policy in "Local" mode, you risk having the source IP of incoming mail overwritten
@@ -137,7 +138,7 @@ pod:
       # -----------------------------------------------
       # --- Required Section ---------------------------
       # -----------------------------------------------
-      OVERRIDE_HOSTNAME: 
+      OVERRIDE_HOSTNAME: mail.example.com       # You must OVERRIDE this!
 
       # -----------------------------------------------
       # --- General Section ---------------------------
@@ -157,14 +158,14 @@ pod:
       TLS_LEVEL: 
       SPOOF_PROTECTION: 
       ENABLE_SRS: 0
-      ENABLE_OPENDKIM: 1
-      ENABLE_OPENDMARC: 1
-      ENABLE_POLICYD_SPF: 1
+      ENABLE_OPENDKIM: 0
+      ENABLE_OPENDMARC: 0
+      ENABLE_POLICYD_SPF: 0
       ENABLE_POP3: 
       ENABLE_IMAP: 1
       ENABLE_CLAMAV: 0
       ENABLE_RSPAMD: 1
-      ENABLE_RSPAMD_REDIS: 
+      ENABLE_RSPAMD_REDIS: 1
       RSPAMD_LEARN: 0
       RSPAMD_CHECK_AUTHENTICATED: 0
       RSPAMD_GREYLISTING: 0

@@ -8,32 +8,13 @@ metadata:
     release: "{{ .Release.Name }}"
   name: {{ template "dockermailserver.fullname" . }}-configs
 data:   
-{{/* Use sample data if user is running in demo mode */}}
-{{- if .Values.demoMode.enabled -}}
-  ### We are in demo mode, so add in some sample data for quick testing
-  postfix-accounts.cf: |
-    # A sample user - the password is "password"
-    user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
-  postfix-virtual.cf: |
-    # Intentionally left empty
-  SigningTable: |
-    *@example.com mail._domainkey.example.com
-  KeyTable: |
-    mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private
-  TrustedHosts: |
-    127.0.0.1
-    localhost
-  ### End demo mode data
-
 {{/* Copy files from config subdirectory into a config map. The key for each file is its path
      stripped of the leading "/config" and then base 64 encoded. */}}  
-{{ else -}}
-  {{- range $path, $content := .Files.Glob  "config/**" }}
-    {{/* Skip empty files and public / private keys */}}  
-    {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
+{{- range $path, $content := .Files.Glob  "config/**" }}
+  {{/* Skip empty files and public / private keys */}}  
+  {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
   # {{ $path }}
   {{ regexReplaceAll "[^-_.\\w]" $path "." }}: |
 {{ tpl ($.Files.Get $path) $ | indent 6 }}
-    {{- end }}
   {{- end }}
 {{- end }}

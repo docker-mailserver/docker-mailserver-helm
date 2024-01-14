@@ -132,7 +132,6 @@ spec:
             - name: {{ template "dockermailserver.fullname" $ }}-configs
               subPath: {{ regexReplaceAll "[^-_.\\w]" $path "." }}
               mountPath: /tmp/docker-mailserver/{{ $path | trimPrefix  "config/" }}
-              readOnly: true
         {{- end }}
       {{- end }}
 
@@ -167,12 +166,6 @@ spec:
         {{- end }}
       {{- end }}
 
-            {{- if .Values.demoMode.enabled }}
-            - name: opendkim-keys
-              mountPath: "/tmp/docker-mailserver/opendkim/keys/example.com/mail.private"
-              subPath: "example.com-mail.private"
-              readOnly: true
-            {{- end }}
 {{- if .Values.additionalVolumeMounts }}
 {{ toYaml .Values.additionalVolumeMounts | indent 12 }}
 {{- end }}
