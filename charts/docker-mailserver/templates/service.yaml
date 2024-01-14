@@ -81,6 +81,12 @@ spec:
       {{- end }}    
     {{- end }}   
  
+    {{- if .Values.pod.dockermailserver.env.ENABLE_RSPAMD }}
+    - name: rspamd
+      targetPort: rspamd
+      port: 11334  
+    {{- end }}   
+
     {{- if and (.Values.pod.dockermailserver.env.ENABLE_MANAGESIEVE) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
     - name: managesieve
       targetPort: managesieve
