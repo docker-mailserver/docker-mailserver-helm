@@ -15,16 +15,50 @@ priorityClassName:
 serviceAccount:
   create: "true"
 
-## By default, the chart will create a configmap based on the contents of the config/ subdirectory
-## If you want to create the configmap yourself, set useExisting to "true", and specify the name
-## of the existing configmap.
-## This is an advanced feature, allowing further customization / templating of config elements
+## ConfigMaps (and Secrets) are used to copy docker-mailserver configuration files 
+## into running containers. This chart automatically sets up any config files that 
+## are stored in its chart/config directory. 
+## 
+## However, Helm does not provide a way too save external files to a ConfigMap or Secret.
+## This is problem for docker-mailserver because you need to setup postfix acounts,
+## dovecot accounts, etc.
 ##
-configMap:
-  useExisting: false
+## The configs and secrets keys solve this problem. They allow you to add additional config
+## files by either referencing existing ConfigMaps (that you create before installing the Chart)
+## or by creating new ones (set the create key to true).
+##
+##  configs:
+##  - name: dovecot.example.com                      # This is the name of the ConfigMap
+##    create: true                                   # If true, create a new ConfigMap
+##    data:
+##      - subPath: dovecot-masters.cf
+##        mountPath: dovecot-masters.cf              # This is relative path to /tmp/docker-mailserver/
+##        content: |                                 # If create is true, then you must specify content
+##          someuser|{SHA512-CRYPT}...
+##
+##  - name: postfix.example.com
+##    create: true
+##    data:
+##      - subPath: postfix-accounts.cf
+##        mountPath: postfix-accounts.cf
+##        content: |
+##          someuser|{SHA512-CRYPT}...
+configs: []
 
-secret:
-  useExisting: false  
+## The secrets key is similar section allows you to add additional secrets
+##
+##  secrets:
+##  - name: rspamd.example.com                      # This is the name of the Secret
+##    create: true                                  # If true, create a new Secret
+##    data:
+##      - subPath: rspamd.dkim.rsa-2048-mail-example.com.private.txt
+##        mountPath: rspamd/dkim/rsa-2048-mail-example.com.private.txt
+##        content: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
+##
+##      - subPath: rspamd.dkim.rsa-2048-mail-example.com.public
+##        mountPath: rspamd/dkim/rsa-2048-mail-example.com.public
+##        content: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
+secrets: []
 
 ## Specify an existing secret that contains TLS certificates. The easiest way to create a 
 ## secret is by using cert-manager.
@@ -388,7 +422,7 @@ monitoring:
 
 rspamd:
   ingress:
-    enabled: true
+    enabled: false
     ingressClassName: nginx
     annotations: {}
     host: rspamd.example.com

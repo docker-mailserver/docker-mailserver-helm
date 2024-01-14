@@ -40,13 +40,33 @@ spec:
             claimName: {{ template "dockermailserver.fullname" . }}
         - name: "config"
           emptyDir: {}
-        - name: "configmap"
+
+        # Default ConfigMap
+        - name: {{ template "dockermailserver.fullname" . }}-configs
           configMap:
             name: {{ template "dockermailserver.fullname" . }}-configs
+
+        # User ConfigMaps
+      {{- range $config := .Values.configs }}
+        - name: {{ regexReplaceAll "[.]" $config.name "-" }}-config
+          configMap:
+            name: {{ $config.name }}
+      {{- end }}
+
+        # Default Secret
         - name: "secrets"
           secret:
             secretName: {{ template "dockermailserver.fullname" . }}-secrets
-{{- if and .Values.pod.dockermailserver.env.SSL_TYPE .Values.ssl.useExisting }}
+
+        # User Secrets
+      {{- range $secret := .Values.secrets }}
+        - name: {{ regexReplaceAll "[.]" $secret.name "-" }}-secret
+          secret:
+            secretName: {{ $secret.name }}
+      {{- end }}
+
+
+{{- if .Values.pod.dockermailserver.env.SSL_TYPE }}
         - name: "ssl-cert"
           secret:
             secretName: {{ .Values.ssl.existingName }}
@@ -104,23 +124,48 @@ spec:
               mountPath: /var/mail-state
               subPath: mail-state
 
-        {{- range $path, $content := .Files.Glob  "config/**" }}
-          {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
-            - name: configmap
-              subPath: {{ $path | replace "/" "." }}
+            ### Default ConfigMap ###
+      {{- /* Mount configuration files stored in the built-in ConfigMap into the container */}}
+      {{- range $path, $content := .Files.Glob  "config/**" }}
+        {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
+            # {{ $path }}
+            - name: {{ template "dockermailserver.fullname" $ }}-configs
+              subPath: {{ regexReplaceAll "[^-_.\\w]" $path "." }}
               mountPath: /tmp/docker-mailserver/{{ $path | trimPrefix  "config/" }}
               readOnly: true
-          {{- end }}
-       {{- end }}
-            
+        {{- end }}
+      {{- end }}
+
+            ### User ConfigMaps ###
+      {{- range $config := .Values.configs }}
+        {{- range $item := $config.data }}
+            # {{ $item.subPath }}
+            - name: {{ regexReplaceAll "[.]" $config.name "-" }}-config
+              subPath: {{ $item.subPath }}
+              mountPath: /tmp/docker-mailserver/{{ $item.mountPath }}
+        {{- end }}
+      {{- end }}
+
+            ### Default Secret ###
         {{- range $path, $content := .Files.Glob  "config/**" }}
           {{- if and (gt (len $content) 0) (or (contains "private" $path) (contains "public" $path)) }}
+            ### System defined secrets ###
             - name: secrets
-              subPath: {{ $path | replace "/" "." }}
+              subPath: {{ regexReplaceAll "[^-_.\\w]" $path "." }}
               mountPath: /tmp/docker-mailserver/{{ $path | trimPrefix  "config/" }}
               readOnly: true
           {{- end }}
        {{- end }}
+
+            ### User Secrets ###
+      {{- range $secret := .Values.secrets }}
+        {{- range $item := $secret.data }}
+            # {{ $item.subPath }}
+            - name: {{ regexReplaceAll "[.]" $secret.name "-" }}-secret
+              subPath: {{ $item.subPath }}
+              mountPath: /tmp/docker-mailserver/{{ $item.mountPath }}
+        {{- end }}
+      {{- end }}
 
             {{- if .Values.demoMode.enabled }}
             - name: opendkim-keys
@@ -171,7 +216,7 @@ spec:
               containerPort: 995
             {{- end }}  
 
-            {{- if and (.Values.pod.dockermailserver.env.ENABLE_RSPAMD) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+            {{- if .Values.pod.dockermailserver.env.ENABLE_RSPAMD }}
             - name: "rspamd"
               containerPort: 11334  
             {{- end }}  
