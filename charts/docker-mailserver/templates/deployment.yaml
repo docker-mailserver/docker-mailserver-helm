@@ -85,6 +85,8 @@ spec:
           {{- end }} 
 
           {{- if .Values.certificate }}
+          - name: SSL_TYPE
+            value: manual
           - name: SSL_CERT_PATH
             value: /tmp/dms/custom-certs/tls.crt
           - name: SSL_KEY_PATH
