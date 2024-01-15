@@ -45,8 +45,15 @@ serviceAccount:
 ##       content: |
 ##         # A sample user - the password is "password"
 ##         user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
+##
+##  If you set the create key to false, then you must manually create the ConfigMaps before deploying the chart.
+##
+##    kubectl create configmap postfix.example.com --namespace mail --from-file=postfix-accounts.cf=<path_to_postfix_accounts.cf>
+##
+configs: []
 
-## The secrets key is similar section allows you to add additional secrets
+## The secrets key works the same way as the configs key. Use secrets to store sensitive information,
+## such as DKIM signing keys.
 ##
 ##  secrets:
 ##  - name: rspamd.example.com                      # This is the name of the Secret
@@ -59,6 +66,10 @@ serviceAccount:
 ##      - subPath: rspamd.dkim.rsa-2048-mail-example.com.public
 ##        mountPath: rspamd/dkim/rsa-2048-mail-example.com.public
 ##        content: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
+##
+##  If you set the create key to false, then you must manually create the ConfigMaps before deploying the chart.
+##
+##    kubectl create secret rspamd.example.com --namespace mail --from-file=rspamd.dkim.rsa-2048-mail-example.com.private.txt=<path_to_rspamd.dkim.rsa-2048-mail-example.com.private.txt>
 secrets: []
 
 ## Specify an existing secret that contains TLS certificates. The easiest way to create a 
@@ -86,12 +97,6 @@ spfTestsDisabled: false
 
 # List extra RBL domains to use for hard reject filtering
 rblRejectDomains: []
-
-# List all the domains to be used below - this is necessary to correctly configure DKIM keys for email signing
-# domains is the list of domains to be served by your docker-mailserver instance
-domains: []
-#  - your-first-domain.com
-#  - your-second-domain.com
 
 livenessTests:
   # livenessTests.enabled will add a liveness test, which will classify a pod as 'unhealthy' if any livenessTests.commands (below) return non-zero
