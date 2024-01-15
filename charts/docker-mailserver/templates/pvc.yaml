@@ -10,7 +10,7 @@ metadata:
   {{ end }}
 spec:
   accessModes:
-    - {{ default "ReadWriteOnce" .Values.persistence.accessMode | quote }}
+    - {{ .Values.persistence.accessMode }}
   {{- if .Values.persistence.storageClass }}
   storageClassName: {{ .Values.persistence.storageClass | quote }}
   {{- end }}    
@@ -20,5 +20,8 @@ spec:
   {{- if .Values.persistence.selector }}
   selector:
 {{ toYaml .Values.persistence.selector | indent 4 }}
+  {{ end }}
+  {{- if .Values.persistence.volumeName }}
+  volumeName: {{ .Values.persistence.volumeName }}
   {{ end }}
 {{- end }}

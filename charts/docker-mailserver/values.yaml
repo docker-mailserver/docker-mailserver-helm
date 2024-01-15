@@ -371,10 +371,16 @@ resources:
     ephemeral-storage: "500Mi"
 
 persistence:
+  # existingClaim: # Specify an existing PVC to use
   size: "10Gi"
   # Uncomment the backup.kubernetes.io/deltas annotation below if you use https://github.com/miracle2k/k8s-snapshots
   annotations: {}
     # backup.kubernetes.io/deltas: PT1H P2D P30D P180D
+  accessMode: ReadWriteOnce
+  # storageClass:
+  # selector:
+  # Specify a volumeName, otherwise a new volume will be dynamically provisioned
+  # volumeName: my-volume
 
 ## Monitoring adds the prometheus.io annotations to pods and services, so that the Prometheus Kubernetes SD mechanism
 ## as configured in the examples will automatically discover both the pods and the services to query.
