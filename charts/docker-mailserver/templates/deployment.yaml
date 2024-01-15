@@ -66,16 +66,21 @@ spec:
       {{- end }}
 
 
-{{- if .Values.pod.dockermailserver.env.SSL_TYPE }}
+  {{- if .Values.pod.dockermailserver.env.SSL_TYPE }}
         - name: "ssl-cert"
           secret:
+    {{- if .Values.ssl.useExisting }}
             secretName: {{ .Values.ssl.existingName }}
-{{- end }}
+    {{- else }}
+            secretName: {{ template "dockermailserver.fullname" . }}-tls
+    {{- end }}
+  {{- end }}
+
 {{- if .Values.additionalVolumes }}
+        # Additional Volumes
 {{ toYaml .Values.additionalVolumes | indent 8 }}
 {{- end }}
-        - name: tmp
-          emptyDir: {}
+
       containers:
         - name: docker-mailserver
           env:
@@ -103,15 +108,11 @@ spec:
             {{ end }}
 {{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
           volumeMounts:
-            - name: config
-              mountPath: /tmp/docker-mailserver
-{{- if and .Values.pod.dockermailserver.env.SSL_TYPE .Values.ssl.useExisting }}
+{{- if .Values.pod.dockermailserver.env.SSL_TYPE }}
             - name: ssl-cert
               mountPath: /tmp/dms/custom-certs
               readOnly: true
 {{- end }}
-            - name: tmp
-              mountPath: /var/tmp
 {{ if .Values.metrics.enabled }}
             - name: data
               mountPath: /var/log/mail

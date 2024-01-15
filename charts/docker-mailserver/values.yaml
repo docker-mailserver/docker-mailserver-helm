@@ -79,13 +79,16 @@ ssl:
   existingName: name-of-existing-secret
 
 ## Mount additional volumes into the container.  Useful for persistent logs or
-## injecting additional config files.
+## creating or injecting additional config files.
 #additionalVolumes:
-#  - name: "additional"
-#    emptyDir: {}
+#- name: host-config-files
+#  hostPath:
+#    path: /tmp/docker-mailserver-config   # Directory on host
+#    type: Directory
+
 #additionalVolumeMounts:
-#  - name: additional
-#    mountPath: /additional
+#- name: host-config-files
+#  mountPath: /tmp/docker-mailserver       # Directory in container
 
 # If you choose _not_ to use haproxy, and you're not exposing your services with a load-balanced service
 # with an external traffic policy in "Local" mode, you risk having the source IP of incoming mail overwritten
@@ -381,15 +384,6 @@ persistence:
   # Uncomment the backup.kubernetes.io/deltas annotation below if you use https://github.com/miracle2k/k8s-snapshots
   annotations: {}
     # backup.kubernetes.io/deltas: PT1H P2D P30D P180D
-
-additionalVolumeMounts: []
-# - name: backup
-#   mountPath: /scratch
-  
-additionalVolumes: []
-# - name: backup
-#   emptyDir:
-#     sizeLimit: 10Gi   
 
 ## Monitoring adds the prometheus.io annotations to pods and services, so that the Prometheus Kubernetes SD mechanism
 ## as configured in the examples will automatically discover both the pods and the services to query.
