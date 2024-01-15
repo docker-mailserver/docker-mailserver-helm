@@ -50,16 +50,16 @@ The chart includes the following features:
 - [Helm](https://helm.sh) >= 3.0 
 
 ## Getting Started
+Setting up docker-mailserver requires generating a number of configuration (files)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/optional-config/]. Luckily, docker-mailserver ships with a helpful `setup` command that makes it easy to generate these files. It writes files to the `/tmp/docker-mailserver` directory inside a running container.
 
-### Install
-First install docker-mailserver:
+First run docker-mailserver:
 
 ```console
 helm upgrade --install docker-mailserver docker-mailserver --namespace mail --create-namespace
 ```
 
 ### Create a User
-Next you'll need to quickly open a command prompt into the running container (you have two minutes) and setup an email account.
+Next you'll need to quickly open a command prompt in the running container (you have two minutes) and setup an email account.
 
 ```console
 kubectl exec -it --namespace mail deploy/docker-mailserver -- bash
@@ -67,15 +67,14 @@ kubectl exec -it --namespace mail deploy/docker-mailserver -- bash
 setup email add user@example.com password
 ```
 
-This will geneate a new new file:
+This will geneate a new `postfix-accounts.cf` file:
 
 ```console
 cat /tmp/docker-mailserver/postfix-accounts.cf
 ```
 
-## Configuration
-Assuming you still have a command prompt in the running container, run the setup command to see additional 
-configuration options:
+### Create Additional Configuration Files
+Assuming you still have a command prompt open in the running container, run the setup command to see additional configuration options:
 
 ```console
 setup
@@ -85,8 +84,7 @@ For extensive configuration documentation, please refer to [configuration](https
 
 As you run various setup commands, additional files will be generated in `/tmp/docker-mailserver`.
 
-Once you are done, you will want to copy them to your local machine (remember when the pod is terminated all of
-these files will be deleted!)
+Once you are done, copy the configuration files to your local machine (remember when the pod is terminated all of these files will be deleted!)
 
 ```console
 exit # To exit the bash prompt in the container
@@ -100,12 +98,7 @@ podname=$(kubectl get pod --namespace mail -l app.kubernetes.io/name=docker-mail
 kubectl cp mail/$podname:tmp/docker-mailserver /tmp/test
 ```
 
-### Using Docker To Generate Configuration Files
-If you have docker or podman installed, you can run a docker-mailserver container and run the setup script. You'll want to mount a local volume into the container so that configuration files are save locally.
-
-To make this easier, the docker-mailserver project includes a [setup.sh] (https://docker-mailserver.github.io/docker-mailserver/latest/config/setup.sh/) script.
-
-### Create custom values.yaml
+## Customize values.yaml
 Once you have generated configuration files, you need to deploy them along with the Helm Chart.
 
 Unfortunately, Helm does not provide a way too include external files in a deployment. Instead, 
