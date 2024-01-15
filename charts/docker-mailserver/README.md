@@ -2,21 +2,18 @@
 
 This helm chart deploys [Docker
 Mailserver](https://github.com/docker-mailserver/docker-mailserver) into a
-Kubernetes cluster, in a manner which retains compatibility with the upstream,
-docker-specific version.
+Kubernetes cluster.
 
 Docker Mailserver was originally intended to be run with Docker or Docker
-Compose, it's been [adapted to
-Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in-Kubernetes).
+Compose, but it has been [adapted to Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in-Kubernetes).
 
 ## Contents
 
 - [Contents](#contents)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
-- [Architecture](#architecture)
 - [Getting Started](#getting-started)
-  - [Install Helm](#1-install-helm)
+  - [Install](install)
   - [Install Cert-manager](#2-install-cert-manager)
   - [Install Docker Mailserver](#install-docker-mailserver)
 - [Configuration and Operation](#configuration-and-operation)
@@ -37,7 +34,7 @@ Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in
 
 The chart includes the following features:
 
-- All configuration is done in values.yaml, or using the native "setup.sh" script (to create mailboxes or DKIM keys)
+- Configuration is done in values.yaml and by using the setup script inside the container
 - Avoids the [common problem of masking of source IP](https://kubernetes.io/docs/tutorials/services/source-ip/) by supporting haproxy's PROXY protocol (enabled by default)
 - Employs [cert-manager](https://github.com/jetstack/cert-manager) to automatically provide/renew SSL certificates
 - Starts in "demo" mode, allowing the user to test core functionality before configuring for specific domains
@@ -45,151 +42,112 @@ The chart includes the following features:
 
 ## Prerequisites
 
-- Kubernetes 1.16+ (*CI validates against > 1.18.0*)
-- To use HAProxy ingress, you'll need to deploying the chart to a cluster with a cloud provider capable of provisioning an
-external load balancer (e.g. AWS, DO or GKE). (There is an [update planned](https://github.com/funkypenguin/docker-mailserver/issues/5) to support HA ingress on bare-metal deployments)
-- You control DNS for the domain(s) you intend to route through Traefik
+- A Kubernetes cluster
+- Acquire a custom domain
+- Configure a [DNS](https://docker-mailserver.github.io/docker-mailserver/latest/usage/#minimal-dns-setup)
 - __Suggested:__ PV provisioner support in the underlying infrastructure
 - [Cert-manager](https://github.com/jetstack/cert-manager/tree/master/deploy/charts/cert-manager) => 1.0 requires manual deployment into your cluster (details below)
-- [Helm](https://helm.sh) >= 2.13.0 (*errors were encountered when testing with 2.11.0, so the chart has a minimum requirement of 2.13.0*)
-- Access to a platform with Docker installed, in order to run [docker-mailserver's setup.sh binary](https://github.com/docker-mailserver/docker-mailserver/blob/master/setup.sh), which uses a docker container to setup dovecot password hashes and OpenDKIM keys
-
-## Architecture
-
-There are several ways you might deploy docker-mailserver. The most common would be:
-
-1. Within a cloud provider, utilizing a load balancer service from the cloud provider (i.e. GKE). This is an expensive option, since typically you'd pay for each individual port (25, 465, 993, etc) which gets load-balanced
-
-2. Either within a cloud provider, or in a private Kubernetes cluster, behind a non-integrated load-balancer such as haproxy. An example deployment might be something like [Funky Penguin's Poor Man's K8s Load Balancer](https://www.funkypenguin.co.nz/project/a-simple-free-load-balancer-for-your-kubernetes-cluster/), or even a manually configured haproxy instance/pair.
+- [Helm](https://helm.sh) >= 3.0 
 
 ## Getting Started
 
-### 1. Install helm
-
-You need helm, obviously.   Instructions are [here](https://helm.sh/docs/intro/install/). 
-
-### 2. Install cert-manager
-
-You need to install cert-manager, and [setup issuers](https://docs.cert-manager.io/en/latest/index.html). It's easy to install using helm (which you have anyway, right?). Cert-manager is what will request and renew SSL certificates required for `docker-mailserver` to work. The chart will assume that you've configured and tested certmanager.
-
-Here are the TL;DR steps for installing cert-manager:
-
-```console
-# Install the CustomResourceDefinition resources separately
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.9.1/cert-manager.yaml
-
-# Create the namespace for cert-manager
-kubectl create namespace cert-manager
-
-# Label the cert-manager namespace to disable resource validation
-kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
-
-# Add the Jetstack Helm repository
-helm repo add jetstack https://charts.jetstack.io
-
-# Update your local Helm chart repository cache
-helm repo update
-
-# Install the cert-manager Helm chart
-helm install \
-  --name cert-manager \
-  --namespace cert-manager \
-  --version v1.9.1 \
-  jetstack/cert-manager
-```
-
-### Install docker-mailserver
-
-You will either need a local clone of this repository or to add the docker-mailserver-helm helm chart repository to your helm configuration:
-
-```console
-helm repo add docker-mailserver https://docker-mailserver.github.io/docker-mailserver-helm/
-```
-
-## Configuration and Operation
-
 ### Install
-
-This command will install Docker Mailserver with default values.  You probably want to read the below section for how to configure it before doing this.
-
-```console
-helm install --name docker-mailserver docker-mailserver
-```
-
-### Download setup.sh
-
-Download the [upstream setup.sh](https://raw.githubusercontent.com/docker-mailserver/docker-mailserver/master/setup.sh) to a local folder (*ideally the same location you store your custom values.yaml*)
-
-Run `./setup.sh` without arguments for a list of full options
-
-### Create / Update / Delete users
-
-Run `./setup.sh <email address>` to create the email addresses in `$PWD/config`
-
-Example output:
+First install docker-mailserver:
 
 ```console
-[funkypenguin:~/demo] ./setup.sh email add david@kowalski.elpenguino.net
-"docker inspect" requires at least 1 argument.
-See 'docker inspect --help'.
-
-Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
-
-Return low-level information on Docker objects
-Enter Password:
-[funkypenguin:~/demo] %
+helm upgrade --install docker-mailserver docker-mailserver --namespace mail --create-namespace
 ```
 
-### Setup OpenDKIM
-
-Example output:
+### Create a User
+Next you'll need to quickly open a command prompt into the running container (you have two minutes) and setup an email account.
 
 ```console
-[funkypenguin:~/demo] ./setup.sh config dkim
-"docker inspect" requires at least 1 argument.
-See 'docker inspect --help'.
+kubectl exec -it --namespace mail deploy/docker-mailserver -- bash
 
-Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
-
-Return low-level information on Docker objects
-Creating DKIM private key /tmp/docker-mailserver/opendkim/keys/bob.com/mail.private
-Creating DKIM KeyTable
-Creating DKIM SigningTable
-Creating DKIM private key /tmp/docker-mailserver/opendkim/keys/example.com/mail.private
-Creating DKIM TrustedHosts
-[funkypenguin:~/demo]
+setup email add user@example.com password
 ```
 
-### Docker Mailserver Configuration
-
-All configuration values are documented in values.yaml. Check that for references, default values etc. To modify a
-configuration value for a chart, you can either supply your own values.yaml overriding the default one in the repo:
+This will geneate a new new file:
 
 ```console
-$ helm upgrade --install docker-mailserver docker-mailserver --values path/to/custom/values/file.yaml
+cat /tmp/docker-mailserver/postfix-accounts.cf
 ```
 
-Or, you can override an individual configuration setting with `helm upgrade --set`, specifying each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
+## Configuration
+Assuming you still have a command prompt in the running container, run the setup command to see additional 
+configuration options:
 
 ```console
-$ helm upgrade --install docker-mailserver docker-mailserver --set pod.dockermailserver.image="your/image:1.0.0"
+setup
+```console
+
+For extensive configuration documentation, please refer to [configuration](https://docker-mailserver.github.io/docker-mailserver/latest/config/environment/).
+
+As you run various setup commands, additional files will be generated in `/tmp/docker-mailserver`.
+
+Once you are done, you will want to copy them to your local machine (remember when the pod is terminated all of
+these files will be deleted!)
+
+```console
+exit # To exit the bash prompt in the container
+
+mdkir /tmp/config
+
+cd /tmp/config
+
+podname=$(kubectl get pod --namespace mail -l app.kubernetes.io/name=docker-mailserver  -o jsonpath="{.items[0].metadata.name}")
+     
+kubectl cp mail/$podname:tmp/docker-mailserver /tmp/test
 ```
 
-#### Minimal configuration
+### Using Docker To Generate Configuration Files
+If you have docker or podman installed, you can run a docker-mailserver container and run the setup script. You'll want to mount a local volume into the container so that configuration files are save locally.
 
-Most of the values recorded belowe are set to sensible default, butyou'll definately want to pay attention to at least the following:
+To make this easier, the docker-mailserver project includes a [setup.sh] (https://docker-mailserver.github.io/docker-mailserver/latest/config/setup.sh/) script.
 
-| Parameter                                | Description                                                                                                           | Default                |
-|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|------------------------|
-| `pod.dockermailserver.override_hostname` | The hostname to be presented on SMTP banners                                                                          | `mail.batcave.org`     |
-| `demoMode.enabled`                       | Start the container with a demo "user@example.com" user (password is "password")                                      | `true`                 |
-| `domains`                                | List of domains to be served                                                                                          | `[]`                   |
-| `ssl.issuer.name`                        | The name of the cert-manager issuer expected to issue certs                                                           | `letsencrypt-staging`  |
-| `ssl.issuer.kind`                        | Whether the issuer is namespaced (`Issuer`) on cluster-wide (`ClusterIssuer`)                                         | `ClusterIssuer`        |
-| `ssl.dnsname`                            | DNS domain used for DNS01 validation                                                                                  | `example.com`          |
+### Create custom values.yaml
+Once you have generated configuration files, you need to deploy them along with the Helm Chart.
+
+Unfortunately, Helm does not provide a way too include external files in a deployment. Instead, 
+configuration files need to be stored in ConfigMaps and Secrets that are then mounted as volumes
+into a container.
+
+This can be done by via the `configs` and `secrets` key in the values.yaml file. Please see the comments
+in (values.yaml)[./values.yaml] on how to setup these keys.
+
+Once you have created your own values.yaml files, then redeploy the chart like this:
+
+```console
+helm upgrade docker-mailserver docker-mailserver --namespace mail --values <path_to_values.yaml>
+```
+
+You can also override individual configuration setting with `helm upgrade --set`, specifying each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
+
+```console
+$ helm upgrade docker-mailserver docker-mailserver --namespace mail --set pod.dockermailserver.image="your/image:1.0.0"
+```
+
+### Minimal configuration
+There are various settings in `values.yaml` that you must override.
+
+| Parameter                                    | Description                                         | Default          |
+| -------------------------------------------- | --------------------------------------------------- | ---------------- | 
+| pod.dockermailserver.pod.OVERRIDE_HOSTNAME   | The hostname to be presented on SMTP banners        | mail.example.com |
+| configs                                      | Specify ConfigMaps that contain configuration files | []               |
+| secrets                                      | Specify Secrets that contain configuration files    | []               |
+| ssl.issuer.name                              | The name of the cert-manager issuer expected to issue certs  | `letsencrypt-staging`  |
+| ssl.issuer.kind                              | Whether the issuer is namespaced (`Issuer`) on cluster-wide (`ClusterIssuer`) | ClusterIssuer |
+| ssl.dnsname                                  | DNS domain used for DNS01 validation                 | example.com      |
+
+### Environmental Variables
+There are **many** environment variables which allow you to customize the behaviour of docker-mailserver. The function of each variable is described at https://github.com/docker-mailserver/docker-mailserver#environment-variables
+
+Every variable can be set using `values.yaml`, but note that docker-mailserver expects any true/false values to be set as binary numbers (1/0), rather than boolean (true/false). BadThings(tm) will happen if you try to pass an environment variable as "true" when [`start-mailserver.sh`](https://github.com/docker-mailserver/docker-mailserver/blob/master/target/start-mailserver.sh) is expecting a 1 or a 0!
+
+### Default Configuration
+By default, the Chart enables `rspamd` and disables `opendkim`, `dmarc`, `policyd-spf` and `clamav`. This is the setup [recommended] (https://docker-mailserver.github.io/docker-mailserver/latest/config/best-practices/dkim_dmarc_spf/) by the docker-mailserver project.
 
 #### Chart Configuration
-
 The following table lists the configurable parameters of the docker-mailserver chart and their default values.
 
 | Parameter                                         | Description                                                                                                                                                                          | Default                                              |
@@ -230,12 +188,6 @@ The following table lists the configurable parameters of the docker-mailserver c
 | `runtimeClassName`                                | Optionally, set the pod's [runtimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/)                                                                              | `""`                                                 |
 | `priorityClassName`                               | Optionally, set the pod's [priorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)                                                          | `""`                                                 |
 
-#### docker-mailserver Configuration
-
-There are **many** environment variables which allow you to customize the behaviour of docker-mailserver. The function of each variable is described at https://github.com/docker-mailserver/docker-mailserver#environment-variables
-
-Every variable can be set using `values.yaml`, but note that docker-mailserver expects any true/false values to be set as binary numbers (1/0), rather than boolean (true/false). BadThings(tm) will happen if you try to pass an environment variable as "true" when [`start-mailserver.sh`](https://github.com/docker-mailserver/docker-mailserver/blob/master/target/start-mailserver.sh) is expecting a 1 or a 0!
-
 #### HA Proxy-Ingress Configuration
 
 | Parameter                                       | Description                                                                                                                                       | Default                                   |
@@ -268,9 +220,6 @@ Every variable can be set using `values.yaml`, but note that docker-mailserver e
 | `metrics.image.pullPolicy`              | pullPolicy                                                                                    | `IfNotPresent`                                                     |
 | `metrics.serviceMonitor.enabled`        | generate serviceMonitor for metrics                                                           | `false`                                                            |
 | `metrics.serviceMonitor.scrapeInterval` | default scrape interval                                                                       | `15s`                                                              |
-
-
-
 
 
 ## Development
