@@ -1,5 +1,4 @@
-  {{- /* Enable proxy protocol for postscreen / dovecot */}}
-  {{- if .Values.haproxy.enabled -}}  # Necessary to permit proxy protocol from haproxy to postscreen
+  {{- if .Values.proxy_protocol.enabled -}}
     postscreen_upstream_proxy_protocol = haproxy
   {{- end }}
   {{- if not .Values.spfTestsDisabled -}}

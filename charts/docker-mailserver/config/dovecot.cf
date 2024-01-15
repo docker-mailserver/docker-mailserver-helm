@@ -1,19 +1,41 @@
-{{- if .Values.haproxy.enabled }}
-haproxy_trusted_networks = {{ .Values.haproxy.trustedNetworks }}
-{{- end -}}
+{{- if .Values.proxy_protocol.enabled }}
+proxy_protocol_trusted_networks = {{ .Values.proxy_protocol.trustedNetworks }}
+
+{{- if and (.Values.pod.dockermailserver.env.ENABLE_IMAP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
 service imap-login {
     inet_listener imap {
-    {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
+        proxy_protocol = yes
     }  
+    # Provide a port for internal cluster clients that don't use the Proxy protocol
+    inet_listener imap-no-proxy {
+        port = 10143
+    }
     inet_listener imaps {
-    {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
+        proxy_protocol = yes
+    }
+    # Provide a port for internal cluster clients that don't use the Proxy protocol
+    inet_listener imaps-no-proxy {
+        port = 10993
     }
 }    
+{{- end -}}
+
+{{- if and (.Values.pod.dockermailserver.env.ENABLE_POP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
 service pop3-login {
     inet_listener pop3 {
-    {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
+        proxy_protocol = yes
+    }
+    # Provide a port for internal cluster clients that don't use the Proxy protocol
+    inet_listener pop3-no-proxy {
+        port = 10110
     }
     inet_listener pop3s {
-    {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
+        proxy_protocol = yes
+    }                        
+    # Provide a port for internal cluster clients that don't use the Proxy protocol
+    inet_listener pop3s-no-proxy {
+        port = 10995
     }                        
 }
+{{- end -}}
+{{- end -}}

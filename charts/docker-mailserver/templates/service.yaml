@@ -64,6 +64,15 @@ spec:
       {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30993" .Values.service.nodePort.imaps }}
       {{- end }}   
+
+    {{- if .Values.proxy_protocol.enabled -}}
+    - name: imap-no-proxy
+      targetPort: imap
+      port: 10143
+    - name: imaps-no-proxy
+      targetPort: imaps
+      port: 10993
+    {{- end }}   
     {{- end }}   
 
     {{- if and (.Values.pod.dockermailserver.env.ENABLE_POP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
@@ -79,6 +88,14 @@ spec:
       {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30995" .Values.service.nodePort.pop3s }}
       {{- end }}    
+    {{- if .Values.proxy_protocol.enabled -}}
+    - name: pop3-no-proxy
+      targetPort: imap
+      port: 10110
+    - name: pop3s-no-proxy
+      targetPort: imaps
+      port: 10995
+    {{- end }}   
     {{- end }}   
  
     {{- if .Values.pod.dockermailserver.env.ENABLE_RSPAMD }}

@@ -140,7 +140,34 @@ Every variable can be set using `values.yaml`, but note that docker-mailserver e
 ### Default Configuration
 By default, the Chart enables `rspamd` and disables `opendkim`, `dmarc`, `policyd-spf` and `clamav`. This is the setup [recommended] (https://docker-mailserver.github.io/docker-mailserver/latest/config/best-practices/dkim_dmarc_spf/) by the docker-mailserver project.
 
-#### Chart Configuration
+## Exposing Ports to the Outside World
+If you are running a bare-metal Kubernetes cluster, you will need to expose ports to the internet to receive and send emails. In addition, you need to make sure that docker-mailserver receives the correct client IP address so that spam filtering works.
+
+This can get a bit complicated, as explained in the docker-mailserver (documentation)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#exposing-your-mail-server-to-the-outside-world]. 
+
+One approach is to use the PROXY protocol, which is also explained in the (documentation)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#proxy-port-to-service-via-proxy-protocol].
+
+The Helm chart supports the use of the proxy protocol via the `proxy_protocol` key. To enable it set the `enable` key to true. You will also want to set the `trustedNetworks` key.
+
+```yaml
+proxy_protocol:
+  enabled: true
+  # List of sources (in CIDR format, space-separated) to permit PROXY protocol from
+  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
+```
+
+However, if you enable the Proxy protocol you will break any clients (for example NextCloud) inside your Kubernetes cluster that talk to Dovecot because they will not be using the PROXY protocol. Therefore, if the PROXY protocol is enabled, the Helm chart will create additional ports that listen without the PROXY protocol by adding 10,000 to the standard port value.
+
+| Protocol   |  PROXY Port  |  No PROXY Port |
+| ---------- | ------------ | -------------- |
+| imap       |    143       |    10143       |
+| imaps      |    993       |    10993       |
+| pop3       |    110       |    10110       |
+| pop3s      |    995       |    10995       |
+
+Note thes ports are NOT exposed outside of the Kubernetes cluster.
+
+## Chart Values
 The following table lists the configurable parameters of the docker-mailserver chart and their default values.
 
 | Parameter                                         | Description                                                                                                                                                                          | Default                                              |

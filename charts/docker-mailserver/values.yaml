@@ -427,6 +427,11 @@ rspamd:
       enabled: false
       secret:
 
+proxy_protocol:
+  enabled: false
+  # List of sources (in CIDR format, space-separated) to permit PROXY protocol from
+  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
+  
 ## These values are for the haproxy sub-chart
 haproxy:
   # haproxy.enabled will deploy an haproxy sub-chart, configured for the TCP ports used by docker-mailserver
@@ -456,8 +461,6 @@ haproxy:
   # A space-separated list, on a single line, is required
   # By default, we allow all RFC1918 private ranges, but this can be tightened up for the known IP/range
   # of your HAProxy instance
-  # haproxy.trustedNetworks is the list of sources (in CIDR format, space-separated) to permit haproxy PROXY protocol from
-  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
 
 # when metrics is enabled, we mount subpath log from pvc into /var/log/mail
 metrics:
