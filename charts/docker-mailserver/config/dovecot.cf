@@ -1,7 +1,7 @@
 {{- if .Values.proxy_protocol.enabled }}
 proxy_protocol_trusted_networks = {{ .Values.proxy_protocol.trustedNetworks }}
 
-{{- if and (.Values.pod.dockermailserver.env.ENABLE_IMAP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+{{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
 service imap-login {
     inet_listener imap {
         proxy_protocol = yes
@@ -20,7 +20,7 @@ service imap-login {
 }    
 {{- end -}}
 
-{{- if and (.Values.pod.dockermailserver.env.ENABLE_POP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+{{- if and (.Values.deployment.env.ENABLE_POP) (not .Values.deployment.env.SMTP_ONLY) }}
 service pop3-login {
     inet_listener pop3 {
         proxy_protocol = yes

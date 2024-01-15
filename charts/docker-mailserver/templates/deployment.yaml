@@ -18,15 +18,15 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
       release: "{{ .Release.Name }}"
-  strategy: {{- toYaml .Values.pod.dockermailserver.strategy | nindent 4 }}
+  strategy: {{- toYaml .Values.deployment.strategy | nindent 4 }}
   template:
     metadata:
       labels:
         app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
         release: "{{ .Release.Name }}"
-        {{- if .Values.pod.dockermailserver.annotations }}
+        {{- if .Values.deployment.annotations }}
       annotations:
-{{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}
+{{ toYaml .Values.deployment.annotations | indent 8 }}
         {{ end }}
     spec:
       runtimeClassName: {{ .Values.runtimeClassName }}
@@ -79,7 +79,7 @@ spec:
       containers:
         - name: docker-mailserver
           env:
-          {{- range $pkey, $pval := .Values.pod.dockermailserver.env }}
+          {{- range $pkey, $pval := .Values.deployment.env }}
           - name: {{ $pkey }}
             value: {{ quote $pval }}
           {{- end }} 
@@ -96,12 +96,12 @@ spec:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
           securityContext:
-            {{- if eq .Values.pod.dockermailserver.env.ENABLE_FAIL2BAN 1.0 }}
+            {{- if eq .Values.deployment.env.ENABLE_FAIL2BAN 1.0 }}
             capabilities:
               add:
                 - "NET_ADMIN"
             {{ end }}
-{{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
+{{ toYaml .Values.deployment.containerSecurityContext | indent 12 }}
           volumeMounts:
         {{- if .Values.certificate }}
             - name: certificate
@@ -191,26 +191,26 @@ spec:
             - name: "submission"
               containerPort: 587
 
-            {{- if and (.Values.pod.dockermailserver.env.ENABLE_IMAP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+            {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
             - name: "imap"
               containerPort: 143
             - name: "imaps"
               containerPort: 993
             {{- end }}  
 
-            {{- if and (.Values.pod.dockermailserver.env.ENABLE_POP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+            {{- if and (.Values.deployment.env.ENABLE_POP) (not .Values.deployment.env.SMTP_ONLY) }}
             - name: "pop3"
               containerPort: 110
             - name: "pop3s"
               containerPort: 995
             {{- end }}  
 
-            {{- if .Values.pod.dockermailserver.env.ENABLE_RSPAMD }}
+            {{- if .Values.deployment.env.ENABLE_RSPAMD }}
             - name: "rspamd"
               containerPort: 11334  
             {{- end }}  
 
-            {{- if and (.Values.pod.dockermailserver.env.ENABLE_MANAGESIEVE) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+            {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
             - name: "managesieve"
               containerPort: 4190  
             {{- end }}  
@@ -233,7 +233,7 @@ spec:
           resources:
 {{ toYaml .Values.metrics.resources | indent 12 }}          
           securityContext:
-{{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
+{{ toYaml .Values.deployment.containerSecurityContext | indent 12 }}
 
           volumeMounts:
             - name: data

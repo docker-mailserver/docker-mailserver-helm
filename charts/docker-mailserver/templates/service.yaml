@@ -51,7 +51,7 @@ spec:
       nodePort: {{ default "30587" .Values.service.nodePort.submission }}
       {{ end }}   
  
-    {{- if and (.Values.pod.dockermailserver.env.ENABLE_IMAP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+    {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
     - name: imap
       targetPort: imap
       port: 143
@@ -75,7 +75,7 @@ spec:
     {{- end }}   
     {{- end }}   
 
-    {{- if and (.Values.pod.dockermailserver.env.ENABLE_POP) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+    {{- if and (.Values.deployment.env.ENABLE_POP) (not .Values.deployment.env.SMTP_ONLY) }}
     - name: pop3
       targetPort: pop3
       port: 110
@@ -98,13 +98,13 @@ spec:
     {{- end }}   
     {{- end }}   
  
-    {{- if .Values.pod.dockermailserver.env.ENABLE_RSPAMD }}
+    {{- if .Values.deployment.env.ENABLE_RSPAMD }}
     - name: rspamd
       targetPort: rspamd
       port: 11334  
     {{- end }}   
 
-    {{- if and (.Values.pod.dockermailserver.env.ENABLE_MANAGESIEVE) (not .Values.pod.dockermailserver.env.SMTP_ONLY) }}
+    {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
     - name: managesieve
       targetPort: managesieve
       port: 4190  
