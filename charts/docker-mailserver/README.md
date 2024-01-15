@@ -14,7 +14,6 @@ Compose, but it has been [adapted to Kubernetes](https://github.com/docker-mails
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
   - [Install](install)
-  - [Install Cert-manager](#2-install-cert-manager)
   - [Install Docker Mailserver](#install-docker-mailserver)
 - [Configuration and Operation](#configuration-and-operation)
   - [Download setup.sh](#download-setupsh)
@@ -140,7 +139,17 @@ Every variable can be set using `values.yaml`, but note that docker-mailserver e
 ### Default Configuration
 By default, the Chart enables `rspamd` and disables `opendkim`, `dmarc`, `policyd-spf` and `clamav`. This is the setup [recommended] (https://docker-mailserver.github.io/docker-mailserver/latest/config/best-practices/dkim_dmarc_spf/) by the docker-mailserver project.
 
-## Exposing Ports to the Outside World
+### Certificate
+You will need to setup a TLS certificate for your email domain. Perhaps the easiest way to do this is use (cert-manager)[https://cert-manager.io/].
+
+Once you acquire a certificate, you will need to store it in a TLS secret in the docker-mailserver namespace. Once you have done that, update the values.yaml file like this:
+
+```yaml
+certificate: my-certificate-secret
+```
+The chart will then automatically copy the certificate and private key to the `/tmp/dms/custom-certs` director in the container and set correctly set the `SSL_CERT_PATH` and `SSL_KEY_PATH` environment variables.
+
+### Exposing Ports to the Outside World
 If you are running a bare-metal Kubernetes cluster, you will need to expose ports to the internet to receive and send emails. In addition, you need to make sure that docker-mailserver receives the correct client IP address so that spam filtering works.
 
 This can get a bit complicated, as explained in the docker-mailserver (documentation)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#exposing-your-mail-server-to-the-outside-world]. 

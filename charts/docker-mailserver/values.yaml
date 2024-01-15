@@ -72,11 +72,8 @@ configs: []
 ##    kubectl create secret rspamd.example.com --namespace mail --from-file=rspamd.dkim.rsa-2048-mail-example.com.private.txt=<path_to_rspamd.dkim.rsa-2048-mail-example.com.private.txt>
 secrets: []
 
-## Specify an existing secret that contains TLS certificates. The easiest way to create a 
-## secret is by using cert-manager.
-ssl:
-  useExisting: false 
-  existingName: name-of-existing-secret
+## Specify a TLS secret name that contains a certificate and private key for your email domain
+certificate:
 
 ## Mount additional volumes into the container.  Useful for persistent logs or
 ## creating or injecting additional config files.
@@ -183,8 +180,9 @@ pod:
       ENABLE_MANAGESIEVE: 
       POSTSCREEN_ACTION: enforce
       SMTP_ONLY: 
-      SSL_TYPE: 
-      # These two values are automatically setup if SSL_TYPE is configured
+      SSL_TYPE: manual  # This should always be manual because the chart just points to an existing
+                        # tls secret (which may be setup manually or by cert-manager)
+      # These two values are automatically set by the chart based on the certificate key
       # SSL_CERT_PATH: 
       # SSL_KEY_PATH: 
       SSL_ALT_CERT_PATH: 
