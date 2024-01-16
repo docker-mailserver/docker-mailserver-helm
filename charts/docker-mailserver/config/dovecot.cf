@@ -1,17 +1,17 @@
 {{- if .Values.proxy_protocol.enabled }}
-proxy_protocol_trusted_networks = {{ .Values.proxy_protocol.trustedNetworks }}
+haproxy_trusted_networks = {{ .Values.proxy_protocol.trustedNetworks }}
 
 {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
 service imap-login {
     inet_listener imap {
-        proxy_protocol = yes
+        haproxy = yes
     }  
     # Provide a port for internal cluster clients that don't use the Proxy protocol
     inet_listener imap-no-proxy {
         port = 10143
     }
     inet_listener imaps {
-        proxy_protocol = yes
+        haproxy = yes
     }
     # Provide a port for internal cluster clients that don't use the Proxy protocol
     inet_listener imaps-no-proxy {
@@ -23,14 +23,14 @@ service imap-login {
 {{- if and (.Values.deployment.env.ENABLE_POP) (not .Values.deployment.env.SMTP_ONLY) }}
 service pop3-login {
     inet_listener pop3 {
-        proxy_protocol = yes
+        haproxy = yes
     }
     # Provide a port for internal cluster clients that don't use the Proxy protocol
     inet_listener pop3-no-proxy {
         port = 10110
     }
     inet_listener pop3s {
-        proxy_protocol = yes
+        haproxy = yes
     }                        
     # Provide a port for internal cluster clients that don't use the Proxy protocol
     inet_listener pop3s-no-proxy {

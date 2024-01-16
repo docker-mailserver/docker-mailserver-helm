@@ -65,7 +65,7 @@ spec:
       nodePort: {{ default "30993" .Values.service.nodePort.imaps }}
       {{- end }}   
 
-    {{- if .Values.proxy_protocol.enabled -}}
+    {{- if .Values.proxy_protocol.enabled }}
     - name: imap-no-proxy
       targetPort: imap
       port: 10143
@@ -88,7 +88,7 @@ spec:
       {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30995" .Values.service.nodePort.pop3s }}
       {{- end }}    
-    {{- if .Values.proxy_protocol.enabled -}}
+    {{- if .Values.proxy_protocol.enabled }}
     - name: pop3-no-proxy
       targetPort: imap
       port: 10110
