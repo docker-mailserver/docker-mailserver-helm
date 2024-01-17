@@ -35,30 +35,30 @@ spec:
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
       volumes:
-        - name: "data"
+        - name: data
           persistentVolumeClaim:
             claimName: {{ template "dockermailserver.fullname" . }}
-        - name: "config"
-          emptyDir: {}
 
+      {{- if .Values.configs.installDefault }}
         # Default ConfigMap
         - name: {{ template "dockermailserver.fullname" . }}-configs
           configMap:
             name: {{ template "dockermailserver.fullname" . }}-configs
+      {{- end }}
 
-        # User ConfigMaps
-      {{- range $config := .Values.configs }}
+        # Custom ConfigMaps
+      {{- range $config := .Values.configs.custom }}
         - name: {{ regexReplaceAll "[.]" $config.name "-" }}-config
           configMap:
             name: {{ $config.name }}
       {{- end }}
 
         # Default Secret
-        - name: "secrets"
+        - name: secrets
           secret:
             secretName: {{ template "dockermailserver.fullname" . }}-secrets
 
-        # User Secrets
+        # Custom Secrets
       {{- range $secret := .Values.secrets }}
         - name: {{ regexReplaceAll "[.]" $secret.name "-" }}-secret
           secret:
@@ -66,15 +66,15 @@ spec:
       {{- end }}
 
       {{- if .Values.certificate }}
-        - name: "certificate"
+        - name: certificate
           secret:
             secretName: {{ .Values.certificate }}
      {{- end }}
 
-{{- if .Values.additionalVolumes }}
+     {{- if .Values.additionalVolumes }}
         # Additional Volumes
 {{ toYaml .Values.additionalVolumes | indent 8 }}
-{{- end }}
+    {{- end }}
 
       containers:
         - name: docker-mailserver
@@ -123,18 +123,20 @@ spec:
               subPath: mail-state
 
             ### Default ConfigMap ###
-      {{- /* Mount configuration files stored in the built-in ConfigMap into the container */}}
-      {{- range $path, $content := .Files.Glob  "config/**" }}
-        {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
+      {{- if .Values.configs.installDefault }}
+        {{- /* Mount configuration files stored in the built-in ConfigMap into the container */}}
+        {{- range $path, $content := .Files.Glob  "config/**" }}
+          {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
             # {{ $path }}
             - name: {{ template "dockermailserver.fullname" $ }}-configs
               subPath: {{ regexReplaceAll "[^-_.\\w]" $path "." }}
               mountPath: /tmp/docker-mailserver/{{ $path | trimPrefix  "config/" }}
+          {{- end }}
         {{- end }}
       {{- end }}
 
-            ### User ConfigMaps ###
-      {{- range $config := .Values.configs }}
+            ### Custom ConfigMaps ###
+      {{- range $config := .Values.configs.custom }}
         {{- range $item := $config.data }}
             # {{ $item.subPath }}
             - name: {{ regexReplaceAll "[.]" $config.name "-" }}-config
@@ -154,7 +156,7 @@ spec:
           {{- end }}
        {{- end }}
 
-            ### User Secrets ###
+            ### Custom Secrets ###
       {{- range $secret := .Values.secrets }}
         {{- range $item := $secret.data }}
             # {{ $item.subPath }}
@@ -164,9 +166,10 @@ spec:
         {{- end }}
       {{- end }}
 
-{{- if .Values.additionalVolumeMounts }}
+      {{- if .Values.additionalVolumeMounts }}
+        # Additional VolumeMounts
 {{ toYaml .Values.additionalVolumeMounts | indent 12 }}
-{{- end }}
+      {{- end }}
           livenessProbe:
             exec:
                command:
@@ -186,36 +189,55 @@ spec:
             timeoutSeconds: 5
             failureThreshold: 3
           ports:
-            - name: "smtp"
+            - name: smtp
               containerPort: 25
-            - name: "smtps"
+
+            - name: submissions
               containerPort: 465
-            - name: "submission"
+            - name: submission
               containerPort: 587
+          {{- if .Values.proxy_protocol.enabled }}
+            - name: subs-proxy
+              containerPort: 10465
+            - name: sub-proxy
+              containerPort: 10587
+          {{- end }}   
 
-            {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
-            - name: "imap"
+        {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
+            - name: imap
               containerPort: 143
-            - name: "imaps"
+            - name: imaps
               containerPort: 993
-            {{- end }}  
+          {{- if .Values.proxy_protocol.enabled }}
+            - name: imap-proxy
+              containerPort: 10143
+            - name: imaps-proxy
+              containerPort: 10993
+          {{- end }}   
+        {{- end }}   
 
-            {{- if and (.Values.deployment.env.ENABLE_POP) (not .Values.deployment.env.SMTP_ONLY) }}
-            - name: "pop3"
+        {{- if and (.Values.deployment.env.ENABLE_POP) (not .Values.deployment.env.SMTP_ONLY) }}
+            - name: pop3
               containerPort: 110
-            - name: "pop3s"
+            - name: pop3s
               containerPort: 995
-            {{- end }}  
+          {{- if .Values.proxy_protocol.enabled }}
+            - name: pop3-proxy
+              containerPort: 10110
+            - name: pop3s-proxy
+              containerPort: 10995
+          {{- end }}   
+        {{- end }}  
 
-            {{- if .Values.deployment.env.ENABLE_RSPAMD }}
-            - name: "rspamd"
+        {{- if .Values.deployment.env.ENABLE_RSPAMD }}
+            - name: rspamd
               containerPort: 11334  
-            {{- end }}  
+        {{- end }}  
 
-            {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
-            - name: "managesieve"
+        {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
+            - name: managesieve
               containerPort: 4190  
-            {{- end }}  
+        {{- end }}  
 
 {{- if .Values.metrics.enabled }}
         - name: metrics-exporter
