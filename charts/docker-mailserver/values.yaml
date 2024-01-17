@@ -27,30 +27,31 @@ serviceAccount:
 ## files by either referencing existing ConfigMaps (that you create before installing the Chart)
 ## or by creating new ones (set the create key to true).
 ##
-## configs:
-## - name: postfix.example.com
-##   create: true
-##   data:
-##     - subPath: postfix-accounts.cf
-##       mountPath: postfix-accounts.cf
-##       content: |
-##         # A sample user - the password is "password"
-##         user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
+configs:
+  installDefault: true # Install the built-in config files
+##  custom:
+##  - name: postfix.example.com
+##    create: true
+##    data:
+##      - subPath: postfix-accounts.cf
+##        mountPath: postfix-accounts.cf
+##        content: |
+##          # A sample user - the password is "password"
+##          user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
 ##
-## - name: dovecot.example.com                     # Name of the ConfigMap
-##   create: true                                  # Whether to create the ConfigMap (if true, content must be specified)
-##   data:
-##     - subPath: dovecot-masters.cf
-##       mountPath: dovecot-masters.cf             # Relative path to /tmp/docker-mailserver/
-##       content: |
-##         # A sample user - the password is "password"
-##         user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
+##  - name: dovecot.example.com                     # Name of the ConfigMap
+##    create: true                                  # Whether to create the ConfigMap (if true, content must be specified)
+##    data:
+##      - subPath: dovecot-masters.cf
+##        mountPath: dovecot-masters.cf             # Relative path to /tmp/docker-mailserver/
+##        content: |
+##          # A sample user - the password is "password"
+##          user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
 ##
 ##  If you set the create key to false, then you must manually create the ConfigMaps before deploying the chart.
 ##
 ##    kubectl create configmap postfix.example.com --namespace mail --from-file=postfix-accounts.cf=<path_to_postfix_accounts.cf>
 ##
-configs: []
 
 ## The secrets key works the same way as the configs key. Use secrets to store sensitive information,
 ## such as DKIM signing keys.
@@ -81,7 +82,7 @@ certificate:
 #- name: host-config-files
 #  hostPath:
 #    path: /tmp/docker-mailserver-config   # Directory on host
-#    type: Directory
+#    type: DirectoryOrCreate
 
 #additionalVolumeMounts:
 #- name: host-config-files
@@ -104,7 +105,6 @@ livenessTests:
   # livenessTests.commands is an array of commands to be executed within the docker-mailserver container, intended to prove that the container is healthy. Each command must exit 0 under normal (healthy) circumstances
   commands:
     - "clamscan /tmp/docker-mailserver/TrustedHosts"
-
 
 deployment:
   ## How many versions of the deployment to run on kubernetes

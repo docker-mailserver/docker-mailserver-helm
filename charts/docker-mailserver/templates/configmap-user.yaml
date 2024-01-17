@@ -1,4 +1,4 @@
-{{- range $config := .Values.configs }}
+{{- range $config := .Values.configs.custom }}
 {{- if $config.create }}
 apiVersion: "v1"
 kind: "ConfigMap"

@@ -1,3 +1,4 @@
+{{- if .Values.configs.installDefault }}
 apiVersion: "v1"
 kind: "ConfigMap"
 metadata:
@@ -10,11 +11,12 @@ metadata:
 data:   
 {{/* Copy files from config subdirectory into a config map. The key for each file is its path
      stripped of the leading "/config" and then base 64 encoded. */}}  
-{{- range $path, $content := .Files.Glob  "config/**" }}
-  {{/* Skip empty files and public / private keys */}}  
-  {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
+  {{- range $path, $content := .Files.Glob  "config/**" }}
+    {{/* Skip empty files and public / private keys */}}  
+    {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
   # {{ $path }}
   {{ regexReplaceAll "[^-_.\\w]" $path "." }}: |
 {{ tpl ($.Files.Get $path) $ | indent 6 }}
+    {{- end }}
   {{- end }}
 {{- end }}
