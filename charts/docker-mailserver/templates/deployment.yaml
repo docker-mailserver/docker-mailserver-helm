@@ -35,45 +35,38 @@ spec:
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
       volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: {{ template "dockermailserver.fullname" . }}
-
-      {{- if .Values.configs.installDefault }}
-        # Default ConfigMap
-        - name: {{ template "dockermailserver.fullname" . }}-configs
+          # ConfigMaps
+      {{- range $config := .Values.configFiles }}
+        - name: {{ regexReplaceAll "[.]" $config.name "-" }}
           configMap:
-            name: {{ template "dockermailserver.fullname" . }}-configs
+            name: {{ regexReplaceAll "[.]" $config.name "-" }}
       {{- end }}
 
-        # Custom ConfigMaps
-      {{- range $config := .Values.configs.custom }}
-        - name: {{ regexReplaceAll "[.]" $config.name "-" }}-config
-          configMap:
-            name: {{ $config.name }}
-      {{- end }}
-
-        # Default Secret
-        - name: secrets
-          secret:
-            secretName: {{ template "dockermailserver.fullname" . }}-secrets
-
-        # Custom Secrets
+        # Secrets
       {{- range $secret := .Values.secrets }}
-        - name: {{ regexReplaceAll "[.]" $secret.name "-" }}-secret
+        - name: {{ regexReplaceAll "[.]" $secret.name "-" }}
           secret:
-            secretName: {{ $secret.name }}
+            secretName: {{ regexReplaceAll "[.]" $secret.name "-" }}
       {{- end }}
 
+        # Certificate
       {{- if .Values.certificate }}
         - name: certificate
           secret:
             secretName: {{ .Values.certificate }}
-     {{- end }}
+      {{- end }}
 
-     {{- if .Values.additionalVolumes }}
-        # Additional Volumes
-{{ toYaml .Values.additionalVolumes | indent 8 }}
+        # PVCs
+    {{- range $name, $persistence := .Values.persistence }}
+      {{- if $persistence.enabled }}
+        - name: {{ $name }}
+          persistentVolumeClaim:
+            {{- if $persistence.existingClaim}}
+            claimName: {{ $persistence.existingClaim }}
+            {{ else }}
+            claimName: {{ template "dockermailserver.fullname" $ }}-{{ $name }}
+            {{ end }}
+      {{- end }}
     {{- end }}
 
       containers:
@@ -104,72 +97,36 @@ spec:
                 - "NET_ADMIN"
             {{ end }}
 {{ toYaml .Values.deployment.containerSecurityContext | indent 12 }}
+
           volumeMounts:
         {{- if .Values.certificate }}
             - name: certificate
               mountPath: /tmp/dms/custom-certs
               readOnly: true
         {{- end }}
-        {{ if .Values.metrics.enabled }}
-            - name: data
-              mountPath: /var/log/mail
-              subPath: log
-        {{- end }}
-            - name: data
-              mountPath: /var/mail
-              subPath: mail      
-            - name: data
-              mountPath: /var/mail-state
-              subPath: mail-state
 
-            ### Default ConfigMap ###
-      {{- if .Values.configs.installDefault }}
-        {{- /* Mount configuration files stored in the built-in ConfigMap into the container */}}
-        {{- range $path, $content := .Files.Glob  "config/**" }}
-          {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
-            # {{ $path }}
-            - name: {{ template "dockermailserver.fullname" $ }}-configs
-              subPath: {{ regexReplaceAll "[^-_.\\w]" $path "." }}
-              mountPath: /tmp/docker-mailserver/{{ $path | trimPrefix  "config/" }}
+            # ConfigFiles via ConfigMaps
+        {{- range $config := .Values.configFiles }}
+            - name: {{ regexReplaceAll "[.]" $config.name "-" }}
+              subPath: {{ $config.key | default $config.path }}
+              mountPath: /tmp/docker-mailserver/{{ $config.path }}
+        {{- end }}
+
+            # Config via Secrets
+        {{- range $secret := .Values.secrets }}
+            - name: {{ regexReplaceAll "[.]" $secret.name "-" }}
+              subPath: {{ $secret.key | default $secret.path }}
+              mountPath: /tmp/docker-mailserver/{{ $secret.path }}
+        {{- end }}
+
+          # Volumes
+        {{- range $name, $persistence := .Values.persistence }}
+          {{- if $persistence.enabled }}
+            - name: {{ $name }}
+              mountPath: {{ $persistence.mountPath }}
           {{- end }}
         {{- end }}
-      {{- end }}
 
-            ### Custom ConfigMaps ###
-      {{- range $config := .Values.configs.custom }}
-        {{- range $item := $config.data }}
-            # {{ $item.subPath }}
-            - name: {{ regexReplaceAll "[.]" $config.name "-" }}-config
-              subPath: {{ $item.subPath }}
-              mountPath: /tmp/docker-mailserver/{{ $item.mountPath }}
-        {{- end }}
-      {{- end }}
-
-            ### Default Secret ###
-        {{- range $path, $content := .Files.Glob  "config/**" }}
-          {{- if and (gt (len $content) 0) (or (contains "private" $path) (contains "public" $path)) }}
-            ### System defined secrets ###
-            - name: secrets
-              subPath: {{ regexReplaceAll "[^-_.\\w]" $path "." }}
-              mountPath: /tmp/docker-mailserver/{{ $path | trimPrefix  "config/" }}
-              readOnly: true
-          {{- end }}
-       {{- end }}
-
-            ### Custom Secrets ###
-      {{- range $secret := .Values.secrets }}
-        {{- range $item := $secret.data }}
-            # {{ $item.subPath }}
-            - name: {{ regexReplaceAll "[.]" $secret.name "-" }}-secret
-              subPath: {{ $item.subPath }}
-              mountPath: /tmp/docker-mailserver/{{ $item.mountPath }}
-        {{- end }}
-      {{- end }}
-
-      {{- if .Values.additionalVolumeMounts }}
-        # Additional VolumeMounts
-{{ toYaml .Values.additionalVolumeMounts | indent 12 }}
-      {{- end }}
           livenessProbe:
             exec:
                command:
