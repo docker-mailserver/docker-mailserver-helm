@@ -29,8 +29,8 @@ spec:
 {{ toYaml .Values.deployment.annotations | indent 8 }}
         {{ end }}
     spec:
-      runtimeClassName: {{ .Values.runtimeClassName }}
-      priorityClassName: {{ .Values.priorityClassName }}
+      runtimeClassName: {{ .Values.deployment.runtimeClassName }}
+      priorityClassName: {{ .Values.deployment.priorityClassName }}
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}

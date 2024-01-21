@@ -7,12 +7,6 @@ image:
   tag: "13.2.0"
   pullPolicy: "IfNotPresent"
 
-## Optionally specify a runtimeClassName for the deployment
-runtimeClassName: 
-
-## Optionally specify a priorityClassName for the deployment
-priorityClassName:
-
 serviceAccount:
   create: "true"
 
@@ -45,6 +39,12 @@ deployment:
   ## Add annotations to the deployment
   ## Useful for using something like stash to backup data (https://stash.run/docs/v0.9.0-rc.0/guides/latest/auto-backup/workload/)
   annotations: {}  
+
+  ## Optionally specify a runtimeClassName for the deployment
+  runtimeClassName: 
+
+  ## Optionally specify a priorityClassName for the deployment
+  priorityClassName:
 
   ## Host networking requested for this pod. Use the host’s network namespace. If this option is set, the ports that
   ## will be used must be specified.
