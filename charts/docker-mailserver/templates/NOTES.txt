@@ -1,15 +1,13 @@
 GOOD NEWS!
 ====================
 
-You've successfully launched the docker-mailserver helm chart!
-
-{{- if not .Values.configs -}}  
+You've successfully installed the docker-mailserver helm chart!
 
 Initial Setup
 ------------
 
-But wait, dear reader! You haven't configured your mail server yet! You'll need to quickly open a command
-prompt into the running container (you have two minutes) and setup a first email account.
+If you have not yet configured your mail server you'll need to quickly open a command
+prompt inside the running container (you have two minutes) and setup a first email account.
 
     kubectl exec -it --namespace mail deploy/docker-mailserver -- bash
 
@@ -19,62 +17,17 @@ This will create a file:
 
     cat /tmp/docker-mailserver/postfix-accounts.cf
 
-Next, run the setup command to see your other options:
+Next, run the setup command to see additonal options:
 
     setup
 
-As you run various setup commands, additional files will be generated in `/tmp/docker-mailserver`.
+For more information please refer to this Chart's README file.
 
-Once you are done, you will want to copy them to your local machine (remember when the pod is terminated all of
-these files will be deleted!)
+{{ if .Values.proxy_protocol.enabled -}}  
 
-    exit # To exit the bash prompt in the container
+Proxy Ports
+------------
+You have enabled PROXY protocol support, likely because you are running on a bare metal Kubernetes cluster. This means additional ports have been created that are configured for the PROXY protocol. These ports are in the 10,000 range - thus IMAPs is 10993 (10000 + 993), SUBMISSION is 10587 (10000 + 587), etc.
 
-     mdkir /tmp/config
-     
-     cd /tmp/config
-     
-     podname=$(kubectl get pod --namespace mail -l app.kubernetes.io/name=docker-mailserver  -o jsonpath="{.items[0].metadata.name}")
-     
-     kubectl cp mail/$podname:tmp/docker-mailserver /tmp/test
-
-Once you have copied these files locally, you then need to save them into configmaps or 
-secrets. Please see the `configs` and `secrets` key in the values.yaml file for more information. Once you have created your custom values.yaml file you
-can then redeploy the chart 
-
-   helm upgrade --namespace mail {{ .Release.Namespace }} docker-mailserver --values <path_to_your_values.yaml>
-
-{{ end }}
-
-{{ if .Values.haproxy.enabled -}}  
-{{ if .Values.poorMansK8sLb.enabled -}} 
-
--------
-You're running with HAProxy enabled, and poor-mans-k8s-lb turned on. Provided you've correctly setup your 
-poorMansK8sLb.webhook.url and poorMansK8sLb.webhook.token, you don't need to do anything further in
-order for your external access to work
--------
-
-{{ else if .Values.haproxy.deploy_ingress_chart -}} 
-
--------
-You're configured for HAProxy in "ingress" mode. Theoretically you don't have to do anything, provided the 
-ingress resource started up correctly - you should be able to access your external IP on the standard email
-ports, and have it "Just Work (tm)"
--------
-
-{{ else -}} 
-
--------
-You've enabled haproxy support, but you've not activated ingress or poorMansK8sLb. You'll need to manually configure
-your haproxy to send the incoming traffic to the node running your pod, on the configured nodeport ports. Use the
-"send-proxy" value for ports 25,110,143,993 and 995 (but not 465 and 587)
--------
-{{ end }}
-{{ else }}
-
--------
-You've disabled haproxy support. This means that you'll need to MANUALLY configure how your services are exposed
-to the internet. You may be running in host mode, or nodeport mode, or some other complex configuration.
--------
+It is now up to you to configure incoming traffic to use these ports. For more information please refer to this Chart's README file.
 {{ end }}
