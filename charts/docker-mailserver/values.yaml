@@ -1,4 +1,5 @@
----
+fullnameOverride: ""
+
 image:
   # image.name is the name of the container image to use. Refer to https://hub.docker.com/r/mailserver/docker-mailserver
   name: "mailserver/docker-mailserver"
@@ -15,78 +16,8 @@ priorityClassName:
 serviceAccount:
   create: "true"
 
-## ConfigMaps (and Secrets) are used to copy docker-mailserver configuration files 
-## into running containers. This chart automatically sets up any config files that 
-## are stored in its chart/config directory. 
-## 
-## However, Helm does not provide a way too save external files to a ConfigMap or Secret.
-## This is problem for docker-mailserver because you need to setup postfix acounts,
-## dovecot accounts, etc.
-##
-## The configs and secrets keys solve this problem. They allow you to add additional config
-## files by either referencing existing ConfigMaps (that you create before installing the Chart)
-## or by creating new ones (set the create key to true).
-##
-configs:
-  installDefault: true # Install the built-in config files
-##  custom:
-##  - name: postfix.example.com
-##    create: true
-##    data:
-##      - subPath: postfix-accounts.cf
-##        mountPath: postfix-accounts.cf
-##        content: |
-##          # A sample user - the password is "password"
-##          user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
-##
-##  - name: dovecot.example.com                     # Name of the ConfigMap
-##    create: true                                  # Whether to create the ConfigMap (if true, content must be specified)
-##    data:
-##      - subPath: dovecot-masters.cf
-##        mountPath: dovecot-masters.cf             # Relative path to /tmp/docker-mailserver/
-##        content: |
-##          # A sample user - the password is "password"
-##          user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
-##
-##  If you set the create key to false, then you must manually create the ConfigMaps before deploying the chart.
-##
-##    kubectl create configmap postfix.example.com --namespace mail --from-file=postfix-accounts.cf=<path_to_postfix_accounts.cf>
-##
-
-## The secrets key works the same way as the configs key. Use secrets to store sensitive information,
-## such as DKIM signing keys.
-##
-##  secrets:
-##  - name: rspamd.example.com                      # This is the name of the Secret
-##    create: true                                  # If true, create a new Secret
-##    data:
-##      - subPath: rspamd.dkim.rsa-2048-mail-example.com.private.txt
-##        mountPath: rspamd/dkim/rsa-2048-mail-example.com.private.txt
-##        content: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
-##
-##      - subPath: rspamd.dkim.rsa-2048-mail-example.com.public
-##        mountPath: rspamd/dkim/rsa-2048-mail-example.com.public
-##        content: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
-##
-##  If you set the create key to false, then you must manually create the ConfigMaps before deploying the chart.
-##
-##    kubectl create secret rspamd.example.com --namespace mail --from-file=rspamd.dkim.rsa-2048-mail-example.com.private.txt=<path_to_rspamd.dkim.rsa-2048-mail-example.com.private.txt>
-secrets: []
-
 ## Specify a TLS secret name that contains a certificate and private key for your email domain
 certificate:
-
-## Mount additional volumes into the container.  Useful for persistent logs or
-## creating or injecting additional config files.
-#additionalVolumes:
-#- name: host-config-files
-#  hostPath:
-#    path: /tmp/docker-mailserver-config   # Directory on host
-#    type: DirectoryOrCreate
-
-#additionalVolumeMounts:
-#- name: host-config-files
-#  mountPath: /tmp/docker-mailserver       # Directory in container
 
 # If you choose _not_ to use haproxy, and you're not exposing your services with a load-balanced service
 # with an external traffic policy in "Local" mode, you risk having the source IP of incoming mail overwritten
@@ -160,7 +91,7 @@ deployment:
     TZ: 
     NETWORK_INTERFACE: 
     TLS_LEVEL: 
-    SPOOF_PROTECTION: 
+    SPOOF_PROTECTION: 1
     ENABLE_SRS: 0
     ENABLE_OPENDKIM: 0
     ENABLE_OPENDMARC: 0
@@ -307,8 +238,8 @@ deployment:
   enable_dovecot_replication: true
 
   securityContext:
-    runAsUser: 10001
-    runAsGroup: 10001
+    runAsUser: 5000
+    runAsGroup: 5000
 
   containerSecurityContext:
     readOnlyRootFilesystem: false # incompatible with the way docker-mailserver works
@@ -369,17 +300,57 @@ resources:
     memory: "2048Mi"
     ephemeral-storage: "500Mi"
 
+# Note this is a dictionary and not a list so invidual keys can be overriden by --set or --value helm parameters
 persistence:
-  # existingClaim: # Specify an existing PVC to use
-  size: "10Gi"
-  # Uncomment the backup.kubernetes.io/deltas annotation below if you use https://github.com/miracle2k/k8s-snapshots
-  annotations: {}
-    # backup.kubernetes.io/deltas: PT1H P2D P30D P180D
-  accessMode: ReadWriteOnce
-  # storageClass:
-  # selector:
-  # Specify a volumeName, otherwise a new volume will be dynamically provisioned
-  # volumeName: my-volume
+  # Stores generated configuration files
+  # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsconfig-directory
+  mail-config:
+    enabled: true
+    existingClaim: ""
+    mountPath: /tmp/docker-mailserver
+    size: "1Mi"
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
+    storageClass:
+    selector: {}
+
+  # Stores emails
+  mail-data:
+    enabled: true
+    existingClaim: ""
+    size: 10Gi
+    mountPath: /var/mail
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
+    storageClass:
+    selector: {}
+
+  # Stores state for Postfix, Dovecot, Fail2Ban, Amavis, PostGrey, ClamAV, SpamAssassin, Rspamd & Redis
+  # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsmail-state-directory
+  mail-state:
+    enabled: true
+    existingClaim: ""
+    mountPath: /var/mail-state
+    size: "1Gi"
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
+    storageClass:
+    selector: {}
+
+  # Store mail logs
+  mail-log:
+    enabled: true
+    existingClaim: ""
+    mountPath: /var/log/mail
+    size: "1Gi"
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
+    storageClass:
+    selector: {}
 
 ## Monitoring adds the prometheus.io annotations to pods and services, so that the Prometheus Kubernetes SD mechanism
 ## as configured in the examples will automatically discover both the pods and the services to query.
@@ -424,7 +395,7 @@ rspamd:
       secret:
 
 proxy_protocol:
-  enabled: false
+  enabled: true
   # List of sources (in CIDR format, space-separated) to permit PROXY protocol from
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
   
@@ -477,3 +448,168 @@ metrics:
   serviceMonitor:
     enabled: false
     scrapeInterval: 15s
+
+
+## ConfigMaps (and Secrets) are used to copy docker-mailserver configuration files 
+## into running containers. This chart automatically sets up any config files that 
+## are stored in its chart/config directory. 
+## 
+## However, Helm does not provide a way too save external files to a ConfigMap or Secret.
+## This is problem for docker-mailserver because you need to setup postfix acounts,
+## dovecot accounts, etc.
+##
+## The configs and secrets keys solve this problem. They allow you to add additional config
+## files by either referencing existing ConfigMaps (that you create before installing the Chart)
+## or by creating new ones (set the create key to true).
+##
+configFiles:
+  - name: dovecot.cf
+    create: true
+    path: dovecot.cf
+    data: |
+      {{- if .Values.proxy_protocol.enabled }}
+        haproxy_trusted_networks = {{ .Values.proxy_protocol.trustedNetworks }}
+
+        {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
+        service imap-login {
+            inet_listener imap {
+                port = 143
+            }
+          
+            inet_listener imaps {
+                port = 993
+                ssl = yes
+            }
+          
+            inet_listener imap_proxy {
+                haproxy = yes
+                port = 10143
+                ssl = no
+            }
+
+            inet_listener imaps_proxy {
+                haproxy = yes
+                port = 10993
+                ssl = yes
+            }
+        }    
+        {{- end -}}
+
+        {{- if and (.Values.deployment.env.ENABLE_POP) (not .Values.deployment.env.SMTP_ONLY) }}
+        service pop3-login {
+            inet_listener pop3 {
+                port = 110
+            }
+          
+            inet_listener pop3s {
+                port = 995
+                ssl = yes
+            }
+
+            inet_listener pop3_proxy {
+                haproxy = yes
+                port = 10110
+                ssl = no
+            }
+
+            inet_listener pop3s_proxy {
+                haproxy = yes
+                port = 10995
+                ssl = yes
+            }                        
+        }
+        {{- end -}}
+      {{- end -}}
+
+  - name: postfix-main.cf
+    create: true
+    path: postfix-main.cf
+    data: |
+      {{- if not .Values.spfTestsDisabled }}
+        smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination, reject_unauth_pipelining, reject_invalid_helo_hostname, reject_non_fqdn_helo_hostname, reject_unknown_recipient_domain, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net{{ range .Values.rblRejectDomains }}, reject_rbl_client {{ . }}{{ end }}
+      {{ end -}}
+
+  - name: 91-override-sieve.conf
+    create: true
+    path: 91-override-sieve.conf
+    data: |
+      plugin {
+        sieve = /var/mail/sieve/%d/%n/.dovecot.sieve
+        sieve_dir = /var/mail/sieve/%d/%n/sieve
+      }
+
+  - name: am-i-health.sh
+    create: true
+    path: am-i-health.sh
+    data: |
+      #!/bin/bash
+      # this script is intended to be used by periodic kubernetes liveness probes to ensure that the container
+      # (and all its dependent services) is healthy
+      {{ range .Values.livenessTests.commands -}}
+      {{ . }} && \
+      {{- end }}
+      echo "All healthy"
+
+  - name: user-patches.sh
+    create: true
+    path: user-patches.sh
+    data: |
+      #!/bin/bash
+
+      {{- if .Values.proxy_protocol.enabled }}
+      # Make sure to keep this file in sync with https://github.com/docker-mailserver/docker-mailserver/blob/master/target/postfix/master.cf!
+      cat <<EOS >> /etc/postfix/master.cf
+
+      # Submission with proxy
+      10587     inet  n       -       n       -       -       smtpd
+        -o syslog_name=postfix/submission
+        -o smtpd_tls_security_level=encrypt
+        -o smtpd_sasl_auth_enable=yes
+        -o smtpd_sasl_type=dovecot
+        -o smtpd_reject_unlisted_recipient=no
+        -o smtpd_sasl_authenticated_header=yes
+        -o smtpd_client_restrictions=permit_sasl_authenticated,reject
+        -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+        -o smtpd_sender_restrictions=\$mua_sender_restrictions
+        -o smtpd_discard_ehlo_keywords=
+        -o milter_macro_daemon_name=ORIGINATING
+        -o cleanup_service_name=sender-cleanup
+        -o smtpd_upstream_proxy_protocol=haproxy  
+
+      # Submissions with proxy
+      10465     inet  n       -       n       -       -       smtpd
+        -o syslog_name=postfix/submissions
+        -o smtpd_tls_wrappermode=yes
+        -o smtpd_sasl_auth_enable=yes
+        -o smtpd_sasl_type=dovecot
+        -o smtpd_reject_unlisted_recipient=no
+        -o smtpd_sasl_authenticated_header=yes
+        -o smtpd_client_restrictions=permit_sasl_authenticated,reject
+        -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+        -o smtpd_sender_restrictions=\$mua_sender_restrictions
+        -o smtpd_discard_ehlo_keywords=
+        -o milter_macro_daemon_name=ORIGINATING
+        -o cleanup_service_name=sender-cleanup
+        -o smtpd_upstream_proxy_protocol=haproxy
+      EOS
+      {{- end }}
+
+
+## The secrets key works the same way as the configs key. Use secrets to store sensitive information,
+## such as DKIM signing keys.
+##
+##  secrets:
+##  - name: rspamd.example.com                      # This is the name of the Secret
+##    create: true                                  # If true, create a new Secret
+##    path: rspamd.dkim.rsa-2048-mail-example.com.private.txt
+##    data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
+##
+##  - name: rspamd.dkim.rsa-2048-mail-example.com.public
+##    create: true
+##    path: rspamd/dkim/rsa-2048-mail-example.com.public
+##    data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
+##
+##  If you set the create key to false, then you must manually create the ConfigMaps before deploying the chart.
+##
+##    kubectl create secret rspamd.example.com --namespace mail --from-file=rspamd.dkim.rsa-2048-mail-example.com.private.txt=<path_to_rspamd.dkim.rsa-2048-mail-example.com.private.txt>
+secrets: []
