@@ -1,64 +1,42 @@
-# docker-mailserver-helm
-
-This helm chart deploys [Docker
-Mailserver](https://github.com/docker-mailserver/docker-mailserver) into a
-Kubernetes cluster.
-
-Docker Mailserver was originally intended to be run with Docker or Docker
-Compose, but it has been [adapted to Kubernetes](https://github.com/docker-mailserver/docker-mailserver/wiki/Using-in-Kubernetes).
-
 ## Contents
 
 - [Contents](#contents)
-- [Features](#features)
+- [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
-  - [Install](install)
-  - [Install Docker Mailserver](#install-docker-mailserver)
-- [Configuration and Operation](#configuration-and-operation)
-  - [Download setup.sh](#download-setupsh)
-  - [Create / Update / Delete users](#create--update--delete-users)
-  - [Setup OpenDKIM](#setup-opendkim)
-  - [Configuration](#docker-mailserver-configuration)
-    - [Minimal configuration](#minimal-configuration)
-    - [Chart Configuration](#chart-configuration)
-    - [docker-mailserver Configuration](#docker-mailserver-configuration)
-    - [HA Proxy-Ingress Configuration](#ha-proxy-ingress-configuration)
+- [Create Configuration Files](#create-configuration-files)
+- [Values YAML](#values-yaml)
+    - [Minimal Configuration](#minimal-configuration)
+    - [Environmental Variables](#environmental-variables)
+    - [Ports](#ports)
 - [Development](#development)
   - [Testing](#testing)
 
 (Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc.go))
 
-## Features
+## Introduction
+This chart deploys [Docker
+Mailserver](https://github.com/docker-mailserver/docker-mailserver) into a
+Kubernetes cluster. 
 
-The chart includes the following features:
-
-- Configuration is done in values.yaml and by using the setup script inside the container
-- Avoids the [common problem of masking of source IP](https://kubernetes.io/docs/tutorials/services/source-ip/) by supporting haproxy's PROXY protocol (enabled by default)
-- Employs [cert-manager](https://github.com/jetstack/cert-manager) to automatically provide/renew SSL certificates
-- Starts in "demo" mode, allowing the user to test core functionality before configuring for specific domains
-- CI/CD tested against Kubernetes 1.18,1.19, and 1.20 : ![Lint and Test Charts](https://github.com/funkypenguin/helm-docker-mailserver/workflows/Lint%20and%20Test%20Charts/badge.svg)
+docker-mailserver is a production-ready, fullstack mail server that supports SMTP, IMAP, LDAP, Anti-spam, Anti-virus, etc.). Just as importantly, it is designed to be simple to install and configure.
 
 ## Prerequisites
-
-- A Kubernetes cluster
-- Acquire a custom domain
-- Configure a [DNS](https://docker-mailserver.github.io/docker-mailserver/latest/usage/#minimal-dns-setup)
-- __Suggested:__ PV provisioner support in the underlying infrastructure
-- [Cert-manager](https://github.com/jetstack/cert-manager/tree/master/deploy/charts/cert-manager) => 1.0 requires manual deployment into your cluster (details below)
-- [Helm](https://helm.sh) >= 3.0 
+- [Helm](https://helm.sh)
+- A [Kubernetes](https://kubernetes.io/releases/) cluster with persistent storage and access to email [ports](https://docker-mailserver.github.io/docker-mailserver/latest/config/security/understanding-the-ports/#overview-of-email-ports)
+- A custom domain name (for example, example.com)
+- Correctly configured [DNS](https://docker-mailserver.github.io/docker-mailserver/latest/usage/#minimal-dns-setup)
 
 ## Getting Started
-Setting up docker-mailserver requires generating a number of configuration (files)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/optional-config/]. Luckily, docker-mailserver ships with a helpful `setup` command that makes it easy to generate these files. It writes files to the `/tmp/docker-mailserver` directory inside a running container.
+Setting up docker-mailserver requires generating a number of configuration (files)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/optional-config/]. To make this easier, docker-mailserver includes a `setup` command that will generate these files.
 
-First run docker-mailserver:
+To get started, first install docker-mailserver:
 
 ```console
 helm upgrade --install docker-mailserver docker-mailserver --namespace mail --create-namespace
 ```
 
-### Create a User
-Next you'll need to quickly open a command prompt in the running container (you have two minutes) and setup an email account.
+Next open a command prompt to the running container and create an email account.
 
 ```console
 kubectl exec -it --namespace mail deploy/docker-mailserver -- bash
@@ -66,46 +44,36 @@ kubectl exec -it --namespace mail deploy/docker-mailserver -- bash
 setup email add user@example.com password
 ```
 
-This will geneate a new `postfix-accounts.cf` file:
+This will create a new `postfix-accounts.cf` file:
 
 ```console
 cat /tmp/docker-mailserver/postfix-accounts.cf
 ```
 
-### Create Additional Configuration Files
+## Create Configuration Files
 Assuming you still have a command prompt open in the running container, run the setup command to see additional configuration options:
 
 ```console
 setup
 ```console
 
-For extensive configuration documentation, please refer to [configuration](https://docker-mailserver.github.io/docker-mailserver/latest/config/environment/).
-
-As you run various setup commands, additional files will be generated in `/tmp/docker-mailserver`.
-
-Once you are done, copy the configuration files to your local machine (remember when the pod is terminated all of these files will be deleted!)
+As you run various setup commands, additional files will be generated. At a minimum you will want to run:
 
 ```console
-exit # To exit the bash prompt in the container
-
-mdkir /tmp/config
-
-cd /tmp/config
-
-podname=$(kubectl get pod --namespace mail -l app.kubernetes.io/name=docker-mailserver  -o jsonpath="{.items[0].metadata.name}")
-     
-kubectl cp mail/$podname:tmp/docker-mailserver /tmp/test
+setup dovecot-master add user@example.com password
+setup config dkim keysize 2048 domain 'example.com'
 ```
 
-## Customize values.yaml
-Once you have generated configuration files, you need to deploy them along with the Helm Chart.
+Configuration files are stored inside the container at `/tmp/docker-mailserver` which by default is mapped to a Kubernetes volume. You may of course add additional configuration files to the volume as needed.
 
-Unfortunately, Helm does not provide a way too include external files in a deployment. Instead, 
-configuration files need to be stored in ConfigMaps and Secrets that are then mounted as volumes
-into a container.
+For extensive configuration documentation, please refer to [configuration](https://docker-mailserver.github.io/docker-mailserver/latest/config/environment/).
 
-This can be done by via the `configs` and `secrets` key in the values.yaml file. Please see the comments
-in (values.yaml)[./values.yaml] on how to setup these keys.
+## Values YAML
+In addition to the configuration files generated above, the `values.yaml` file contains a number of knobs for customizing the docker-mailserver installation.
+
+By default, the Chart enables `rspamd` and disables `opendkim`, `dmarc`, `policyd-spf` and `clamav`. This is the setup [recommended] (https://docker-mailserver.github.io/docker-mailserver/latest/config/best-practices/dkim_dmarc_spf/) by the docker-mailserver project.
+
+It also provides a secondary mechanism for adding config files and secrets via the `configFiles` and `secrets` keys.
 
 Once you have created your own values.yaml files, then redeploy the chart like this:
 
@@ -119,28 +87,21 @@ You can also override individual configuration setting with `helm upgrade --set`
 $ helm upgrade docker-mailserver docker-mailserver --namespace mail --set pod.dockermailserver.image="your/image:1.0.0"
 ```
 
-### Minimal configuration
+### Minimal Configuration
 There are various settings in `values.yaml` that you must override.
 
-| Parameter                                    | Description                                         | Default          |
-| -------------------------------------------- | --------------------------------------------------- | ---------------- | 
-| pod.dockermailserver.pod.OVERRIDE_HOSTNAME   | The hostname to be presented on SMTP banners        | mail.example.com |
-| configs                                      | Specify ConfigMaps that contain configuration files | []               |
-| secrets                                      | Specify Secrets that contain configuration files    | []               |
-| ssl.issuer.name                              | The name of the cert-manager issuer expected to issue certs  | `letsencrypt-staging`  |
-| ssl.issuer.kind                              | Whether the issuer is namespaced (`Issuer`) on cluster-wide (`ClusterIssuer`) | ClusterIssuer |
-| ssl.dnsname                                  | DNS domain used for DNS01 validation                 | example.com      |
+| Parameter                         | Description                                         | Default          |
+| --------------------------------- | --------------------------------------------------- | ---------------- | 
+| deployment.env.[OVERRIDE_HOSTNAME](https://docker-mailserver.github.io/docker-mailserver/latest/config/environment/#override_hostname) | The hostname to be presented on SMTP banners        | mail.example.com |
+| certificate                       | Name of a Kubernetes secret that stores TLS certificate for mail domain | |
 
 ### Environmental Variables
 There are **many** environment variables which allow you to customize the behaviour of docker-mailserver. The function of each variable is described at https://github.com/docker-mailserver/docker-mailserver#environment-variables
 
 Every variable can be set using `values.yaml`, but note that docker-mailserver expects any true/false values to be set as binary numbers (1/0), rather than boolean (true/false). BadThings(tm) will happen if you try to pass an environment variable as "true" when [`start-mailserver.sh`](https://github.com/docker-mailserver/docker-mailserver/blob/master/target/start-mailserver.sh) is expecting a 1 or a 0!
 
-### Default Configuration
-By default, the Chart enables `rspamd` and disables `opendkim`, `dmarc`, `policyd-spf` and `clamav`. This is the setup [recommended] (https://docker-mailserver.github.io/docker-mailserver/latest/config/best-practices/dkim_dmarc_spf/) by the docker-mailserver project.
-
 ### Certificate
-You will need to setup a TLS certificate for your email domain. Perhaps the easiest way to do this is use (cert-manager)[https://cert-manager.io/].
+You will need to setup a TLS certificate for your email domain. The easiest way to do this is use (cert-manager)[https://cert-manager.io/].
 
 Once you acquire a certificate, you will need to store it in a TLS secret in the docker-mailserver namespace. Once you have done that, update the values.yaml file like this:
 
@@ -149,7 +110,7 @@ certificate: my-certificate-secret
 ```
 The chart will then automatically copy the certificate and private key to the `/tmp/dms/custom-certs` director in the container and set correctly set the `SSL_CERT_PATH` and `SSL_KEY_PATH` environment variables.
 
-### Exposing Ports to the Outside World
+### Ports
 If you are running a bare-metal Kubernetes cluster, you will need to expose ports to the internet to receive and send emails. In addition, you need to make sure that docker-mailserver receives the correct client IP address so that spam filtering works.
 
 This can get a bit complicated, as explained in the docker-mailserver (documentation)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#exposing-your-mail-server-to-the-outside-world]. 
@@ -165,22 +126,24 @@ proxy_protocol:
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
 ```
 
-However, if you enable the Proxy protocol you will break any clients (for example NextCloud) inside your Kubernetes cluster that talk to Dovecot because they will not be using the PROXY protocol. Therefore, if the PROXY protocol is enabled, the Helm chart will create additional ports that listen without the PROXY protocol by adding 10,000 to the standard port value.
+Enabling the PROXY protocol will create a new port for each protocol by adding 10,000 to the standard port value. Thus:
 
-| Protocol   |  PROXY Port  |  No PROXY Port |
-| ---------- | ------------ | -------------- |
-| imap       |    143       |    10143       |
-| imaps      |    993       |    10993       |
-| pop3       |    110       |    10110       |
-| pop3s      |    995       |    10995       |
+| Protocol    |  Port   |  PROXY Port |
+| ----------  | ------- | ----------- |
+| submissions |   465   |    10465    |
+| submission  |   587   |    10587    |
+| imap        |   143   |    10143    |
+| imaps       |   993   |    10993    |
+| pop3        |   110   |    10110    |
+| pop3s       |   995   |    10995    |
 
 Note thes ports are NOT exposed outside of the Kubernetes cluster.
 
 ## Chart Values
 The following table lists the configurable parameters of the docker-mailserver chart and their default values.
 
-| Parameter                                         | Description                                                                                                                                                                          | Default                                              |
-|---------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------|
+| Parameter        | Description                                              | Default                       |
+|------------------|----------------------------------------------------------|-------------------------------|
 | `image.name`                                      | The name of the container image to use                                                                                                                                               | `mailserver/docker-mailserver`                       |
 | `image.tag`                                       | The image tag to use (You may prefer "latest" over "v6.1.0", for example)                                                                                                            | `release-v6.1.0`                                     |
 | `demoMode.enabled`                                | Start the container with a demo "user@example.com" user (password is "password")                                                                                                     | `true`                                               |
