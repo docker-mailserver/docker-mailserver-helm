@@ -1,22 +1,17 @@
-{{- if .Values.configs.installDefault }}
+{{- range $config := .Values.configFiles }}
+{{- if $config.create }}
 apiVersion: "v1"
 kind: "ConfigMap"
 metadata:
   labels:
-    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
-  name: {{ template "dockermailserver.fullname" . }}-configs
-data:   
-{{/* Copy files from config subdirectory into a config map. The key for each file is its path
-     stripped of the leading "/config" and then base 64 encoded. */}}  
-  {{- range $path, $content := .Files.Glob  "config/**" }}
-    {{/* Skip empty files and public / private keys */}}  
-    {{- if and (gt (len $content) 0) (not (contains "private" $path)) (not (contains "public" $path)) }}
-  # {{ $path }}
-  {{ regexReplaceAll "[^-_.\\w]" $path "." }}: |
-{{ tpl ($.Files.Get $path) $ | indent 6 }}
-    {{- end }}
-  {{- end }}
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" $ }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    heritage: "{{ $.Release.Service }}"
+    release: "{{ $.Release.Name }}"
+  name: {{ regexReplaceAll "[.]" $config.name "-" }}
+data:
+  {{ $config.key | default $config.path }}: |
+{{ tpl $config.data $ | indent 6 }}
+---
+{{- end }}
 {{- end }}
