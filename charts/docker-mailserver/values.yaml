@@ -13,14 +13,6 @@ serviceAccount:
 ## Specify a TLS secret name that contains a certificate and private key for your email domain
 certificate:
 
-# If you choose _not_ to use haproxy, and you're not exposing your services with a load-balanced service
-# with an external traffic policy in "Local" mode, you risk having the source IP of incoming mail overwritten
-# with a local Kubernetes cluster IP, as part of the ingress routing of the connection. This, in turn, 
-# will cause all incoming to appear to be coming from an internal IP, causing SPF tests to fail.
-# Disable the following to bypass SPF tests altogether, to accommodate this scenario.
-# spfTestsDisabled will ignore all SPF-based spam tests, in the event that you cannot obtain valid source IP details on ingress emails
-spfTestsDisabled: false
-
 # List extra RBL domains to use for hard reject filtering
 rblRejectDomains: []
 
@@ -520,14 +512,6 @@ configFiles:
         }
         {{- end -}}
       {{- end -}}
-
-  - name: postfix-main.cf
-    create: true
-    path: postfix-main.cf
-    data: |
-      {{- if not .Values.spfTestsDisabled }}
-        smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination, reject_unauth_pipelining, reject_invalid_helo_hostname, reject_non_fqdn_helo_hostname, reject_unknown_recipient_domain, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net{{ range .Values.rblRejectDomains }}, reject_rbl_client {{ . }}{{ end }}
-      {{ end -}}
 
   - name: 91-override-sieve.conf
     create: true

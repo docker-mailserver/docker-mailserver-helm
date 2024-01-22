@@ -115,9 +115,11 @@ If you are running a bare-metal Kubernetes cluster, you will need to expose port
 
 This can get a bit complicated, as explained in the docker-mailserver (documentation)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#exposing-your-mail-server-to-the-outside-world]. 
 
-One approach is to use the PROXY protocol, which is also explained in the (documentation)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#proxy-port-to-service-via-proxy-protocol].
+If you disable the PROXY protocol and your mail server is not exposed using a load-balancer service with an external traffic policy in "Local" mode, then all incoming mail traffic will look like it comes from a local Kubernetes cluster IP.
 
-The Helm chart supports the use of the proxy protocol via the `proxy_protocol` key. To enable it set the `enable` key to true. You will also want to set the `trustedNetworks` key.
+One approach to preserving the client IP address is to use the PROXY protocol, which is also explained in the (documentation)[https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#proxy-port-to-service-via-proxy-protocol].
+
+The Helm chart supports the use of the proxy protocol via the `proxy_protocol` key. To enable it set the `proxy_protocol.enable` key to true. You will also want to set the `trustedNetworks` key.
 
 ```yaml
 proxy_protocol:
@@ -137,8 +139,6 @@ Enabling the PROXY protocol will create a new port for each protocol by adding 1
 | pop3        |   110   |    10110    |
 | pop3s       |   995   |    10995    |
 
-Note thes ports are NOT exposed outside of the Kubernetes cluster.
-
 ## Chart Values
 The following table lists the configurable parameters of the docker-mailserver chart and their default values.
 
@@ -149,7 +149,6 @@ The following table lists the configurable parameters of the docker-mailserver c
 | `demoMode.enabled`                                | Start the container with a demo "user@example.com" user (password is "password")                                                                                                     | `true`                                               |
 | `haproxy.enabled`                                 | Support HAProxy PROXY protocol on SMTP, IMAP(S), and POP3(S) connections. Provides real source IP instead of load balancer IP                                                        | `false`                                              |
 | `haproxy.trustedNetworks`                         | The IPs (*in space-separated CIDR format*) from which to trust inbound HAProxy-enabled connections                                                                                   | `"10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"`          |
-| `spfTestsDisabled`                                | Disable all SPF-related spam checks (*if source IP of inbound connections is a problem, and you're not using haproxy*)                                                               | `false`                                              |
 | `domains`                                         | List of domains to be served                                                                                                                                                         | `[]`                                                 |
 | `livenessTests.enabled`                           | Whether to execute liveness tests by running (arbitrary) commands in the docker-mailserver container. Useful to detect component failure (*i.e., clamd dies due to memory pressure*) | `true`                                               |
 | `livenessTests.enabled`                           | Array of commands to execute in sequence, to determine container health. A non-zero exit of any command is considered a failure                                                      | `[ "clamscan /tmp/docker-mailserver/TrustedHosts" ]` |
