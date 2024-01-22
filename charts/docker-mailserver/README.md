@@ -139,6 +139,16 @@ Enabling the PROXY protocol will create a new port for each protocol by adding 1
 | pop3        |   110   |    10110    |
 | pop3s       |   995   |    10995    |
 
+## Volumes
+By default, the Chart requests creates four PersistentVolumeClaims. These are defined under the `persistence` key:
+
+| PVC Name    |  Default Size  | Mount            |  Description                         |
+| ----------  | ------- | ----------------------- | -------------------------------------|
+| mail-config |   1Mi   | /tmp/docker-mailserver  | Stores generated [configuration](https://docker-mailserver.github.io/docker-mailserver/latest/faq/#what-about-the-docker-datadmsconfig-directory) files |
+| mail-data   |   10Gi  | /var/mail               | Stores emails                        |
+| mail-state  |   1Gi   | /var/mail-state         | Stores [state](https://docker-mailserver.github.io/docker-mailserver/latest/faq/#what-about-the-docker-datadmsmail-state-directory) for mail services       |
+| mail-log    |   1Gi   | /var/log/mail           | Stores log files                     |
+
 ## Chart Values
 The following table lists the configurable parameters of the docker-mailserver chart and their default values.
 
