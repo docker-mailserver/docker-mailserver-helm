@@ -17,7 +17,7 @@ This will create a file:
 
     cat /tmp/docker-mailserver/postfix-accounts.cf
 
-Next, run the setup command to see additonal options:
+Next, run the setup command to see additional options:
 
     setup
 
