@@ -108,15 +108,23 @@ spec:
             # ConfigFiles via ConfigMaps
         {{- range $config := .Values.configFiles }}
             - name: {{ regexReplaceAll "[.]" $config.name "-" }}
-              subPath: {{ $config.key | default $config.path }}
+              subPath: {{ $config.key | default $config.name }}
+            {{- if isAbs $config.path }}
+              mountPath: {{ $config.path }}
+            {{- else }}
               mountPath: /tmp/docker-mailserver/{{ $config.path }}
+            {{- end }}
         {{- end }}
 
             # Config via Secrets
         {{- range $secret := .Values.secrets }}
             - name: {{ regexReplaceAll "[.]" $secret.name "-" }}
-              subPath: {{ $secret.key | default $secret.path }}
+              subPath: {{ $secret.key | default $secret.name }}
+            {{- if isAbs $secret.path }}
+              mountPath: {{ $secret.path }}
+            {{- else }}
               mountPath: /tmp/docker-mailserver/{{ $secret.path }}
+            {{- end }}
         {{- end }}
 
           # Volumes

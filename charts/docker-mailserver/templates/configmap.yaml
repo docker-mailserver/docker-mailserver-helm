@@ -10,7 +10,7 @@ metadata:
     release: "{{ $.Release.Name }}"
   name: {{ regexReplaceAll "[.]" $config.name "-" }}
 data:
-  {{ $config.key | default $config.path }}: |
+  {{ $config.key | default $config.name }}: |
 {{ tpl $config.data $ | indent 6 }}
 ---
 {{- end }}
