@@ -4,9 +4,9 @@ templates:
   - deployment-poor-mans-k8s-lb.yaml
 tests:
 
-  - it: should not add haproxy options to postfix/dovecot if haproxy support is not enabled
+  - it: should not add proxy_protocol options to postfix/dovecot if proxy_protocol support is not enabled
     set:
-      haproxy.enabled: false
+      proxy_protocol.enabled: false
     asserts:
       - notMatchRegex:
           path: data.postfix-main\.cf
@@ -14,7 +14,7 @@ tests:
       - isNull:
           path: data.dovecot\.cf
           
-  - it: should create phonehome deployment if haproxy is enabled and set to external-auto mode
+  - it: should create phonehome deployment if proxy_protocol is enabled and set to external-auto mode
     set:
       poorMansK8sLb.enabled: true
     asserts:

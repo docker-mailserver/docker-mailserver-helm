@@ -391,36 +391,6 @@ proxy_protocol:
   # List of sources (in CIDR format, space-separated) to permit PROXY protocol from
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
   
-## These values are for the haproxy sub-chart
-haproxy:
-  # haproxy.enabled will deploy an haproxy sub-chart, configured for the TCP ports used by docker-mailserver
-  enabled: false
-  controller:
-    replicaCount: 1
-    kind: "Deployment"
-    enableStaticPorts: false
-    tcp:
-      25: "default/docker-mailserver:25::PROXY-V1"
-      110: "default/docker-mailserver:110::PROXY-V1"
-      143: "default/docker-mailserver:143::PROXY-V1"            
-      465: "default/docker-mailserver:465"
-      587: "default/docker-mailserver:587"
-      993: "default/docker-mailserver:993::PROXY-V1"  
-      995: "default/docker-mailserver:995::PROXY-V1"     
-    service:
-      externalTrafficPolicy: "Local"
-    # Set to avoid CI error when running the generated manifest through kubeval (FIXME)
-    podAnnotations: 
-      set-to-avoid-lint-errors-in: "docker-mailserver"
-
-  defaultBackend:
-    replicaCount: 1
-
-  # These values populate dovecot's list of networks it'll "trust" for incoming haproxy connections.
-  # A space-separated list, on a single line, is required
-  # By default, we allow all RFC1918 private ranges, but this can be tightened up for the known IP/range
-  # of your HAProxy instance
-
 # when metrics is enabled, we mount subpath log from pvc into /var/log/mail
 metrics:
   enabled: false

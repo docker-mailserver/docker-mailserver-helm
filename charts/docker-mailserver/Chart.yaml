@@ -20,10 +20,3 @@ icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
 annotations:
   artifacthub.io/changes: |
     - Breaking : Standardized app labels to app.kubernetes.io/name for Istio workload/Cilium compatibility
-    
-dependencies:
-  - name: "kubernetes-ingress"
-    version: "1.21.1"
-    repository: "https://haproxytech.github.io/helm-charts"
-    condition: haproxy.enabled
-    alias: "haproxy"
