@@ -46,17 +46,13 @@ spec:
         - name: "opendkim-keys"
           secret:
             secretName: {{ template "dockermailserver.fullname" . }}-secrets
-{{ if .Values.pod.dockermailserver.ssl_type }}
+{{- if and .Values.pod.dockermailserver.env.SSL_TYPE .Values.ssl.useExisting }}
         - name: "ssl-cert"
           secret:
-{{ if .Values.ssl.useExisting }}
             secretName: {{ .Values.ssl.existingName }}
-{{- else }}
-            secretName: {{ template "dockermailserver.fullname" . }}-tls
 {{- end }}
-{{- end }}
-{{ if .Values.additionalVolumes }}
-{{- toYaml .Values.additionalVolumes | indent 8 }}
+{{- if .Values.additionalVolumes }}
+{{ toYaml .Values.additionalVolumes | indent 8 }}
 {{- end }}
         - name: tmp
           emptyDir: {}
@@ -76,25 +72,27 @@ spec:
           securityContext:
 {{ toYaml .Values.initContainer.containerSecurityContext | indent 12 }}
       containers:
-
-        - name: dockermailserver
+        - name: docker-mailserver
           env:
-{{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
+          {{- range $pkey, $pval := .Values.pod.dockermailserver.env }}
+          - name: {{ $pkey }}
+            value: {{ quote $pval }}
+          {{- end }}          
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-            {{- if eq .Values.pod.dockermailserver.enable_fail2ban 1.0 }}
+          securityContext:
+            {{- if eq .Values.pod.dockermailserver.env.ENABLE_FAIL2BAN 1.0 }}
             capabilities:
               add:
                 - "NET_ADMIN"
             {{ end }}
-          securityContext:
 {{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
           volumeMounts:
             - name: config
               mountPath: /tmp/docker-mailserver
-{{ if .Values.pod.dockermailserver.ssl_type }}
+{{- if and .Values.pod.dockermailserver.env.SSL_TYPE .Values.ssl.useExisting }}
             - name: ssl-cert
               mountPath: /tmp/ssl
               readOnly: true
@@ -141,8 +139,8 @@ spec:
               subPath: 91-override-sieve.conf
               mountPath: /etc/dovecot/conf.d/91-override-sieve.conf
               readOnly: true
-            {{ end }}
-              {{- if .Values.demoMode.enabled }}
+            {{- end }}
+            {{- if .Values.demoMode.enabled }}
             - name: opendkim-keys
               mountPath: "/tmp/docker-mailserver/opendkim/keys/example.com/mail.private"
               subPath: "example.com-mail.private"
@@ -158,7 +156,7 @@ spec:
               readOnly: true
               {{- end }}
               {{- end }}
-{{ if .Values.additionalVolumeMounts }}
+{{- if .Values.additionalVolumeMounts }}
 {{ toYaml .Values.additionalVolumeMounts | indent 12 }}
 {{- end }}
           livenessProbe:
@@ -168,7 +166,7 @@ spec:
                  - -c
                  - supervisorctl status | grep -E "amavis|clamav|cron|dovecot|mailserver|opendkim|opendmarc|postfix|rsyslog" | grep RUNNING
             initialDelaySeconds: 10
-            timeoutSeconds: 1
+            timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
             exec:
@@ -177,7 +175,7 @@ spec:
                  - -c
                  - supervisorctl status | grep -E "mailserver|postfix" | grep RUNNING
             initialDelaySeconds: 10
-            timeoutSeconds: 1
+            timeoutSeconds: 5
             failureThreshold: 3
 
 {{ if .Values.metrics.enabled }}

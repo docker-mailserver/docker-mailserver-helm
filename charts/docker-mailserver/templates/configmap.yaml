@@ -12,14 +12,17 @@ metadata:
   name: {{ template "dockermailserver.fullname" . }}-configs
 data:
   {{/* Use sample data if user is running in demo mode */}}
-  {{- if .Values.demoMode.enabled -}}  
+  {{- if .Values.demoMode.enabled -}}
   ### We are in demo mode, so add in some sample data for quick testing
   postfix-accounts.cf: |
     # A sample user - the password is "password"
     user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
-  postfix-virtual.cf: "# Intentionally left empty"
-  SigningTable: "*@example.com mail._domainkey.example.com"
-  KeyTable: "mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private"
+  postfix-virtual.cf: |
+    # Intentionally left empty
+  SigningTable: |
+    *@example.com mail._domainkey.example.com
+  KeyTable: |
+    mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private
   TrustedHosts: |
     127.0.0.1
     localhost
