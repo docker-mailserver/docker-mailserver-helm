@@ -5,6 +5,38 @@ entries:
       artifacthub.io/changes: |
         - Breaking : Standardized app labels to app.kubernetes.io/name for Istio workload/Cilium compatibility
     apiVersion: v2
+    appVersion: 13.2.0
+    created: "2024-01-29T02:02:52.884409293Z"
+    dependencies:
+    - alias: haproxy
+      condition: haproxy.enabled
+      name: kubernetes-ingress
+      repository: https://haproxytech.github.io/helm-charts
+      version: 1.21.1
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
+    digest: db53b2ccc714633cc30521c6f317a34e84789255b88b39b8f0d2a5ff131fcec1
+    home: https://github.com/funkypenguin/helm-docker-mailserver
+    icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
+    keywords:
+    - mailserver
+    - postfix
+    - dovecot
+    - amavis
+    - imap
+    maintainers:
+    - email: davidy@funkypenguin.co.nz
+      name: funkypenguin
+    name: docker-mailserver
+    sources:
+    - https://github.com/docker-mailserver/docker-mailserver-helm
+    urls:
+    - https://github.com/docker-mailserver/docker-mailserver-helm/releases/download/docker-mailserver-2.2.2/docker-mailserver-2.2.2.tgz
+    version: 2.2.2
+  - annotations:
+      artifacthub.io/changes: |
+        - Breaking : Standardized app labels to app.kubernetes.io/name for Istio workload/Cilium compatibility
+    apiVersion: v2
     appVersion: 12.1.0
     created: "2023-11-17T11:07:18.629950198Z"
     dependencies:
@@ -13,7 +45,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.21.1
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: b5c7dcd10e800b328206ba1569a150f81292056644411a6e46979f781b962f89
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -44,7 +77,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.21.1
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 0b22172f827d510037acabf3ec96b8ccaddc31ca05c0cec1cb822ccf55652fee
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -75,7 +109,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.21.1
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: aad706b14bb3465ee93979fb65d8d2528041cf3bbcc71f27e96b68b8d7ac3a1b
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -106,7 +141,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.21.1
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 557bf18aac6872a5779b7b93b23226629f63f3e6f7cc737326ab741c6645c4ca
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -137,7 +173,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.21.1
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: d82c901bb8f0afb21eee8403031045c3fa65cc57e84bcbb1dc1113ba00d76410
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -168,7 +205,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.21.1
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: e171058ed21a03fb6606cb01d221427a44cc4598f32ebf76c2de1021fd25e95f
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -196,7 +234,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.21.1
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 38c107ea0ea18486ae5c37a862ba8cf739cb3bd9e3b471c7886029ac6cf193db
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -224,7 +263,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.1.3
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 78f8cbd24eb5525dab9fdea82c6b9a4911a72081c8768c2099d8eef067206c0e
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -252,7 +292,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.1.3
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 4364a4e01d5c4a273847b59b46a50e2b495315ac3c6db9c17c9bf4cce9c634a1
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -280,7 +321,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.1.3
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 0e399ffc53752b635696fb433a99b9ec8e27364cf6ef9c533842119cae13ac25
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -308,7 +350,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.1.3
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: aed26ebdee4a50b385dac1876721ce0abc8523ba40e96181d7db9fb5090e9b27
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -336,7 +379,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.1.3
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: b1a85289ee7aad24def0d18416257d6f59597ce6ac421463d1c04b029014b106
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -364,7 +408,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 1.1.3
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 0a3c8c7f537e0f48000a0d095c04fc7c9862a4ead15c17adcd9cd9a979bc5efc
     home: https://github.com/funkypenguin/helm-docker-mailserver
     icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
@@ -392,7 +437,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 458bcc7481d4aa838bf736131f7fb994198e66c9151cdc445c0dea41d1f8e7d8
     home: https://github.com/funkypenguin/helm-docker-mailserver
     keywords:
@@ -419,7 +465,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: fee33f8285a84f6cb3094f29347490457e087e72f87bfd01a6fa5586e23be852
     home: https://github.com/funkypenguin/helm-docker-mailserver
     keywords:
@@ -446,7 +493,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 620657bea11a6fff388097ee236cc11af1d0ea1af0d27b4603f56441fa7a2e7a
     home: https://github.com/funkypenguin/helm-docker-mailserver
     keywords:
@@ -473,7 +521,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 20a334cb59ae371a2a8fe373fbbd5a3aa639f3b10e2b14486cf23aacf0debf47
     home: https://github.com/funkypenguin/helm-docker-mailserver
     keywords:
@@ -500,7 +549,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: c5b68aae258385626be7e8c0b15b6fc9dcca26b9d0c66ff4edeb2a2dce75e2ad
     home: https://github.com/funkypenguin/helm-docker-mailserver
     keywords:
@@ -527,7 +577,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 78253863b1a8ebfac280570a3b3cb58f4555a90c7985cacea66970d88d5077e9
     home: https://github.com/funkypenguin/helm-docker-mailserver
     keywords:
@@ -554,7 +605,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: cab33a6a1c6264622ef5d0f65085105767a6e8f37dfbd8991f89dc410340b8c1
     home: https://github.com/funkypenguin/helm-docker-mailserver
     keywords:
@@ -581,7 +633,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 93daadb566c909debfd6a2a8821835d54394427bbaba1c3a9ae7b8785931fe5c
     keywords:
     - mailserver
@@ -607,7 +660,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: a5f80bea2b1ab3e8d0e97c716e9965faae298b35faf4298a72efc1894ae62c7b
     keywords:
     - mailserver
@@ -633,7 +687,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: fd92e69364c36f5ca4e9ee8a5bb7ddb57144de7e3915f238b1412cf5ba88bc29
     keywords:
     - mailserver
@@ -659,7 +714,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 419bc97a14bbbd5b822b874608e035eb40737f4581fe2d3ca7bb222e6d94325d
     keywords:
     - mailserver
@@ -685,7 +741,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 3da45ddfc35feb10a0abdc1e0d24fbd9c2ed9e9e488e5380301b59ba8a0f358e
     keywords:
     - mailserver
@@ -711,7 +768,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: a771a868a5503232ef7120973f8f98ad3532d653327c0eaab870b485a24a87e6
     keywords:
     - mailserver
@@ -737,7 +795,8 @@ entries:
       name: kubernetes-ingress
       repository: https://haproxytech.github.io/helm-charts
       version: 0.7.0
-    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
     digest: 727d1afb0710dbbdae23109a256e346d16e5a32a380278c72d4dfa5f730f18b8
     keywords:
     - mailserver
@@ -754,4 +813,4 @@ entries:
     urls:
     - https://github.com/funkypenguin/helm-docker-mailserver/releases/download/docker-mailserver-0.2.2-dev1/docker-mailserver-0.2.2-dev1.tgz
     version: 0.2.2-dev1
-generated: "2020-04-20T01:47:46.204144988Z"
+generated: "2024-01-29T02:02:52.884642889Z"
