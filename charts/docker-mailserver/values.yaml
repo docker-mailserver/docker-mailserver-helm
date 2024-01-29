@@ -420,7 +420,6 @@ metrics:
     enabled: false
     scrapeInterval: 15s
 
-
 ## ConfigMaps (and Secrets) are used to copy docker-mailserver configuration files 
 ## into running containers. This chart automatically sets up any config files that 
 ## are stored in its chart/config directory. 
@@ -595,7 +594,6 @@ configFiles:
         -o smtpd_upstream_proxy_protocol=haproxy
       EOS
       {{- end }}
-
 
 ## The secrets key works the same way as the configs key. Use secrets to store sensitive information,
 ## such as DKIM signing keys.
