@@ -1,35 +1,30 @@
+nameOverride: ""
 fullnameOverride: ""
 
 image:
-  # image.name is the name of the container image to use. Refer to https://hub.docker.com/r/mailserver/docker-mailserver
+  # The name of the container image to use. See https://hub.docker.com/r/mailserver/docker-mailserver
   name: "mailserver/docker-mailserver"
-  # image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/mailserver/docker-mailserver
+  # The tag of the container image to use. See https://hub.docker.com/r/mailserver/docker-mailserver
   tag: "13.3.1"
   pullPolicy: "IfNotPresent"
 
+# Specify whether to create a serviceAccount for the pod. The name is generated from the 
+# dockermailserver.serviceAccountName template
 serviceAccount:
-  create: "true"
+  create: true
 
-## Specify a TLS secret name that contains a certificate and private key for your email domain
+## Specify the name of a TLS secret that contains a certificate and private key for your email domain.
+## See https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
 certificate:
 
 # List extra RBL domains to use for hard reject filtering
 rblRejectDomains: []
 
-livenessTests:
-  # livenessTests.enabled will add a liveness test, which will classify a pod as 'unhealthy' if any livenessTests.commands (below) return non-zero
-  enabled: true
-  # livenessTests.commands is an array of commands to be executed within the docker-mailserver container, intended to prove that the container is healthy. Each command must exit 0 under normal (healthy) circumstances
-  commands:
-    - "clamscan /tmp/docker-mailserver/TrustedHosts"
-
 deployment:
-  ## How many versions of the deployment to run on kubernetes
-  ## Default: 2
+  ## How many versions of the deployment to run
   replicas: 1
 
-  ## Add annotations to the deployment
-  ## Useful for using something like stash to backup data (https://stash.run/docs/v0.9.0-rc.0/guides/latest/auto-backup/workload/)
+  ## Optionally add additional annotations to the deployment
   annotations: {}  
 
   ## Optionally specify a runtimeClassName for the deployment
@@ -38,7 +33,7 @@ deployment:
   ## Optionally specify a priorityClassName for the deployment
   priorityClassName:
 
-  ## Host networking requested for this pod. Use the host’s network namespace. If this option is set, the ports that
+  ## Use the host’s network namespace. If this option is set, the ports that
   ## will be used must be specified.
   ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
   # pod.dockermailserver.hostNetwork will configure the pod to use the host's network namespace
@@ -57,6 +52,13 @@ deployment:
     #   maxSurge: 1
     #   maxUnavailable: 1
     type: "Recreate"
+
+  livenessTests:
+    # livenessTests.enabled will add a liveness test, which will classify a pod as 'unhealthy' if any livenessTests.commands (below) return non-zero
+    enabled: true
+    # livenessTests.commands is an array of commands to be executed within the docker-mailserver container, intended to prove that the container is healthy. Each command must exit 0 under normal (healthy) circumstances
+    commands:
+      - "clamscan /tmp/docker-mailserver/TrustedHosts"
 
   ## The following variables affect the behaviour of docker-mailserver
   ## See https://docker-mailserver.github.io/docker-mailserver/latest/config/environment/ for details
@@ -227,7 +229,7 @@ deployment:
 
   # Whether to enable dovecot replication. Allows the syncronization of a pair of dovecot servers
   # https://wiki.dovecot.org/Replication
-  enable_dovecot_replication: true
+  enable_dovecot_replication: false
 
   securityContext:
     runAsUser: 5000
