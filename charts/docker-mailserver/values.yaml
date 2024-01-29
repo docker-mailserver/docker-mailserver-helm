@@ -46,17 +46,10 @@ configMap:
 secret:
   useExisting: false  
 
-## These values define how the certificate created by the chart is processed by cert-manager
-## Ensure you've setup your ClusterIssuers (letsencrypt-staging and letsencrypt-prod) and DNS provider
+## Specify an existing secret that contains TLS certificates. The easiest way to create a 
+## secret is by using cert-manager.
 ssl:
-  issuer:
-    name: letsencrypt-staging
-    kind: ClusterIssuer
-  dnsname: example.com
-
-  # Set this to false to let the chart try to assemble a CR for you. This feature will be deprecated soon, and users will 
-  # need to manage cert-manager outside of this chart (the dependencies involved make it fragile)
-  useExisting: true 
+  useExisting: false 
   existingName: name-of-existing-secret
 
 ## Mount additional volumes into the container.  Useful for persistent logs or
@@ -141,7 +134,7 @@ pod:
       ENABLE_FAIL2BAN: 0 # Setting this to 1 will add the NET_ADMIN cap to the deployment
       FAIL2BAN_BLOCKTYPE: drop
       SMTP_ONLY:
-      SSL_TYPE: manual
+      SSL_TYPE:
       SSL_CERT_PATH:
       SSL_KEY_PATH:
       TLS_LEVEL: 

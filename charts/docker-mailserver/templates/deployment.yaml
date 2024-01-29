@@ -46,14 +46,10 @@ spec:
         - name: "opendkim-keys"
           secret:
             secretName: {{ template "dockermailserver.fullname" . }}-secrets
-{{- if .Values.pod.dockermailserver.env.SSL_TYPE }}
+{{- if and .Values.pod.dockermailserver.env.SSL_TYPE .Values.ssl.useExisting }}
         - name: "ssl-cert"
           secret:
-{{- if .Values.ssl.useExisting }}
             secretName: {{ .Values.ssl.existingName }}
-{{- else }}
-            secretName: {{ template "dockermailserver.fullname" . }}-tls
-{{- end }}
 {{- end }}
 {{- if .Values.additionalVolumes }}
 {{ toYaml .Values.additionalVolumes | indent 8 }}
@@ -96,7 +92,7 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /tmp/docker-mailserver
-{{- if .Values.pod.dockermailserver.env.SSL_TYPE }}
+{{- if and .Values.pod.dockermailserver.env.SSL_TYPE .Values.ssl.useExisting }}
             - name: ssl-cert
               mountPath: /tmp/ssl
               readOnly: true
