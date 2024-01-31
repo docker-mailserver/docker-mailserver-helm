@@ -504,9 +504,6 @@ configMaps:
             fts_autoindex = yes
             fts_enforced = yes
 
-            # disable indexing of folders
-            fts_autoindex_exclude = \Trash
-
             # Index attachements
             fts_decoder = decode2text
         }
