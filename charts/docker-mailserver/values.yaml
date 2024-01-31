@@ -53,13 +53,6 @@ deployment:
     #   maxUnavailable: 1
     type: "Recreate"
 
-  livenessTests:
-    # livenessTests.enabled will add a liveness test, which will classify a pod as 'unhealthy' if any livenessTests.commands (below) return non-zero
-    enabled: true
-    # livenessTests.commands is an array of commands to be executed within the docker-mailserver container, intended to prove that the container is healthy. Each command must exit 0 under normal (healthy) circumstances
-    commands:
-      - "clamscan /tmp/docker-mailserver/TrustedHosts"
-
   ## The following variables affect the behaviour of docker-mailserver
   ## See https://docker-mailserver.github.io/docker-mailserver/latest/config/environment/ for details
   ## Note that an empty value indicates the default as described in the docs above
@@ -540,18 +533,6 @@ configMaps:
         sieve = /var/mail/sieve/%d/%n/.dovecot.sieve
         sieve_dir = /var/mail/sieve/%d/%n/sieve
       }
-
-  am-i-health.sh:
-    create: true
-    path: am-i-health.sh
-    data: |
-      #!/bin/bash
-      # this script is intended to be used by periodic kubernetes liveness probes to ensure that the container
-      # (and all its dependent services) is healthy
-      {{ range .Values.deployment.livenessTests.commands -}}
-      {{ . }} && \
-      {{- end }}
-      echo "All healthy"
 
   user-patches.sh:
     create: true
