@@ -36,17 +36,17 @@ spec:
 {{ toYaml .Values.securityContext | indent 8 }}
       volumes:
           # ConfigMaps
-      {{- range $config := .Values.configFiles }}
-        - name: {{ regexReplaceAll "[.]" $config.name "-" }}
+      {{- range $name, $config := .Values.configMaps }}
+        - name: {{ regexReplaceAll "[.]" $name "-" }}
           configMap:
-            name: {{ regexReplaceAll "[.]" $config.name "-" }}
+            name: {{ regexReplaceAll "[.]" $name "-" }}
       {{- end }}
 
         # Secrets
-      {{- range $secret := .Values.secrets }}
-        - name: {{ regexReplaceAll "[.]" $secret.name "-" }}
+      {{- range $name, $secret := .Values.secrets }}
+        - name: {{ regexReplaceAll "[.]" $name "-" }}
           secret:
-            secretName: {{ regexReplaceAll "[.]" $secret.name "-" }}
+            secretName: {{ regexReplaceAll "[.]" $name "-" }}
       {{- end }}
 
         # Certificate
@@ -105,10 +105,10 @@ spec:
               readOnly: true
         {{- end }}
 
-            # ConfigFiles via ConfigMaps
-        {{- range $config := .Values.configFiles }}
-            - name: {{ regexReplaceAll "[.]" $config.name "-" }}
-              subPath: {{ $config.key | default $config.name }}
+            # Config via ConfigMaps
+        {{- range $name, $config := .Values.configMaps }}
+            - name: {{ regexReplaceAll "[.]" $name "-" }}
+              subPath: {{ $config.key | default $name }}
             {{- if isAbs $config.path }}
               mountPath: {{ $config.path }}
             {{- else }}
@@ -117,9 +117,9 @@ spec:
         {{- end }}
 
             # Config via Secrets
-        {{- range $secret := .Values.secrets }}
-            - name: {{ regexReplaceAll "[.]" $secret.name "-" }}
-              subPath: {{ $secret.key | default $secret.name }}
+        {{- range $name, $secret := .Values.secrets }}
+            - name: {{ regexReplaceAll "[.]" $name "-" }}
+              subPath: {{ $secret.key | default $name }}
             {{- if isAbs $secret.path }}
               mountPath: {{ $secret.path }}
             {{- else }}

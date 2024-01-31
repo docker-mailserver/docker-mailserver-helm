@@ -1,16 +1,16 @@
-{{- range $config := .Values.configFiles }}
+{{- range $name, $config := .Values.configMaps }}
 {{- if $config.create }}
-apiVersion: "v1"
-kind: "ConfigMap"
+apiVersion: v1
+kind: ConfigMap
 metadata:
   labels:
     app.kubernetes.io/name: {{ template "dockermailserver.fullname" $ }}
     chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
     heritage: "{{ $.Release.Service }}"
     release: "{{ $.Release.Name }}"
-  name: {{ regexReplaceAll "[.]" $config.name "-" }}
+  name: {{ regexReplaceAll "[.]" $name "-" }}
 data:
-  {{ $config.key | default $config.name }}: |
+  {{ $config.key | default $name }}: |
 {{ tpl $config.data $ | indent 6 }}
 ---
 {{- end }}

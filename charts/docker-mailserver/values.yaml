@@ -434,8 +434,8 @@ metrics:
 ## files by either referencing existing ConfigMaps (that you create before installing the Chart)
 ## or by creating new ones (set the create key to true).
 ##
-configFiles:
-  - name: dovecot.cf
+configMaps:
+  dovecot.cf:
     create: true
     path: dovecot.cf
     data: |
@@ -493,7 +493,7 @@ configFiles:
         {{- end -}}
       {{- end -}}
 
-  - name: fts-xapian-plugin.conf
+  fts-xapian-plugin.conf:
     create: true
     path: /etc/dovecot/conf.d/10-plugin.conf
     data: |
@@ -532,7 +532,7 @@ configFiles:
         }
       {{- end -}}
 
-  - name: 91-override-sieve.conf
+  91-override-sieve.conf:
     create: true
     path: 91-override-sieve.conf
     data: |
@@ -541,19 +541,19 @@ configFiles:
         sieve_dir = /var/mail/sieve/%d/%n/sieve
       }
 
-  - name: am-i-health.sh
+  am-i-health.sh:
     create: true
     path: am-i-health.sh
     data: |
       #!/bin/bash
       # this script is intended to be used by periodic kubernetes liveness probes to ensure that the container
       # (and all its dependent services) is healthy
-      {{ range .Values.livenessTests.commands -}}
+      {{ range .Values.deployment.livenessTests.commands -}}
       {{ . }} && \
       {{- end }}
       echo "All healthy"
 
-  - name: user-patches.sh
+  user-patches.sh:
     create: true
     path: user-patches.sh
     data: |
@@ -614,4 +614,4 @@ configFiles:
 ##  If you set the create key to false, then you must manually create the ConfigMaps before deploying the chart.
 ##
 ##    kubectl create secret rspamd.example.com --namespace mail --from-file=rspamd.dkim.rsa-2048-mail-example.com.private.txt=<path_to_rspamd.dkim.rsa-2048-mail-example.com.private.txt>
-secrets: []
+secrets: {}
