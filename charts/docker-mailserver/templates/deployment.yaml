@@ -89,7 +89,7 @@ spec:
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
-{{ toYaml .Values.resources | indent 12 }}
+{{ toYaml .Values.deployment.resources | indent 12 }}
           securityContext:
             {{- if eq .Values.deployment.env.ENABLE_FAIL2BAN 1.0 }}
             capabilities:

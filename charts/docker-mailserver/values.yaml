@@ -228,6 +228,36 @@ deployment:
     readOnlyRootFilesystem: false # incompatible with the way docker-mailserver works
     privileged: false
 
+  ## More generally, a "request" can be thought of as "how much is this container expected to need usually". it should be
+  ## possible to burst outside these constraints (during a high load operation). However, Kubernetes may kill the pod
+  ## if the node is under too higher load and the burst is outside its request
+  ##
+  ## Limits are hard limits. Violating them is either impossible, or results in container death. I'm not sure whether
+  ## making these optional is a good idea or not; at the moment, I think I'm happy to defer QOS to the cluster and try
+  ## and keep requests close to usage.
+  ##
+  ## Requests are what are used to determine whether more software "fits" onto the cluster.
+  ##
+  ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Ref: https://github.com/kubernetes/kubernetes/blob/master/docs/design/resource-qos.md
+  ## Ref: https://docs.docker.com/engine/reference/run/#/runtime-constraints-on-resources
+  resources:
+    requests:
+      ## How much CPU this container is expected to need
+      cpu: "1"
+      ## How much memory this container is expected to need.
+      ## Reduce these at requests your peril - too few resources can cause daemons (i.e., clamd) to fail, or timeouts to occur.
+      ## A test installation with clamd running was killed when it consumed 1437Mi (which is why this value was increased to 1536)
+      memory: "1536Mi"
+      ephemeral-storage: "100Mi"
+    limits:
+      ## The max CPU this container should be allowed to use
+      cpu: "2"
+      ## The max memory this container should be allowed to use. Note: If a container exceeds its memory limit,
+      ## it may terminated.
+      memory: "2048Mi"
+      ephemeral-storage: "500Mi"
+
 service:
   ## What scope the service should be exposed in. One of:
   ## - LoadBalancer (to the world)
@@ -252,36 +282,6 @@ service:
     ## If there is a Hostname associated with this site, add it here and it will be rendered in the documentation.
     # hostName:
   annotations: {}
-
-## More generally, a "request" can be thought of as "how much is this container expected to need usually". it should be
-## possible to burst outside these constraints (during a high load operation). However, Kubernetes may kill the pod
-## if the node is under too higher load and the burst is outside its request
-##
-## Limits are hard limits. Violating them is either impossible, or results in container death. I'm not sure whether
-## making these optional is a good idea or not; at the moment, I think I'm happy to defer QOS to the cluster and try
-## and keep requests close to usage.
-##
-## Requests are what are used to determine whether more software "fits" onto the cluster.
-##
-## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
-## Ref: https://github.com/kubernetes/kubernetes/blob/master/docs/design/resource-qos.md
-## Ref: https://docs.docker.com/engine/reference/run/#/runtime-constraints-on-resources
-resources:
-  requests:
-    ## How much CPU this container is expected to need
-    cpu: "1"
-    ## How much memory this container is expected to need.
-    ## Reduce these at requests your peril - too few resources can cause daemons (i.e., clamd) to fail, or timeouts to occur.
-    ## A test installation with clamd running was killed when it consumed 1437Mi (which is why this value was increased to 1536)
-    memory: "1536Mi"
-    ephemeral-storage: "100Mi"
-  limits:
-    ## The max CPU this container should be allowed to use
-    cpu: "2"
-    ## The max memory this container should be allowed to use. Note: If a container exceeds its memory limit,
-    ## it may terminated.
-    memory: "2048Mi"
-    ephemeral-storage: "500Mi"
 
 # Note this is a dictionary and not a list so invidual keys can be overriden by --set or --value helm parameters
 persistence:
