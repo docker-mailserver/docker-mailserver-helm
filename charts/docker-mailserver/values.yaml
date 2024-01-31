@@ -377,20 +377,21 @@ rspamd:
       enabled: false
       secret:
 
+dovecot:
+  fullTextSearch:
+    enabled: true
+    verbose: 1 # 0 (silent), 1 (verbose) or 2 (debug)
+    resources:
+      memory: 2GB
+    cron:
+      enabled: true       # Optimize index every day
+      schedule: 0 4 * * * # Every day at 4am
+
 proxyProtocol:
   enabled: true
   # List of sources (in CIDR format, space-separated) to permit PROXY protocol from
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
   
-fullTextSearch:
-  enabled: true
-  verbose: 1 # 0 (silent), 1 (verbose) or 2 (debug)
-  resources:
-    memory: 2GB
-  cron:
-    enabled: true       # Optimize index every day
-    schedule: 0 4 * * * # Every day at 4am
-
 # when metrics is enabled, we mount subpath log from pvc into /var/log/mail
 metrics:
   enabled: false
@@ -486,7 +487,7 @@ configMaps:
     create: true
     path: /etc/dovecot/conf.d/10-plugin.conf
     data: |
-      {{- if .Values.fullTextSearch.enabled }}
+      {{- if .Values.dovecot.fullTextSearch.enabled }}
         mail_plugins = $mail_plugins fts fts_xapian
 
         plugin {
@@ -495,7 +496,7 @@ configMaps:
 
         plugin {
             fts = xapian
-            fts_xapian = partial=3 full=20 verbose={{ .Values.fullTextSearch.verbose }}
+            fts_xapian = partial=3 full=20 verbose={{ .Values.dovecot.fullTextSearch.verbose }}
 
             fts_autoindex = yes
             fts_enforced = yes
@@ -506,7 +507,7 @@ configMaps:
 
         service indexer-worker {
             # limit size of indexer-worker RAM usage, ex: 512MB, 1GB, 2GB
-            vsz_limit = {{ .Values.fullTextSearch.resources.memory }}
+            vsz_limit = {{ .Values.dovecot.fullTextSearch.resources.memory }}
         }
 
         service decode2text {
