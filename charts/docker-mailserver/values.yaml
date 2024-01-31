@@ -220,10 +220,6 @@ deployment:
     RELAY_USER: 
     RELAY_PASSWORD: 
 
-  # Whether to enable dovecot replication. Allows the syncronization of a pair of dovecot servers
-  # https://wiki.dovecot.org/Replication
-  enable_dovecot_replication: false
-
   securityContext:
     runAsUser: 5000
     runAsGroup: 5000
