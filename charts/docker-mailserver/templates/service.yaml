@@ -51,7 +51,7 @@ spec:
       {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30587" .Values.service.nodePort.submission }}
       {{ end }}
-  {{- if .Values.proxy_protocol.enabled }}
+  {{- if .Values.proxyProtocol.enabled }}
     - name: subs-proxy
       targetPort: subs-proxy
       port: 10465
@@ -73,7 +73,7 @@ spec:
       {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30993" .Values.service.nodePort.imaps }}
       {{- end }}   
-    {{- if .Values.proxy_protocol.enabled }}
+    {{- if .Values.proxyProtocol.enabled }}
     - name: imap-proxy
       targetPort: imap-proxy
       port: 10143
@@ -96,7 +96,7 @@ spec:
       {{- if eq .Values.service.type "NodePort" }}    
       nodePort: {{ default "30995" .Values.service.nodePort.pop3s }}
       {{- end }}    
-    {{- if .Values.proxy_protocol.enabled }}
+    {{- if .Values.proxyProtocol.enabled }}
     - name: pop3-proxy
       targetPort: pop3-proxy
       port: 10110

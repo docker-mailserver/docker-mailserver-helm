@@ -388,7 +388,7 @@ rspamd:
       enabled: false
       secret:
 
-proxy_protocol:
+proxyProtocol:
   enabled: true
   # List of sources (in CIDR format, space-separated) to permit PROXY protocol from
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
@@ -439,8 +439,8 @@ configMaps:
     create: true
     path: dovecot.cf
     data: |
-      {{- if .Values.proxy_protocol.enabled }}
-        haproxy_trusted_networks = {{ .Values.proxy_protocol.trustedNetworks }}
+      {{- if .Values.proxyProtocol.enabled }}
+        haproxy_trusted_networks = {{ .Values.proxyProtocol.trustedNetworks }}
 
         {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
         service imap-login {
@@ -559,7 +559,7 @@ configMaps:
     data: |
       #!/bin/bash
 
-      {{- if .Values.proxy_protocol.enabled }}
+      {{- if .Values.proxyProtocol.enabled }}
       # Make sure to keep this file in sync with https://github.com/docker-mailserver/docker-mailserver/blob/master/target/postfix/master.cf!
       cat <<EOS >> /etc/postfix/master.cf
 
@@ -577,7 +577,7 @@ configMaps:
         -o smtpd_discard_ehlo_keywords=
         -o milter_macro_daemon_name=ORIGINATING
         -o cleanup_service_name=sender-cleanup
-        -o smtpd_upstream_proxy_protocol=haproxy  
+        -o smtpd_upstream_proxyProtocol=haproxy  
 
       # Submissions with proxy
       10465     inet  n       -       n       -       -       smtpd
@@ -593,7 +593,7 @@ configMaps:
         -o smtpd_discard_ehlo_keywords=
         -o milter_macro_daemon_name=ORIGINATING
         -o cleanup_service_name=sender-cleanup
-        -o smtpd_upstream_proxy_protocol=haproxy
+        -o smtpd_upstream_proxyProtocol=haproxy
       EOS
       {{- end }}
 

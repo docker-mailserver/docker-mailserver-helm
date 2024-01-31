@@ -161,7 +161,7 @@ spec:
               containerPort: 465
             - name: submission
               containerPort: 587
-          {{- if .Values.proxy_protocol.enabled }}
+          {{- if .Values.proxyProtocol.enabled }}
             - name: subs-proxy
               containerPort: 10465
             - name: sub-proxy
@@ -173,7 +173,7 @@ spec:
               containerPort: 143
             - name: imaps
               containerPort: 993
-          {{- if .Values.proxy_protocol.enabled }}
+          {{- if .Values.proxyProtocol.enabled }}
             - name: imap-proxy
               containerPort: 10143
             - name: imaps-proxy
@@ -186,7 +186,7 @@ spec:
               containerPort: 110
             - name: pop3s
               containerPort: 995
-          {{- if .Values.proxy_protocol.enabled }}
+          {{- if .Values.proxyProtocol.enabled }}
             - name: pop3-proxy
               containerPort: 10110
             - name: pop3s-proxy

@@ -23,7 +23,7 @@ Next, run the setup command to see additional options:
 
 For more information please refer to this Chart's README file.
 
-{{ if .Values.proxy_protocol.enabled -}}  
+{{ if .Values.proxyProtocol.enabled -}}  
 
 Proxy Ports
 ------------
