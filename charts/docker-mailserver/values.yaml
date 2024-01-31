@@ -519,15 +519,6 @@ configMaps:
         }
       {{- end -}}
 
-  91-override-sieve.conf:
-    create: true
-    path: 91-override-sieve.conf
-    data: |
-      plugin {
-        sieve = /var/mail/sieve/%d/%n/.dovecot.sieve
-        sieve_dir = /var/mail/sieve/%d/%n/sieve
-      }
-
   user-patches.sh:
     create: true
     path: user-patches.sh
