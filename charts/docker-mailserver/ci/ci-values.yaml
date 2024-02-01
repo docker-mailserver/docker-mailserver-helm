@@ -1,10 +1,10 @@
-image:
-  tag: "8.0.1"
-  pullPolicy: "Always"
-
-initContainer:
-  image:
-    pullPolicy: "Always"
-
 service:
   type: ClusterIP
+
+configMaps:
+  postfix-accounts.cf:
+    create: true
+    path: postfix-accounts.cf
+    data: |
+      user@example.com|{SHA512-CRYPT}$6$PLsyDsD5kMTmQbe/$b1jT8MvuoBfs/JeBQ9fBQ0JlnWJZ377SW/OxSlNe7ldjgRQ7K4ysGfM6OpkkxQkAu7c7pR7EAR5Y4aIty2/Qi.
+
