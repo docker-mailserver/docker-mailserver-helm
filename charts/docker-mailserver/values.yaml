@@ -543,7 +543,7 @@ configMaps:
         -o smtpd_discard_ehlo_keywords=
         -o milter_macro_daemon_name=ORIGINATING
         -o cleanup_service_name=sender-cleanup
-        -o smtpd_upstream_proxyProtocol=haproxy  
+        -o smtpd_upstream_proxy_protocol=haproxy  
 
       # Submissions with proxy
       10465     inet  n       -       n       -       -       smtpd
@@ -559,7 +559,7 @@ configMaps:
         -o smtpd_discard_ehlo_keywords=
         -o milter_macro_daemon_name=ORIGINATING
         -o cleanup_service_name=sender-cleanup
-        -o smtpd_upstream_proxyProtocol=haproxy
+        -o smtpd_upstream_proxy_protocol=haproxy
       EOS
       {{- end }}
 
