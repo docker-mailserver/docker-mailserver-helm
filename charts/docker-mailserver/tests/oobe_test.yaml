@@ -35,8 +35,8 @@ tests:
           path: data.postfix-main\.cf
           pattern: smtpd_recipient_restrictions
 
-  # HAProxy is enabled by default
-  - it: should correctly configure postfix/dovecot if haproxy support is enabled
+  # proxyProtocol is enabled by default
+  - it: should correctly configure postfix/dovecot if proxyProtocol support is enabled
     set:
     asserts:
       - matchRegex:
@@ -46,12 +46,12 @@ tests:
           path: data.dovecot\.cf
           pattern: haproxy             
 
-  - it: should configure imaps port 10993 for rainloop if enabled (and haproxy enabled)
+  - it: should configure imaps port 10993 if proxyProtocol is enabled
     set:   
     asserts:
       - matchRegex:
           path: data.dovecot\.cf
-          pattern: rainloop
+          pattern: 10993
 
   - it: manifest should match snapshot
     asserts:
