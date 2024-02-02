@@ -20,8 +20,8 @@
 (Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc.go))
 
 ## Introduction
-This chart deploys [Docker Mailserver](https://github.com/docker-mailserver/docker-mailserver) into a
-Kubernetes cluster. Docker Mailserver is a production-ready, fullstack mail server that supports SMTP, IMAP, LDAP, Anti-spam, Anti-virus, etc.). Just as importantly, it is designed to be simple to install and configure.
+This chart deploys [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) into a
+Kubernetes cluster. docker-mailserver is a production-ready, fullstack mail server that supports SMTP, IMAP, LDAP, Anti-spam, Anti-virus, etc.). Just as importantly, it is designed to be simple to install and configure.
 
 !!WARNING!! - Version 3.0.0 is not backwards compatible with previous versions. Please refer to the [upgrade](#upgrading-to-version-3) section for more information.
 
