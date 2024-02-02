@@ -71,6 +71,8 @@ spec:
 
       containers:
         - name: docker-mailserver
+          image: {{ .Values.image.name }}:{{ default .Chart.AppVersion .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           {{- range $pkey, $pval := .Values.deployment.env }}
           - name: {{ $pkey }}
@@ -86,8 +88,6 @@ spec:
             value: /tmp/dms/custom-certs/tls.key
           {{- end }}
 
-          image: {{ .Values.image.name }}:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
 {{ toYaml .Values.deployment.resources | indent 12 }}
           securityContext:

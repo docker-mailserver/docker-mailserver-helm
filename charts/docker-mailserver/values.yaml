@@ -2,10 +2,11 @@ nameOverride: ""
 fullnameOverride: ""
 
 image:
-  # The name of the container image to use. See https://hub.docker.com/r/mailserver/docker-mailserver
+  ## image.name is the name of the container image to use. Refer to https://hub.docker.com/r/mailserver/docker-mailserver
   name: "mailserver/docker-mailserver"
-  # The tag of the container image to use. See https://hub.docker.com/r/mailserver/docker-mailserver
-  tag: "13.3.1"
+  ## image.tag is the tag of the container image to use. Refer to https://hub.docker.com/r/mailserver/docker-mailserver
+  ## If image.tag is not defined it will default to `.Chart.appVersion`
+  # tag: "latest"
   pullPolicy: "IfNotPresent"
 
 # Specify whether to create a serviceAccount for the pod. The name is generated from the 
