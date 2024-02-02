@@ -1,14 +1,14 @@
 name: Lint and Test Charts
 
 on:
-  # push:
-  #   paths:
-  #     - 'charts/**'
-  #     - '.github/**'
+  push:
+    paths:
+      - 'charts/**'
+      - '.github/**'
   pull_request:
     paths:
-      - 'charts/**'   
-      - '.github/**'        
+      - 'charts/**'
+      - '.github/**'
   workflow_dispatch:
 
 env:
@@ -16,7 +16,7 @@ env:
   HELM_VERSION: v3.13.2
 
 concurrency: 
-  group: ${{ github.head_ref }}
+  group: ${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

@@ -1,120 +1,17 @@
-{{/* This whole template is only necessary if we've enabled creation of the configmap (default true) */}}
-{{- if not .Values.configMap.useExisting -}}  
----
-apiVersion: "v1"
-kind: "ConfigMap"
+{{- range $name, $config := .Values.configMaps }}
+{{- if $config.create }}
+apiVersion: v1
+kind: ConfigMap
 metadata:
   labels:
-    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    heritage: "{{ .Release.Service }}"
-    release: "{{ .Release.Name }}"
-  name: {{ template "dockermailserver.fullname" . }}-configs
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" $ }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    heritage: "{{ $.Release.Service }}"
+    release: "{{ $.Release.Name }}"
+  name: {{ regexReplaceAll "[.]" $name "-" }}
 data:
-  {{/* Use sample data if user is running in demo mode */}}
-  {{- if .Values.demoMode.enabled -}}
-  ### We are in demo mode, so add in some sample data for quick testing
-  postfix-accounts.cf: |
-    # A sample user - the password is "password"
-    user@example.com|{SHA512-CRYPT}$6$l4023rZnQEy/l0Rg$JeNjAAICB43VAX7GTJ9jeE7DR0LeyR5nU.ftq3c42T5E1IZSuRBqwM8erRh6t0CyIT6aYpBIAopzcQHNUvMV00
-  postfix-virtual.cf: |
-    # Intentionally left empty
-  SigningTable: |
-    *@example.com mail._domainkey.example.com
-  KeyTable: |
-    mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private
-  TrustedHosts: |
-    127.0.0.1
-    localhost
-  ### End demo mode data
-  {{/* Use real data from "config" subdirectory if user is _not_ running in demo mode */}}  
-  {{ else -}}
-  postfix-main.cf: |
-  {{/* Enable proxy protocol for postscreen / dovecot */}}
-  {{- if .Values.haproxy.enabled }}  # Necessary to permit proxy protocol from haproxy to postscreen
-    postscreen_upstream_proxy_protocol = haproxy
-  {{ end }}
-  {{ if not .Values.spfTestsDisabled }}
-    smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination, reject_unauth_pipelining, reject_invalid_helo_hostname, reject_non_fqdn_helo_hostname, reject_unknown_recipient_domain, reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net{{ range .Values.rblRejectDomains }}, reject_rbl_client {{ . }}{{ end }}
-  {{ end -}}
-  {{- (.Files.Glob "config/*").AsConfig | nindent 2 }}
-  {{- (.Files.Glob "config/opendkim/*").AsConfig | nindent 2 }}
-  {{- end }}
-  dovecot-services.cf: |
-  {{- if .Values.haproxy.enabled }}
-    haproxy_trusted_networks = {{ .Values.haproxy.trustedNetworks }}
-  {{ end }}
-    service imap-login {
-      inet_listener imap {
-        {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
-      }  
-      inet_listener imaps {
-        {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
-      }
-    {{- if .Values.rainloop.enabled }}
-      inet_listener imaps-rainloop {
-        port = 10993
-        ssl = yes
-      }
-    {{ end }}      
-    }    
-    service pop3-login {
-      inet_listener pop3 {
-        {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
-      }
-      inet_listener pop3s {
-        {{ if .Values.haproxy.enabled -}}haproxy = yes{{ end }}
-      }                        
-    }
-
-
-  80-replication.conf: |
-    mail_plugins = $mail_plugins notify replication
-
-    service replicator {
-      process_min_avail = 1
-      unix_listener replicator-doveadm {
-        mode = 0600
-        user = docker
-      }
-    }
-
-    service aggregator {
-      fifo_listener replication-notify-fifo {
-        user = docker
-      }
-      unix_listener replication-notify {
-        user = docker
-      }
-    }
-    
-    doveadm_port = 4117
-    doveadm_password = secret
-
-    service doveadm {
-      inet_listener {
-        port = 4117
-        ssl = yes
-      }
-    }
-
-    plugin {
-      #mail_replica = tcp:anotherhost.example.com       # use doveadm_port
-      #mail_replica = tcp:anotherhost.example.com:12345 # use port 12345 explicitly
-    }
-
-  91-override-sieve.conf: |
-    plugin {
-      sieve = /var/mail/sieve/%d/%n/.dovecot.sieve
-      sieve_dir = /var/mail/sieve/%d/%n/sieve
-    }
-
-  am-i-healthy.sh: |
-    #!/bin/bash
-    # this script is intended to be used by periodic kubernetes liveness probes to ensure that the container
-    # (and all its dependent services) is healthy
-    {{ range .Values.livenessTests.commands -}}
-    {{ . }} && \
-    {{- end }}
-    echo "All healthy"
-{{- end -}}
+  {{ $config.key | default $name }}: |
+{{ tpl $config.data $ | indent 6 }}
+---
+{{- end }}
+{{- end }}
