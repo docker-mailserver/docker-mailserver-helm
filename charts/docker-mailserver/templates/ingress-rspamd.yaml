@@ -28,7 +28,7 @@ spec:
 
 {{ if .Values.rspamd.ingress.tls.enabled }}
   tls:
-  - secretName: {{ .Values.ingress.tls.secret }}
+  - secretName: {{ .Values.rspamd.ingress.tls.secret }}
     hosts:
     -  {{ .Values.rspamd.ingress.host }}
 {{- end }}
