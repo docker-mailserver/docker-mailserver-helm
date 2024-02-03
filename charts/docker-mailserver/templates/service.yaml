@@ -83,7 +83,7 @@ spec:
     {{- end }}   
   {{- end }}   
 
-  {{- if and (.Values.deployment.env.ENABLE_POP) (not .Values.deployment.env.SMTP_ONLY) }}
+  {{- if and (.Values.deployment.env.ENABLE_POP3) (not .Values.deployment.env.SMTP_ONLY) }}
     - name: pop3
       targetPort: pop3
       port: 110
