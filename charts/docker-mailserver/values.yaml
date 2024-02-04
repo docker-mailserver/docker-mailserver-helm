@@ -458,7 +458,7 @@ configMaps:
         }    
         {{- end -}}
 
-        {{- if and (.Values.deployment.env.ENABLE_POP) (not .Values.deployment.env.SMTP_ONLY) }}
+        {{- if and (.Values.deployment.env.ENABLE_POP3) (not .Values.deployment.env.SMTP_ONLY) }}
         service pop3-login {
             inet_listener pop3 {
                 port = 110
