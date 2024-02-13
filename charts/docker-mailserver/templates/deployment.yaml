@@ -13,7 +13,7 @@ metadata:
 {{ toYaml .Values.deployment.annotations | indent 4 }}
 {{ end }}
 spec:
-  replicas: {{ default 2 .Values.deployment.replicas }}
+  replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
