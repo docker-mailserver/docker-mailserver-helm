@@ -19,9 +19,9 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
-    {{- with .Values.service.labels }}
-    {{ toYaml . | nindent 2 }}
-    {{- end }}
+  {{- if .Values.service.labels }}
+  {{ toYaml .Values.service.labels | indent 2 }}  
+  {{ end }} 
   name: {{ template "dockermailserver.fullname" . }}
 spec:
   ## If a load balancer is being used, ensure that the newer type of LB that passes along IP information is used
