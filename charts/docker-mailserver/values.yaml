@@ -34,6 +34,9 @@ deployment:
   ## Optionally specify a priorityClassName for the deployment
   priorityClassName:
 
+  ## Optionally specify a nodeSelector for the deployment
+  nodeSelector: {}
+
   ## Use the host’s network namespace. If this option is set, the ports that
   ## will be used must be specified.
   ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
@@ -283,6 +286,7 @@ service:
     ## If there is a Hostname associated with this site, add it here and it will be rendered in the documentation.
     # hostName:
   annotations: {}
+  labels: {}
 
 # Note this is a dictionary and not a list so invidual keys can be overriden by --set or --value helm parameters
 persistence:
