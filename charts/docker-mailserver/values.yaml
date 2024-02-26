@@ -34,6 +34,9 @@ deployment:
   ## Optionally specify a priorityClassName for the deployment
   priorityClassName:
 
+  ## Optionally specify a nodeSelector for the deployment
+  nodeSelector: {}
+
   ## Use the host’s network namespace. If this option is set, the ports that
   ## will be used must be specified.
   ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
