@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "13.3.1"
 description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
 name: docker-mailserver
-version: 2.1.1-patch9
+version: 3.0.4-patch1
 sources:
 - https://github.com/docker-mailserver/docker-mailserver-helm
 maintainers:
@@ -20,10 +20,5 @@ icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
 annotations:
   artifacthub.io/changes: |
     - Breaking : Standardized app labels to app.kubernetes.io/name for Istio workload/Cilium compatibility
-    
-dependencies:
-  - name: "kubernetes-ingress"
-    version: "1.36.1"
-    repository: "https://haproxytech.github.io/helm-charts"
-    condition: haproxy.enabled
-    alias: "haproxy"
+
+dependencies: []

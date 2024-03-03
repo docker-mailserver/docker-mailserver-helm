@@ -12,14 +12,13 @@ tests:
           pattern: "dbpurgeage"        
 
 
-  - it: should configure imaps port 10993 for rainloop if enabled (and haproxy enabled)
+  - it: should configure imaps port 10993 if proxyProtocol enabled
     set:
-      rainloop.enabled: true
-      haproxy.enabled: true      
+      proxyProtocol.enabled: true      
     asserts:
       - matchRegex:
           path: data.dovecot\.cf
-          pattern: rainloop
+          pattern: 10993
 
   - it: manifest should match snapshot
     asserts:

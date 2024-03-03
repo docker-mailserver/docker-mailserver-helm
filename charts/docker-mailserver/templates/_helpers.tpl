@@ -26,17 +26,6 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
-Provide a pre-defined claim or a claim based on the Release
-*/}}
-{{- define "dockermailserver.pvcName" -}}
-{{- if .Values.persistence.existingClaim }}
-{{- .Values.persistence.existingClaim }}
-{{- else -}}
-{{- template "dockermailserver.fullname" . }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Create the name of the controller service account to use
 */}}
 {{- define "dockermailserver.serviceAccountName" -}}
@@ -44,16 +33,5 @@ Create the name of the controller service account to use
     {{ default (include "dockermailserver.fullname" .) .Values.serviceAccount.name }}
 {{- else -}}
     {{ default "docker-mailserver" .Values.serviceAccount.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Create the name of the controller service account to use
-*/}}
-{{- define "dockermailserver.rainloop.serviceAccountName" -}}
-{{- if .Values.rainloop.serviceAccount.create -}}
-    {{ default (include "dockermailserver.fullname" .) .Values.rainloop.serviceAccount.name }}
-{{- else -}}
-    {{ default "rainloop" .Values.rainloop.serviceAccount.name }}
 {{- end -}}
 {{- end -}}

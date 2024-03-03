@@ -1,10 +1,10 @@
 name: Lint and Test Charts
 
 on:
-  # push:
-  #   paths:
-  #     - 'charts/**'
-  #     - '.github/**'
+  push:
+    paths:
+      - 'charts/**'
+      - '.github/**'
   pull_request:
     paths:
       - 'charts/**'
@@ -12,11 +12,11 @@ on:
   workflow_dispatch:
 
 env:
-  KUBE_SCORE_VERSION: 1.12.0
-  HELM_VERSION: v3.4.1
+  KUBE_SCORE_VERSION: 1.17.0
+  HELM_VERSION: v3.13.2
 
-concurrency:
-  group: ${{ github.head_ref }}
+concurrency: 
+  group: ${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v3
         with:
           version: ${{ env.HELM_VERSION }}
 
@@ -49,7 +49,7 @@ jobs:
     strategy:
       matrix:
         # Choose from https://hub.docker.com/r/kindest/node/tags
-        KubeVersion: [1.24.15,1.25.11,1.26.6,1.27.3,1.28.0]
+        KubeVersion: [1.27.3, 1.28.0, 1.29.0]
 
     steps:
       - name: Checkout
@@ -60,30 +60,28 @@ jobs:
       # python is a requirement for the chart-testing action below (supports yamllint among other tests)
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: 3.11
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.6.1
+        uses: helm/chart-testing-action@v2.6.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          changed=$(ct list-changed --config .ci/ct-config.yaml)
           if [[ -n "$changed" ]]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "::set-output name=changed::true"
           fi
 
       - name: Run chart-testing (lint)
-        if: steps.list-changed.outputs.changed == 'true'
-        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --config .ci/ct-config.yaml
+        run: ct lint --config .ci/ct-config.yaml
 
       - name: Create ${{matrix.KubeVersion}} kind cluster
-        uses: helm/kind-action@v1.9.0
-        if: steps.list-changed.outputs.changed == 'true'
+        uses: helm/kind-action@v1.5.0
         with:
           node_image: kindest/node:v${{matrix.KubeVersion}}
           cluster_name: kubernetes-${{matrix.KubeVersion}}
+        if: steps.list-changed.outputs.changed == 'true'
 
       - name: Run chart-testing (install) against ${{matrix.KubeVersion}}
-        if: steps.list-changed.outputs.changed == 'true'
-        run: ct install --target-branch ${{ github.event.repository.default_branch }} --config .ci/ct-config.yaml
+        run: ct install --config .ci/ct-config.yaml

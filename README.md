@@ -1,10 +1,6 @@
-# K8s Helm Chart for Docker Mailserver
+# K8s Helm Chart for docker-mailserver
 
-This repostitory contains a helm chart to deploy [Docker
-Mailserver](https://github.com/docker-mailserver/docker-mailserver), a
-production-ready fullstack but simple mail server, into a Kubernetes cluster.
-
-**_LOOKING FOR MAINTAINERS_**! This repository is looking for maintainers that keep the image version up to date and curate the chart. The chart is currently outdated with regards to the image itself as well as documentation and other, related topics. If you are using this Chart, it would be of much help if you provide a solution for issues you encountred in the form of a pull request.
+This repostitory contains a helm chart to deploy [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) into a Kubernetes cluster. docker-mailserver is a production-ready, fullstack mail server that supports SMTP, IMAP, LDAP, Anti-spam, Anti-virus, etc.). Just as importantly, it is designed to be simple to install and configure.
 
 ## Documentation
 
