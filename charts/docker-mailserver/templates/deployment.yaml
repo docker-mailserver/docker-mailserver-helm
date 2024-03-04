@@ -32,6 +32,7 @@ spec:
       nodeSelector: {{- toYaml .Values.deployment.nodeSelector | nindent 8 }}
       runtimeClassName: {{ .Values.deployment.runtimeClassName }}
       priorityClassName: {{ .Values.deployment.priorityClassName }}
+      restartPolicy: "Always"
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
@@ -100,6 +101,7 @@ spec:
 {{ toYaml .Values.deployment.containerSecurityContext | indent 12 }}
 
           volumeMounts:
+            # Certificate
         {{- if .Values.certificate }}
             - name: certificate
               mountPath: /tmp/dms/custom-certs
@@ -128,7 +130,7 @@ spec:
             {{- end }}
         {{- end }}
 
-          # Volumes
+            # Mount Volumes
         {{- range $name, $persistence := .Values.persistence }}
           {{- if $persistence.enabled }}
             - name: {{ $name }}
@@ -226,14 +228,11 @@ spec:
 {{ toYaml .Values.deployment.containerSecurityContext | indent 12 }}
 
           volumeMounts:
-            - name: data
-              mountPath: /var/log/mail
-              subPath: log
-              readOnly: true     
-            - name: data
-              mountPath: /var/mail-state
-              subPath: mail-state
-              readOnly: true
+        {{- range $name, $persistence := pick .Values.persistence "mail-log" "mail-state" }}
+          {{- if $persistence.enabled }}
+            - name: {{ $name }}
+              mountPath: {{ $persistence.mountPath }}
+              readonly: true
+          {{- end }}
+        {{- end }}
 {{- end }}
-
-      restartPolicy: "Always"
