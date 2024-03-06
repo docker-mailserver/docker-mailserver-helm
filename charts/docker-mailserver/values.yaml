@@ -28,6 +28,9 @@ deployment:
   ## Optionally add additional annotations to the deployment
   annotations: {}  
 
+  ## Optionally add additional labels to the deployment
+  labels: {}  
+
   ## Optionally specify a runtimeClassName for the deployment
   runtimeClassName: 
 
