@@ -385,7 +385,7 @@ rspamd:
 dovecot:
   fullTextSearch:
     enabled: false
-    verbose: 1 # 0 (silent), 1 (verbose) or 2 (debug)
+    verbose: 0 # 0 (silent), 1 (verbose) or 2 (debug)
     resources:
       memory: 2GB
     cron:
