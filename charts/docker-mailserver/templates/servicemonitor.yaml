@@ -13,7 +13,7 @@ spec:
   endpoints:
     - interval: {{ .Values.metrics.serviceMonitor.scrapeInterval }}
       path: /metrics
-      port: tcp-metrics
+      port: metrics
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}
