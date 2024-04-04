@@ -39,10 +39,12 @@ Kubernetes cluster. docker-mailserver is a production-ready, fullstack mail serv
 
 Setting up docker-mailserver requires generating a number of configuration [files](https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/optional-config/). To make this easier, docker-mailserver includes a `setup` command that can generate these files.
 
-To get started, first install docker-mailserver:
+To get started, first add the helm repo and install docker-mailserver:
 
 ```console
-helm upgrade --install docker-mailserver docker-mailserver --namespace mail --create-namespace
+helm repo add docker-mailserver https://docker-mailserver.github.io/docker-mailserver-helm
+
+helm upgrade --install docker-mailserver docker-mailserver/docker-mailserver --namespace mail --create-namespace
 ```
 
 Next open a command prompt to the running container.
