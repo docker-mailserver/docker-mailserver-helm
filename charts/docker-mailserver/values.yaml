@@ -419,6 +419,8 @@ metrics:
   serviceMonitor:
     enabled: false
     scrapeInterval: 15s
+    ## Optionally add additional labels to the deployment
+    labels: {}  
 
 ## ConfigMaps (and Secrets) are used to copy docker-mailserver configuration files 
 ## into running containers. This chart automatically sets up any config files that 
