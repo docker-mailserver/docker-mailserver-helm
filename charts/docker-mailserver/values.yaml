@@ -264,6 +264,9 @@ deployment:
       ## it may terminated.
       memory: "2048Mi"
       ephemeral-storage: "500Mi"
+  
+  ## Optionally specify tolerations for the deployment
+  tolerations: []
 
 service:
   ## What scope the service should be exposed in. One of:
