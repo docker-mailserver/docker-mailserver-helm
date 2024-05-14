@@ -298,6 +298,8 @@ persistence:
   annotations: {}
     # backup.kubernetes.io/deltas: PT1H P2D P30D P180D
 
+tolerations: []
+
 ## Monitoring adds the prometheus.io annotations to pods and services, so that the Prometheus Kubernetes SD mechanism
 ## as configured in the examples will automatically discover both the pods and the services to query.
 ##
