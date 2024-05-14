@@ -1,0 +1,1265 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "target": {
+            "limit": 100,
+            "matchAny": false,
+            "tags": [],
+            "type": "dashboard"
+          },
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 51,
+    "iteration": 1691420150351,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 0,
+          "y": 0
+        },
+        "id": 5,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "time",
+                "id": "2",
+                "settings": {
+                  "interval": "1d"
+                },
+                "type": "date_histogram"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "metrics": [
+              {
+                "hide": false,
+                "id": "1",
+                "type": "count"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "Messages total",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 4,
+          "y": 0
+        },
+        "id": 12,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "time",
+                "id": "2",
+                "settings": {
+                  "interval": "1d"
+                },
+                "type": "date_histogram"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "metrics": [
+              {
+                "hide": false,
+                "id": "1",
+                "type": "count"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster AND status:sent",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "sent - count",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 8,
+          "y": 0
+        },
+        "id": 13,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "time",
+                "id": "2",
+                "settings": {
+                  "interval": "1d"
+                },
+                "type": "date_histogram"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "metrics": [
+              {
+                "hide": false,
+                "id": "1",
+                "type": "count"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster AND status:deferred",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "deferred- count",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 12,
+          "y": 0
+        },
+        "id": 8,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "time",
+                "id": "2",
+                "settings": {
+                  "interval": "1d"
+                },
+                "type": "date_histogram"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "metrics": [
+              {
+                "id": "1",
+                "type": "count"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster AND status:bounced",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "bounced- Count",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 16,
+          "y": 0
+        },
+        "id": 9,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "time",
+                "id": "2",
+                "settings": {
+                  "interval": "1d"
+                },
+                "type": "date_histogram"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "metrics": [
+              {
+                "id": "1",
+                "type": "count"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster AND status:expired",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "expired - Count",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 20,
+          "y": 0
+        },
+        "id": 10,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "time",
+                "id": "2",
+                "settings": {
+                  "interval": "1d"
+                },
+                "type": "date_histogram"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "metrics": [
+              {
+                "id": "1",
+                "type": "count"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster AND !_exists_:status",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "unknown - Count",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "bars",
+              "fillOpacity": 0,
+              "gradientMode": "opacity",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineInterpolation": "smooth",
+              "lineWidth": 3,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 4
+        },
+        "id": 2,
+        "options": {
+          "legend": {
+            "calcs": [
+              "sum"
+            ],
+            "displayMode": "table",
+            "placement": "right"
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "status.keyword",
+                "id": "5",
+                "settings": {
+                  "min_doc_count": "0",
+                  "missing": "unknown",
+                  "order": "desc",
+                  "orderBy": "_term",
+                  "size": "0"
+                },
+                "type": "terms"
+              },
+              {
+                "field": "time",
+                "id": "4",
+                "settings": {
+                  "interval": "auto",
+                  "min_doc_count": "0",
+                  "timeZone": "utc",
+                  "trimEdges": "0"
+                },
+                "type": "date_histogram"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "hide": false,
+            "metrics": [
+              {
+                "id": "1",
+                "type": "count"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "postfix/smtp",
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "_id": true,
+                "_index": true,
+                "_source": true,
+                "_type": true,
+                "highlight": true,
+                "hostname": true,
+                "kubernetes.annotations.cni-projectcalico-org/containerID": true,
+                "kubernetes.annotations.cni-projectcalico-org/podIP": true,
+                "kubernetes.annotations.cni-projectcalico-org/podIPs": true,
+                "kubernetes.container_hash": true,
+                "kubernetes.container_image": true,
+                "kubernetes.container_name": true,
+                "kubernetes.docker_id": true,
+                "kubernetes.host": true,
+                "kubernetes.labels.app-kubernetes-io/name": true,
+                "kubernetes.labels.pod-template-hash": true,
+                "kubernetes.labels.release": true,
+                "kubernetes.namespace_name": true,
+                "kubernetes.pod_id": true,
+                "kubernetes.pod_name": true,
+                "log": true,
+                "postfix_time": true,
+                "service": true,
+                "sort": true,
+                "stream": true
+              },
+              "indexByName": {
+                "_id": 6,
+                "_index": 7,
+                "_source": 8,
+                "_type": 9,
+                "cluster": 0,
+                "delays": 10,
+                "domain": 11,
+                "dsn": 12,
+                "highlight": 13,
+                "hostname": 14,
+                "kubernetes.annotations.cni-projectcalico-org/containerID": 15,
+                "kubernetes.annotations.cni-projectcalico-org/podIP": 16,
+                "kubernetes.annotations.cni-projectcalico-org/podIPs": 17,
+                "kubernetes.container_hash": 18,
+                "kubernetes.container_image": 19,
+                "kubernetes.container_name": 20,
+                "kubernetes.docker_id": 21,
+                "kubernetes.host": 22,
+                "kubernetes.labels.app-kubernetes-io/name": 23,
+                "kubernetes.labels.pod-template-hash": 24,
+                "kubernetes.labels.release": 25,
+                "kubernetes.namespace_name": 26,
+                "kubernetes.pod_id": 27,
+                "kubernetes.pod_name": 28,
+                "log": 29,
+                "orig_to": 30,
+                "postfix_time": 5,
+                "process": 31,
+                "queue_id": 32,
+                "relay": 33,
+                "service": 34,
+                "sort": 35,
+                "status": 3,
+                "status_detail": 4,
+                "stream": 36,
+                "time": 1,
+                "to": 2
+              },
+              "renameByName": {
+                "Count": "sent"
+              }
+            }
+          }
+        ],
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              }
+            },
+            "mappings": []
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 12,
+          "w": 8,
+          "x": 0,
+          "y": 14
+        },
+        "id": 14,
+        "options": {
+          "displayLabels": [],
+          "legend": {
+            "displayMode": "table",
+            "placement": "right"
+          },
+          "pieType": "donut",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "/^Count$/",
+            "values": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "hostname.keyword",
+                "id": "5",
+                "settings": {
+                  "min_doc_count": "1",
+                  "order": "desc",
+                  "orderBy": "_term",
+                  "size": "0"
+                },
+                "type": "terms"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "hide": false,
+            "metrics": [
+              {
+                "id": "1",
+                "type": "count"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "hostname",
+        "transformations": [],
+        "type": "piechart"
+      },
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto",
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Count"
+              },
+              "properties": [
+                {
+                  "id": "custom.displayMode",
+                  "value": "gradient-gauge"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 12,
+          "w": 16,
+          "x": 8,
+          "y": 14
+        },
+        "id": 3,
+        "options": {
+          "footer": {
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true,
+          "sortBy": []
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "to.keyword",
+                "id": "3",
+                "settings": {
+                  "min_doc_count": "1",
+                  "order": "desc",
+                  "orderBy": "1",
+                  "size": "10"
+                },
+                "type": "terms"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "metrics": [
+              {
+                "id": "1",
+                "type": "count"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "Top senders",
+        "transformations": [],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "PC2172701F050FD0A"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto",
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "kubernetes.container_hash"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 195
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "time"
+              },
+              "properties": [
+                {
+                  "id": "custom.width"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "postfix_time"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 310
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "to"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 207
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "status"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 85
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "cluster"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 63
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "relay"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 417
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 11,
+          "w": 24,
+          "x": 0,
+          "y": 26
+        },
+        "id": 11,
+        "options": {
+          "footer": {
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true,
+          "sortBy": []
+        },
+        "pluginVersion": "8.5.24",
+        "targets": [
+          {
+            "alias": "",
+            "bucketAggs": [
+              {
+                "field": "time",
+                "id": "2",
+                "settings": {
+                  "interval": "auto"
+                },
+                "type": "date_histogram"
+              }
+            ],
+            "datasource": {
+              "type": "elasticsearch",
+              "uid": "PC2172701F050FD0A"
+            },
+            "metrics": [
+              {
+                "hide": false,
+                "id": "1",
+                "type": "logs"
+              }
+            ],
+            "query": "_exists_:to AND service:\"postfix/smtp\" AND cluster:$cluster",
+            "refId": "A",
+            "timeField": "time"
+          }
+        ],
+        "title": "postfix/smtp",
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "_id": true,
+                "_index": true,
+                "_source": true,
+                "_type": true,
+                "highlight": true,
+                "hostname": true,
+                "kubernetes.annotations.cni-projectcalico-org/containerID": true,
+                "kubernetes.annotations.cni-projectcalico-org/podIP": true,
+                "kubernetes.annotations.cni-projectcalico-org/podIPs": true,
+                "kubernetes.container_hash": true,
+                "kubernetes.container_image": true,
+                "kubernetes.container_name": true,
+                "kubernetes.docker_id": true,
+                "kubernetes.host": true,
+                "kubernetes.labels.app-kubernetes-io/name": true,
+                "kubernetes.labels.pod-template-hash": true,
+                "kubernetes.labels.release": true,
+                "kubernetes.namespace_name": true,
+                "kubernetes.pod_id": true,
+                "kubernetes.pod_name": true,
+                "log": true,
+                "postfix_time": true,
+                "service": true,
+                "sort": true,
+                "stream": true
+              },
+              "indexByName": {
+                "_id": 6,
+                "_index": 7,
+                "_source": 8,
+                "_type": 9,
+                "cluster": 0,
+                "delays": 10,
+                "domain": 11,
+                "dsn": 12,
+                "highlight": 13,
+                "hostname": 14,
+                "kubernetes.annotations.cni-projectcalico-org/containerID": 15,
+                "kubernetes.annotations.cni-projectcalico-org/podIP": 16,
+                "kubernetes.annotations.cni-projectcalico-org/podIPs": 17,
+                "kubernetes.container_hash": 18,
+                "kubernetes.container_image": 19,
+                "kubernetes.container_name": 20,
+                "kubernetes.docker_id": 21,
+                "kubernetes.host": 22,
+                "kubernetes.labels.app-kubernetes-io/name": 23,
+                "kubernetes.labels.pod-template-hash": 24,
+                "kubernetes.labels.release": 25,
+                "kubernetes.namespace_name": 26,
+                "kubernetes.pod_id": 27,
+                "kubernetes.pod_name": 28,
+                "log": 29,
+                "orig_to": 30,
+                "postfix_time": 5,
+                "process": 31,
+                "queue_id": 32,
+                "relay": 33,
+                "service": 34,
+                "sort": 35,
+                "status": 3,
+                "status_detail": 4,
+                "stream": 36,
+                "time": 1,
+                "to": 2
+              },
+              "renameByName": {}
+            }
+          }
+        ],
+        "type": "table"
+      }
+    ],
+    "refresh": false,
+    "schemaVersion": 36,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "selected": true,
+            "text": "prod",
+            "value": "prod"
+          },
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "PC2172701F050FD0A"
+          },
+          "definition": "{ \"find\" : \"terms\" , \"field\": \"cluster.keyword\", \"size\":0 }",
+          "hide": 0,
+          "includeAll": true,
+          "multi": false,
+          "name": "cluster",
+          "options": [],
+          "query": "{ \"find\" : \"terms\" , \"field\": \"cluster.keyword\", \"size\":0 }",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "type": "query"
+        },
+        {
+          "auto": false,
+          "auto_count": 30,
+          "auto_min": "10s",
+          "current": {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          "hide": 0,
+          "name": "interval",
+          "options": [
+            {
+              "selected": false,
+              "text": "5m",
+              "value": "5m"
+            },
+            {
+              "selected": false,
+              "text": "10m",
+              "value": "10m"
+            },
+            {
+              "selected": false,
+              "text": "30m",
+              "value": "30m"
+            },
+            {
+              "selected": false,
+              "text": "1h",
+              "value": "1h"
+            },
+            {
+              "selected": false,
+              "text": "6h",
+              "value": "6h"
+            },
+            {
+              "selected": false,
+              "text": "12h",
+              "value": "12h"
+            },
+            {
+              "selected": true,
+              "text": "1d",
+              "value": "1d"
+            },
+            {
+              "selected": false,
+              "text": "week",
+              "value": "week"
+            },
+            {
+              "selected": false,
+              "text": "month",
+              "value": "month"
+            },
+            {
+              "selected": false,
+              "text": "quarter",
+              "value": "quarter"
+            },
+            {
+              "selected": false,
+              "text": "year",
+              "value": "year"
+            }
+          ],
+          "query": "5m,10m,30m,1h,6h,12h,1d,week,month,quarter,year",
+          "queryValue": "",
+          "refresh": 2,
+          "skipUrlSync": false,
+          "type": "interval"
+        },
+        {
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "PC2172701F050FD0A"
+          },
+          "filters": [],
+          "hide": 0,
+          "name": "Filters",
+          "skipUrlSync": false,
+          "type": "adhoc"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-3h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "postfix-details",
+    "uid": "H0jbXOeVk",
+    "version": 10,
+    "weekStart": ""
+  }

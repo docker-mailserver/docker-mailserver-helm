@@ -26,6 +26,16 @@ initContainer:
     readOnlyRootFilesystem: true
     privileged: false
 
+affinity: {}
+##  nodeAffinity:
+##    requiredDuringSchedulingIgnoredDuringExecution:
+##      nodeSelectorTerms:
+##        - matchExpressions:
+##            - key: <your key>
+##              operator: In
+##              values:
+##                - 'true'
+
 ## Optionally specify a runtimeClassName for the deployment
 runtimeClassName: 
 
@@ -405,3 +415,45 @@ haproxy:
   # of your HAProxy instance
   # haproxy.trustedNetworks is the list of sources (in CIDR format, space-separated) to permit haproxy PROXY protocol from
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
+
+
+# when metrics is enabled, we mount subpath log from pvc into /var/log/mail
+metrics:
+  enabled: false
+  image:
+    name: blackflysolutions/postfix-exporter@sha256
+    tag: 7ed7c0534112aff5b44757ae84a206bf659171631edfc325c3c1638d78e74f73
+    pullPolicy: "IfNotPresent"
+
+  resources:
+    requests:
+      memory: "256Mi"
+    #  cpu: "100M"
+    #limits:
+    #  memory: "256Mi"
+    #  cpu: "500M"
+
+
+  serviceMonitor:
+    enabled: false
+    scrapeInterval: 15s
+
+
+# when logging flow for kube-logging operator 
+logging:
+  enable: false
+  clusterTag: demo
+
+  smtp: true
+  qmgr: false
+
+  # put debug=true to send result into fluentd logging pod /fluentd/log/out
+  debug: false
+  
+  # otherwise flow is send to global or local output
+  outputMode: global
+  output: logging-output-opensearch-postfix
+
+
+
+

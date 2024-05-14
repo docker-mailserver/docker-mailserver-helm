@@ -1,0 +1,39 @@
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: logging-flow-postfix-qmgr-k8s
+spec:
+  filters:
+    - dedot:
+        de_dot_nested: true
+        de_dot_separator: '-'
+    - grep:
+        regexp:
+          - key: log
+            pattern: /.+ postfix\/qmgr\u005B[0-9]+\u005D\u003A [0-9A-F]+\u003A from=/
+    - record_modifier:
+        records:
+          - cluster:  {{ .Values.logging.clusterTag }}
+          - service: "postfix/qmgr"
+          - time: ${require 'time'; Time.parse(record['time'].to_s).utc.iso8601(3)}
+          - postfix_time: ${record['log'].match(/([A-Za-z]{3}[ ]{1,2}[0-9]{1,2} [0-9]{2}\:[0-9]{2}\:[0-9]{2}) /).captures[0]}
+          - log: ${record['log'].gsub(/\n/, '')}          
+    - record_modifier:
+        records:
+          - postfix_time: ${require 'time'; Time.parse(record['postfix_time']).utc.iso8601(3)}
+          - time: ${require 'time'; Time.parse(record['postfix_time']).utc.iso8601(3)}         
+          - hostname:  ${record['log'].match(/.+ (.+) postfix\/qmgr\u005B/).captures[0]}
+          - process: ${record['log'].match(/.+ (postfix\/qmgr\u005B[0-9]+\u005D)/).captures[0]}
+          - queue_id: ${record['log'].match(/postfix\/qmgr\u005B[0-9]+\u005D\u003A ([0-9A-F]+)\u003A from=/).captures[0]}
+          - from:  ${record['log'].match(/postfix\/qmgr\u005B[0-9]+\u005D\u003A [0-9A-F]+\u003A from=<([^<>]+)>,/).captures[0]}
+          - domain: ${record['log'].match(/.+ from=<[^@<]+@([^@>]+)>,/).captures[0]}
+          - size: ${record['log'].match(/.+, size=([0-9]+), nrcpt=/).captures[0]}
+          - nrcpt: ${record['log'].match(/.+, nrcpt=([0-9]+) \(queue active\)/).captures[0]}
+    - stdout:
+        output_type: json
+  globalOutputRefs:
+    - logging-output-null
+  match:
+    - select:
+        container_names:
+          - dockermailserver
