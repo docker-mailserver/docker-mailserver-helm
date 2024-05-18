@@ -25,6 +25,9 @@ deployment:
   ## How many versions of the deployment to run
   replicas: 1
 
+  ## Optionally specify affinity for the deployment
+  affinity: {}
+
   ## Optionally add additional annotations to the deployment
   annotations: {}  
 
