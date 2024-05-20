@@ -597,3 +597,7 @@ configMaps:
 ##
 ##    kubectl create secret rspamd.example.com --namespace mail --from-file=rspamd.dkim.rsa-2048-mail-example.com.private.txt=<path_to_rspamd.dkim.rsa-2048-mail-example.com.private.txt>
 secrets: {}
+
+## @param extraDeploy Array of extra objects to deploy with the release
+##
+extraDeploy: []
