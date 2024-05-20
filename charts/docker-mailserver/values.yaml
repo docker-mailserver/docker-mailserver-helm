@@ -25,6 +25,9 @@ deployment:
   ## How many versions of the deployment to run
   replicas: 1
 
+  ## Optionally specify affinity for the deployment
+  affinity: {}
+
   ## Optionally add additional annotations to the deployment
   annotations: {}  
 
@@ -264,6 +267,9 @@ deployment:
       ## it may terminated.
       memory: "2048Mi"
       ephemeral-storage: "500Mi"
+  
+  ## Optionally specify tolerations for the deployment
+  tolerations: []
 
 service:
   ## What scope the service should be exposed in. One of:

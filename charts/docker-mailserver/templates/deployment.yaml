@@ -32,6 +32,9 @@ spec:
 {{ toYaml .Values.deployment.annotations | indent 8 }}
         {{ end }}
     spec:
+      {{- if .Values.deployment.affinity }}
+      affinity: {{- toYaml .Values.deployment.affinity | nindent 8 }}
+      {{ end }}
       nodeSelector: {{- toYaml .Values.deployment.nodeSelector | nindent 8 }}
       runtimeClassName: {{ .Values.deployment.runtimeClassName }}
       priorityClassName: {{ .Values.deployment.priorityClassName }}
@@ -39,6 +42,9 @@ spec:
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
+      {{- if .Values.deployment.tolerations }}
+      tolerations: {{- toYaml .Values.deployment.tolerations | nindent 8 }}
+      {{ end }}
       volumes:
           # ConfigMaps
       {{- range $name, $config := .Values.configMaps }}
