@@ -601,3 +601,11 @@ secrets: {}
 ## @param extraDeploy Array of extra objects to deploy with the release
 ##
 extraDeploy: []
+
+## @param extraVolumes Optionally specify extra list of additional volumes for the docker-mailserver pod
+##
+extraVolumes: []
+
+## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts for the docker-mailserver container
+##
+extraVolumeMounts: []
