@@ -3,6 +3,8 @@ templates:
   - deployment.yaml
 chart:
   version: 0.1.0
+values:
+  - ../values.yaml
 tests:
   - it: image and tag should end up in deployment
     set:

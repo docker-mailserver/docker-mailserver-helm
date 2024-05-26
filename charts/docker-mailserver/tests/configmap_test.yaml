@@ -3,6 +3,8 @@ templates:
   - configmap.yaml
 chart:
   version: 0.1.0
+values:
+  - ../values.yaml
 tests:
   - it: should configure imaps port 10993 if proxyProtocol enabled
     set:
