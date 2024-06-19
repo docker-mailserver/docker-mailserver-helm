@@ -77,7 +77,6 @@ deployment:
     # -----------------------------------------------
     LOG_LEVEL: info
     SUPERVISOR_LOGLEVEL: 
-    ONE_DIR: 1
     DMS_VMAIL_UID: 
     DMS_VMAIL_GID: 
     ACCOUNT_PROVISIONER: 
