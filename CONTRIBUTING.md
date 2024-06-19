@@ -4,7 +4,7 @@ First off, thank you for helping to improve this chart! :heart_eyes: :pray:
 
 ## Testing
 
-To test the chart locally, before submitting changes, run `./ci/scripts/local-ci.sh`
+To test the chart locally, before submitting changes, run `./.ci/scripts/local-ct-lint.sh`
 
 ## Submitting changes
 
