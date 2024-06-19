@@ -147,7 +147,7 @@ deployment:
     SA_TAG: 2.0
     SA_TAG2: 6.31
     SA_KILL: 10.0
-    SA_SPAM_SUBJECT: '***SPAM*** '
+    SPAM_SUBJECT: '***SPAM*** '
 
     # -----------------------------------------------
     # --- Fetchmail Section -------------------------
