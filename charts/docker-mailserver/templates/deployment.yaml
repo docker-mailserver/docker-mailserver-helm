@@ -80,6 +80,10 @@ spec:
       {{- end }}
     {{- end }}
 
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+
       containers:
         - name: docker-mailserver
           image: {{ .Values.image.name }}:{{ default .Chart.AppVersion .Values.image.tag }}
@@ -146,6 +150,10 @@ spec:
               mountPath: {{ $persistence.mountPath }}
           {{- end }}
         {{- end }}
+
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
 
           livenessProbe:
             exec:
