@@ -77,7 +77,6 @@ deployment:
     # -----------------------------------------------
     LOG_LEVEL: info
     SUPERVISOR_LOGLEVEL: 
-    ONE_DIR: 1
     DMS_VMAIL_UID: 
     DMS_VMAIL_GID: 
     ACCOUNT_PROVISIONER: 
@@ -103,6 +102,7 @@ deployment:
     RSPAMD_GREYLISTING: 0
     RSPAMD_HFILTER: 1
     RSPAMD_HFILTER_HOSTNAME_UNKNOWN_SCORE: 6
+    RSPAMD_NEURAL: 0
     ENABLE_AMAVIS: 0
     AMAVIS_LOGLEVEL: 0
     ENABLE_DNSBL: 0
@@ -131,6 +131,7 @@ deployment:
     LOGWATCH_SENDER: 
     REPORT_RECIPIENT: 
     REPORT_SENDER: 
+    LOGROTATE_COUNT: 4
     LOGROTATE_INTERVAL: weekly
     POSTFIX_REJECT_UNKNOWN_CLIENT_HOSTNAME: 0
     POSTFIX_INET_PROTOCOLS: all
@@ -147,7 +148,7 @@ deployment:
     SA_TAG: 2.0
     SA_TAG2: 6.31
     SA_KILL: 10.0
-    SA_SPAM_SUBJECT: '***SPAM*** '
+    SPAM_SUBJECT: '***SPAM*** '
 
     # -----------------------------------------------
     # --- Fetchmail Section -------------------------
