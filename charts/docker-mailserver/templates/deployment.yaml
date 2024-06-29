@@ -80,6 +80,29 @@ spec:
       {{- end }}
     {{- end }}
 
+        # Extra volumes
+      {{- with .Values.deployment.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.deployment.initContainers }}
+      initContainers:
+      {{- range . }}
+        - name: {{ .name }}
+          image: {{ .image }}
+          {{- with .command }}
+          command: {{ toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .args }}
+          args: {{ toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with $.Values.deployment.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+
       containers:
         - name: docker-mailserver
           image: {{ .Values.image.name }}:{{ default .Chart.AppVersion .Values.image.tag }}
@@ -146,6 +169,11 @@ spec:
               mountPath: {{ $persistence.mountPath }}
           {{- end }}
         {{- end }}
+
+            # Mount Extra Volumes
+          {{- with $.Values.deployment.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
 
           livenessProbe:
             exec:
