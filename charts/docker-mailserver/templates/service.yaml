@@ -11,17 +11,17 @@ metadata:
     prometheus.io/path: {{ .Values.monitoring.service.path | quote }}
     prometheus.io/port: {{ .Values.monitoring.service.port | quote }}
     ##  
-  {{- if .Values.service.annotations }}
-  {{ toYaml .Values.service.annotations | indent 2 }}  
-  {{ end }}    
+{{- if .Values.service.annotations }}
+{{ toYaml .Values.service.annotations | indent 4 }}
+{{ end }}
   labels:
     app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
-  {{- if .Values.service.labels }}
-  {{ toYaml .Values.service.labels | indent 2 }}  
-  {{ end }} 
+{{- if .Values.service.labels }}
+{{ toYaml .Values.service.labels | indent 4 }}
+{{ end }}
   name: {{ template "dockermailserver.fullname" . }}
 spec:
   ## If a load balancer is being used, ensure that the newer type of LB that passes along IP information is used
