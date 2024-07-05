@@ -1,0 +1,20 @@
+{{- if and (eq .Values.service.type "ClusterIP")
+(.Values.proxyProtocol.enabled)
+(eq .Values.ingressClassName "nginx")
+-}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+data:
+  25:  {{ .Release.Namespace }}/{{ template "dockermailserver.fullname" . }}:25
+  465: {{ .Release.Namespace }}/{{ template "dockermailserver.fullname" . }}:465
+  587: {{ .Release.Namespace }}/{{ template "dockermailserver.fullname" . }}:587
+{{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
+  993: {{ .Release.Namespace }}/{{ template "dockermailserver.fullname" . }}:993
+{{- end }}
+{{- if and (.Values.deployment.env.ENABLE_POP3) (not .Values.deployment.env.SMTP_ONLY) }}
+  995: {{ .Release.Namespace }}/{{ template "dockermailserver.fullname" . }}:995
+{{- end }}
+{{- end }}

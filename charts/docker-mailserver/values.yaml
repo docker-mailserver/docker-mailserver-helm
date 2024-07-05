@@ -298,6 +298,9 @@ service:
   annotations: {}
   labels: {}
 
+# IngressClass to define TCP routing with service.type = "ClusterIP" & ProxyProtocol enabled
+ingressClassName: nginx
+
 # Note this is a dictionary and not a list so invidual keys can be overriden by --set or --value helm parameters
 persistence:
   # Stores generated configuration files

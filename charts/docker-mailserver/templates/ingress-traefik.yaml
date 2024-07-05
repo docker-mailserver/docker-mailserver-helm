@@ -1,0 +1,92 @@
+{{- if and (eq .Values.service.type "ClusterIP")
+(.Values.proxyProtocol.enabled)
+(eq .Values.ingressClassName "traefik")
+-}}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+
+metadata:
+  name: smtp
+
+spec:
+  entryPoints: [ smtp ]
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: {{ template "dockermailserver.fullname" . }}
+          port: smtp-proxy # note the 15 character limit here
+          proxyProtocol:
+            version: 2
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+
+metadata:
+  name: submission
+
+spec:
+  entryPoints: [ submission ]
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: {{ template "dockermailserver.fullname" . }}
+          port: sub-proxy # note the 15 character limit here
+          proxyProtocol:
+            version: 2
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+
+metadata:
+  name: submissions
+
+spec:
+  entryPoints: [ submissions ]
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: {{ template "dockermailserver.fullname" . }}
+          port: subs-proxy # note the 15 character limit here
+          proxyProtocol:
+            version: 2
+
+{{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+
+metadata:
+  name: imaps
+
+spec:
+  entryPoints: [ imaps ]
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: {{ template "dockermailserver.fullname" . }}
+          port: imaps-proxy
+          proxyProtocol:
+            version: 2
+
+{{- end }}
+{{- if and (.Values.deployment.env.ENABLE_POP3) (not .Values.deployment.env.SMTP_ONLY) }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+
+metadata:
+  name: pop3s
+
+spec:
+  entryPoints: [ pop3s ]
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: {{ template "dockermailserver.fullname" . }}
+          port: pop3s-proxy
+          proxyProtocol:
+            version: 2
+{{- end }}
+
+{{- end }}
