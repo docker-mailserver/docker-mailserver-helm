@@ -85,22 +85,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
-      {{- with .Values.deployment.initContainers }}
+      {{- if .Values.deployment.initContainers }}
       initContainers:
-      {{- range . }}
-        - name: {{ .name }}
-          image: {{ .image }}
-          {{- with .command }}
-          command: {{ toYaml . | nindent 10 }}
-          {{- end }}
-          {{- with .args }}
-          args: {{ toYaml . | nindent 10 }}
-          {{- end }}
-          {{- with $.Values.deployment.extraVolumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- end }}
+        {{- with .Values.deployment.initContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- end }}
 
       containers:
