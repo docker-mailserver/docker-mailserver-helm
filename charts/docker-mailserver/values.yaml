@@ -577,6 +577,12 @@ configMaps:
         -o milter_macro_daemon_name=ORIGINATING
         -o cleanup_service_name=sender-cleanup
         -o smtpd_upstream_proxy_protocol=haproxy
+
+      # Smtp with proxy
+      12525     inet  n       -       n       -       1       postscreen
+        -o syslog_name=postfix/smtp-proxy
+        -o postscreen_upstream_proxy_protocol=haproxy
+        -o postscreen_cache_map=btree:$data_directory/postscreen_10025_cache
       EOS
       {{- end }}
 

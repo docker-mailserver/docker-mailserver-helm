@@ -55,6 +55,9 @@ spec:
       nodePort: {{ default "30587" .Values.service.nodePort.submission }}
       {{ end }}
   {{- if .Values.proxyProtocol.enabled }}
+    - name: smtp-proxy
+      targetPort: smtp-proxy
+      port: 12525
     - name: subs-proxy
       targetPort: subs-proxy
       port: 10465
