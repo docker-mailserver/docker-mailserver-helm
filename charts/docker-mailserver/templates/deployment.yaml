@@ -191,6 +191,8 @@ spec:
             - name: submission
               containerPort: 587
           {{- if .Values.proxyProtocol.enabled }}
+            - name: smtp-proxy
+              containerPort: 12525
             - name: subs-proxy
               containerPort: 10465
             - name: sub-proxy
