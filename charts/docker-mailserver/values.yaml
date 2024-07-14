@@ -272,6 +272,27 @@ deployment:
   ## Optionally specify tolerations for the deployment
   tolerations: []
 
+  ## Optionally specify initContainers
+  initContainers: []
+  #  - name: init
+  #    image: alpine:3
+  #    command: [sh, -c]
+  #    args:
+  #      - echo "Hello, world!" > /mnt/extra-storage/test
+  #    volumeMounts:
+  #      - name: extra-storage
+  #        mountPath: /mnt/extra-storage
+
+  ## Optionally specify a list of extra mounts to add (normally used with extraVolumes)
+  extraVolumeMounts: []
+  #  - name: extra-storage
+  #    mountPath: /mnt/extra-storage
+
+  ## Optionally specify a list of extra volumes to add
+  extraVolumes: []
+  #  - name: extra-storage
+  #    emptyDir: {}
+
 service:
   ## What scope the service should be exposed in. One of:
   ## - LoadBalancer (to the world)
