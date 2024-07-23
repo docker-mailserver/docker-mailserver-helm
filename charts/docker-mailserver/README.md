@@ -1,4 +1,4 @@
-# docker-mailserver Heml Chart
+# docker-mailserver Helm Chart
 
 ## Contents
 
