@@ -27,6 +27,9 @@ spec:
       labels:
         app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
         release: "{{ .Release.Name }}"
+        {{- if .Values.deployment.labels }}
+{{ toYaml .Values.deployment.labels | indent 8 }}
+        {{ end }}
         {{- if .Values.deployment.annotations }}
       annotations:
 {{ toYaml .Values.deployment.annotations | indent 8 }}
