@@ -184,7 +184,7 @@ spec:
                command:
                  - /bin/bash
                  - -c
-                 - supervisorctl status amavis clamav cron dovecot mailserver opendkim opendmarc postfix rsyslog
+                 - supervisorctl status cron mailserver postfix rsyslog #  - supervisorctl status amavis clamav cron dovecot mailserver opendkim opendmarc postfix rsyslog
             initialDelaySeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
