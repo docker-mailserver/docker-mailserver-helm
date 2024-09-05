@@ -184,7 +184,7 @@ spec:
                command:
                  - /bin/bash
                  - -c
-                 - supervisorctl status | grep -E "amavis|clamav|cron|dovecot|mailserver|opendkim|opendmarc|postfix|rsyslog" | grep RUNNING
+                 - supervisorctl status amavis clamav cron dovecot mailserver opendkim opendmarc postfix rsyslog
             initialDelaySeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
@@ -193,7 +193,7 @@ spec:
                command:
                  - /bin/bash
                  - -c
-                 - supervisorctl status | grep -E "mailserver|postfix" | grep RUNNING
+                 - supervisorctl status mailserver postfix
             initialDelaySeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
