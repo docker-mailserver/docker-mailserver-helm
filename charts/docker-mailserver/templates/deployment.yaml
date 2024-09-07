@@ -184,7 +184,8 @@ spec:
                command:
                  - /bin/bash
                  - -c
-                 - supervisorctl status cron mailserver postfix rsyslog #  - supervisorctl status amavis clamav cron dovecot mailserver opendkim opendmarc postfix rsyslog
+                 - supervisorctl status cron mailserver postfix rsyslog
+                 # TODO: conditionally? add 'amavis changedetector clamav cron dovecot fail2ban fetchmail mta-sts-daemon opendkim opendmarc postgrey postsrsd rspamd rspamd-redis saslauthd_ldap saslauthd_mysql saslauthd_pam saslauthd_rimap saslauthd_shadow'
             initialDelaySeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
