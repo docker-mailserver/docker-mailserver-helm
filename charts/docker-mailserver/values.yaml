@@ -77,7 +77,6 @@ deployment:
     # -----------------------------------------------
     LOG_LEVEL: info
     SUPERVISOR_LOGLEVEL: 
-    ONE_DIR: 1
     DMS_VMAIL_UID: 
     DMS_VMAIL_GID: 
     ACCOUNT_PROVISIONER: 
@@ -103,6 +102,7 @@ deployment:
     RSPAMD_GREYLISTING: 0
     RSPAMD_HFILTER: 1
     RSPAMD_HFILTER_HOSTNAME_UNKNOWN_SCORE: 6
+    RSPAMD_NEURAL: 0
     ENABLE_AMAVIS: 0
     AMAVIS_LOGLEVEL: 0
     ENABLE_DNSBL: 0
@@ -131,6 +131,7 @@ deployment:
     LOGWATCH_SENDER: 
     REPORT_RECIPIENT: 
     REPORT_SENDER: 
+    LOGROTATE_COUNT: 4
     LOGROTATE_INTERVAL: weekly
     POSTFIX_REJECT_UNKNOWN_CLIENT_HOSTNAME: 0
     POSTFIX_INET_PROTOCOLS: all
@@ -147,7 +148,7 @@ deployment:
     SA_TAG: 2.0
     SA_TAG2: 6.31
     SA_KILL: 10.0
-    SA_SPAM_SUBJECT: '***SPAM*** '
+    SPAM_SUBJECT: '***SPAM*** '
 
     # -----------------------------------------------
     # --- Fetchmail Section -------------------------
@@ -270,6 +271,27 @@ deployment:
   
   ## Optionally specify tolerations for the deployment
   tolerations: []
+
+  ## Optionally specify initContainers
+  initContainers: []
+  #  - name: init
+  #    image: alpine:3
+  #    command: [sh, -c]
+  #    args:
+  #      - echo "Hello, world!" > /mnt/extra-storage/test
+  #    volumeMounts:
+  #      - name: extra-storage
+  #        mountPath: /mnt/extra-storage
+
+  ## Optionally specify a list of extra mounts to add (normally used with extraVolumes)
+  extraVolumeMounts: []
+  #  - name: extra-storage
+  #    mountPath: /mnt/extra-storage
+
+  ## Optionally specify a list of extra volumes to add
+  extraVolumes: []
+  #  - name: extra-storage
+  #    emptyDir: {}
 
 service:
   ## What scope the service should be exposed in. One of:
@@ -576,6 +598,12 @@ configMaps:
         -o milter_macro_daemon_name=ORIGINATING
         -o cleanup_service_name=sender-cleanup
         -o smtpd_upstream_proxy_protocol=haproxy
+
+      # Smtp with proxy
+      12525     inet  n       -       n       -       1       postscreen
+        -o syslog_name=postfix/smtp-proxy
+        -o postscreen_upstream_proxy_protocol=haproxy
+        -o postscreen_cache_map=btree:$data_directory/postscreen_10025_cache
       EOS
       {{- end }}
 
@@ -583,15 +611,17 @@ configMaps:
 ## such as DKIM signing keys.
 ##
 ##  secrets:
-##  - name: rspamd.example.com                      # This is the name of the Secret
-##    create: true                                  # If true, create a new Secret
-##    path: rspamd.dkim.rsa-2048-mail-example.com.private.txt
-##    data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
+##    rspamd.example.com:
+##      name: rspamd.example.com                      # This is the name of the Secret
+##      create: true                                  # If true, create a new Secret
+##      path: rspamd.dkim.rsa-2048-mail-example.com.private.txt
+##      data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
 ##
-##  - name: rspamd.dkim.rsa-2048-mail-example.com.public
-##    create: true
-##    path: rspamd/dkim/rsa-2048-mail-example.com.public
-##    data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
+##    rspamd.dkim.rsa-2048-mail-example.com.public:
+##      name: rspamd.dkim.rsa-2048-mail-example.com.public
+##      create: true
+##      path: rspamd/dkim/rsa-2048-mail-example.com.public
+##      data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
 ##
 ##  If you set the create key to false, then you must manually create the ConfigMaps before deploying the chart.
 ##
