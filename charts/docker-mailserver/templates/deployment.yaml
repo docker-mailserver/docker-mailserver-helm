@@ -57,10 +57,10 @@ spec:
       {{- end }}
 
         # Secrets
-      {{- range $name, $secret := .Values.secrets }}
-        - name: {{ regexReplaceAll "[.]" $name "-" }}
+      {{- range .Values.secrets }}
+        - name: {{ regexReplaceAll "[.]" .name "-" }}
           secret:
-            secretName: {{ regexReplaceAll "[.]" $name "-" }}
+            secretName: {{ regexReplaceAll "[.]" .name "-" }}
       {{- end }}
 
         # Certificate
@@ -82,18 +82,6 @@ spec:
             {{ end }}
       {{- end }}
     {{- end }}
-
-        # Extra volumes
-      {{- with .Values.deployment.extraVolumes }}
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-
-      {{- if .Values.deployment.initContainers }}
-      initContainers:
-        {{- with .Values.deployment.initContainers }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-      {{- end }}
 
       containers:
         - name: docker-mailserver
@@ -144,13 +132,13 @@ spec:
         {{- end }}
 
             # Config via Secrets
-        {{- range $name, $secret := .Values.secrets }}
-            - name: {{ regexReplaceAll "[.]" $name "-" }}
-              subPath: {{ $secret.key | default $name }}
-            {{- if isAbs $secret.path }}
-              mountPath: {{ $secret.path }}
+        {{- range .Values.secrets }}
+            - name: {{ regexReplaceAll "[.]" .name "-" }}
+              subPath: {{ .key | default .name }}
+            {{- if isAbs .path }}
+              mountPath: {{ $.path }}
             {{- else }}
-              mountPath: /tmp/docker-mailserver/{{ $secret.path }}
+              mountPath: /tmp/docker-mailserver/{{ .path }}
             {{- end }}
         {{- end }}
 
@@ -161,11 +149,6 @@ spec:
               mountPath: {{ $persistence.mountPath }}
           {{- end }}
         {{- end }}
-
-            # Mount Extra Volumes
-          {{- with $.Values.deployment.extraVolumeMounts }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
 
           livenessProbe:
             exec:
@@ -194,8 +177,6 @@ spec:
             - name: submission
               containerPort: 587
           {{- if .Values.proxyProtocol.enabled }}
-            - name: smtp-proxy
-              containerPort: 12525
             - name: subs-proxy
               containerPort: 10465
             - name: sub-proxy
@@ -263,7 +244,7 @@ spec:
           {{- if $persistence.enabled }}
             - name: {{ $name }}
               mountPath: {{ $persistence.mountPath }}
-              readonly: true
+              readOnly: true
           {{- end }}
         {{- end }}
 {{- end }}

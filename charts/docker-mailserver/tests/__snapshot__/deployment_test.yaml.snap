@@ -152,8 +152,6 @@ manifest should match snapshot:
                   name: submissions
                 - containerPort: 587
                   name: submission
-                - containerPort: 12525
-                  name: smtp-proxy
                 - containerPort: 10465
                   name: subs-proxy
                 - containerPort: 10587
