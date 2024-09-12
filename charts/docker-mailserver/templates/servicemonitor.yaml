@@ -8,12 +8,15 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
+{{- if .Values.metrics.serviceMonitor.labels }}
+{{ toYaml .Values.metrics.serviceMonitor.labels | indent 4 }}
+{{ end }}    
   name: {{ template "dockermailserver.fullname" . }}
 spec:
   endpoints:
     - interval: {{ .Values.metrics.serviceMonitor.scrapeInterval }}
       path: /metrics
-      port: tcp-metrics
+      port: metrics
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}

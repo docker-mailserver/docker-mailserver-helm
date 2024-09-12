@@ -7,161 +7,166 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     heritage: "{{ .Release.Service }}"
     release: "{{ .Release.Name }}"
+{{- if .Values.deployment.labels }}
+{{ toYaml .Values.deployment.labels | indent 4 }}
+{{ end }}
   name: {{ template "dockermailserver.fullname" . }}
 {{- if .Values.deployment.annotations }}
   annotations:
 {{ toYaml .Values.deployment.annotations | indent 4 }}
 {{ end }}
 spec:
-  replicas: {{ default 2 .Values.deployment.replicas }}
+  replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
       release: "{{ .Release.Name }}"
-  strategy: {{- toYaml .Values.pod.dockermailserver.strategy | nindent 4 }}
+  strategy: {{- toYaml .Values.deployment.strategy | nindent 4 }}
   template:
     metadata:
       labels:
         app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
         release: "{{ .Release.Name }}"
-        {{- if .Values.pod.dockermailserver.annotations }}
+        {{- if .Values.deployment.labels }}
+{{ toYaml .Values.deployment.labels | indent 8 }}
+        {{ end }}
+        {{- if .Values.deployment.annotations }}
       annotations:
-{{ toYaml .Values.pod.dockermailserver.annotations | indent 8 }}
+{{ toYaml .Values.deployment.annotations | indent 8 }}
         {{ end }}
     spec:
-      runtimeClassName: {{ .Values.runtimeClassName }}
-      priorityClassName: {{ .Values.priorityClassName }}
+      {{- if .Values.deployment.affinity }}
+      affinity: {{- toYaml .Values.deployment.affinity | nindent 8 }}
+      {{ end }}
+      nodeSelector: {{- toYaml .Values.deployment.nodeSelector | nindent 8 }}
+      runtimeClassName: {{ .Values.deployment.runtimeClassName }}
+      priorityClassName: {{ .Values.deployment.priorityClassName }}
+      restartPolicy: "Always"
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
+      {{- if .Values.deployment.tolerations }}
+      tolerations: {{- toYaml .Values.deployment.tolerations | nindent 8 }}
+      {{ end }}
       volumes:
-        - name: "data"
-          persistentVolumeClaim:
-            claimName: {{ template "dockermailserver.pvcName" . }}
-        - name: "configmap"
+          # ConfigMaps
+      {{- range $name, $config := .Values.configMaps }}
+        - name: {{ regexReplaceAll "[.]" $name "-" }}
           configMap:
-            name: {{ template "dockermailserver.fullname" . }}-configs
-{{- $openDKIM := .Values.openDKIM | default dict }}
-{{- if $openDKIM.configMap }}
-        - name: configmap-dkim
-          configMap:
-            name: {{ template "dockermailserver.fullname" . }}-dkim-configs
-            defaultMode: 384
-{{- end }}
-        - name: "opendkim-keys"
-          secret:
-            secretName: {{ template "dockermailserver.fullname" . }}-dkim-secrets
-            defaultMode: 384
-{{- if .Values.pod.dockermailserver.ssl_type }}
-        - name: "ssl-cert"
-          secret:
-{{- if .Values.ssl.useExisting }}
-            secretName: {{ .Values.ssl.existingName }}
-{{- else }}
-            secretName: {{ template "dockermailserver.fullname" . }}-tls
-{{- end }}
-{{- end }}
-        - name: accounts
-          secret:
-            secretName: {{ template "dockermailserver.fullname" . }}-accounts
-{{- if .Values.additionalVolumes }}
-{{- toYaml .Values.additionalVolumes | indent 8 }}
-{{- end }}
-        - name: tmp
-          emptyDir: {}
-      containers:
+            name: {{ regexReplaceAll "[.]" $name "-" }}
+      {{- end }}
 
-        - name: dockermailserver
-          env:
-{{- include "dockermailserver.upstream-env-variables" . | nindent 10 }}
+        # Secrets
+      {{- range $name, $secret := .Values.secrets }}
+        - name: {{ regexReplaceAll "[.]" $name "-" }}
+          secret:
+            secretName: {{ regexReplaceAll "[.]" $name "-" }}
+      {{- end }}
+
+        # Certificate
+      {{- if .Values.certificate }}
+        - name: certificate
+          secret:
+            secretName: {{ .Values.certificate }}
+      {{- end }}
+
+        # PVCs
+    {{- range $name, $persistence := .Values.persistence }}
+      {{- if $persistence.enabled }}
+        - name: {{ $name }}
+          persistentVolumeClaim:
+            {{- if $persistence.existingClaim}}
+            claimName: {{ $persistence.existingClaim }}
+            {{ else }}
+            claimName: {{ template "dockermailserver.fullname" $ }}-{{ $name }}
+            {{ end }}
+      {{- end }}
+    {{- end }}
+
+        # Extra volumes
+      {{- with .Values.deployment.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- if .Values.deployment.initContainers }}
+      initContainers:
+        {{- with .Values.deployment.initContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
+
+      containers:
+        - name: docker-mailserver
           image: {{ .Values.image.name }}:{{ default .Chart.AppVersion .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            - sh
-            - -c
-            - >
-              mkdir -p /tmp/docker-mailserver/opendkim/keys
-              && ln -s /tmp/docker-mailserver-configs/* /tmp/docker-mailserver
-              && ln -s /tmp/docker-mailserver-accounts/* /tmp/docker-mailserver
-              && (cp /tmp/docker-mailserver-opendkim/* /tmp/docker-mailserver/opendkim/ || (exit 0))
-              && cp -r /tmp/docker-mailserver-opendkim-keys/* /tmp/docker-mailserver/opendkim/keys
-              && chown -R opendkim:opendkim /tmp/docker-mailserver/opendkim/*
-              && supervisord -c /etc/supervisor/supervisord.conf
-          # TrustedHosts might be modified by PERMIT_DOCKER and cannot be mounted as symlink
+          env:
+          {{- range $pkey, $pval := .Values.deployment.env }}
+          - name: {{ $pkey }}
+            value: {{ quote $pval }}
+          {{- end }} 
+
+          {{- if .Values.certificate }}
+          - name: SSL_TYPE
+            value: manual
+          - name: SSL_CERT_PATH
+            value: /tmp/dms/custom-certs/tls.crt
+          - name: SSL_KEY_PATH
+            value: /tmp/dms/custom-certs/tls.key
+          {{- end }}
+
           resources:
-{{ toYaml .Values.resources | indent 12 }}
+{{ toYaml .Values.deployment.resources | indent 12 }}
           securityContext:
-            {{- if eq .Values.pod.dockermailserver.enable_fail2ban 1.0 }}
+            {{- if eq .Values.deployment.env.ENABLE_FAIL2BAN 1.0 }}
             capabilities:
               add:
                 - "NET_ADMIN"
             {{ end }}
-{{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
+{{ toYaml .Values.deployment.containerSecurityContext | indent 12 }}
+
           volumeMounts:
-            - name: configmap
-              mountPath: /tmp/docker-mailserver-configs
-            - name: accounts
-              mountPath: /tmp/docker-mailserver-accounts
-{{- if .Values.pod.dockermailserver.ssl_type }}
-            - name: ssl-cert
-              mountPath: /tmp/ssl
+            # Certificate
+        {{- if .Values.certificate }}
+            - name: certificate
+              mountPath: /tmp/dms/custom-certs
               readOnly: true
-{{- end }}
-            - name: tmp
-              mountPath: /var/tmp
-{{ if .Values.metrics.enabled }}
-            - name: data
-              mountPath: /var/log/mail
-              subPath: log
-{{- end }}
-            - name: data
-              mountPath: /var/mail
-              subPath: mail      
-            - name: data
-              mountPath: /var/mail-state
-              subPath: mail-state
-            - name: configmap
-              subPath: dovecot-services.cf
-              mountPath: /etc/dovecot/conf.d/services.cf
-              readOnly: true
-            - name: configmap
-              subPath: dovecot.cf
-              mountPath: /etc/dovecot/conf.d/zz-custom.cf
-              readOnly: true
-{{- if $openDKIM.configMap }}
-            - name: configmap-dkim
-              mountPath: /tmp/docker-mailserver-opendkim
-              readOnly: true
-{{- end }}
-{{- if .Values.pod.dockermailserver.enable_dovecot_replication }}
-            - name: configmap
-              subPath: 80-replication.conf
-              mountPath: /etc/dovecot/conf.d/80-replication.conf
-              readOnly: true
-            - name: configmap
-              subPath: 91-override-sieve.conf
-              mountPath: /etc/dovecot/conf.d/91-override-sieve.conf
-              readOnly: true
-{{ end }}
-{{- if .Values.demoMode.enabled }}
-            - name: opendkim-keys
-              mountPath: "/tmp/docker-mailserver-opendkim-keys/example.com/mail.private"
-              subPath: "example.com-mail.private"
-              readOnly: true
-{{- else -}}
-            {{/* Mount a dkim key for every domain configured */}}
-            {{- range .Values.domains }}
-            {{- $path := printf "/tmp/docker-mailserver-opendkim-keys/%s/mail.private" . }}
-            {{- $name := printf "%s-mail.private" . }}
-            - name: opendkim-keys
-              mountPath: {{ $path }}
-              subPath: {{ $name }}
-              readOnly: true
-{{- end }}
-{{- end }}
-{{ if .Values.additionalVolumeMounts }}
-{{ toYaml .Values.additionalVolumeMounts | indent 12 }}
-{{- end }}
+        {{- end }}
+
+            # Config via ConfigMaps
+        {{- range $name, $config := .Values.configMaps }}
+            - name: {{ regexReplaceAll "[.]" $name "-" }}
+              subPath: {{ $config.key | default $name }}
+            {{- if isAbs $config.path }}
+              mountPath: {{ $config.path }}
+            {{- else }}
+              mountPath: /tmp/docker-mailserver/{{ $config.path }}
+            {{- end }}
+        {{- end }}
+
+            # Config via Secrets
+        {{- range $name, $secret := .Values.secrets }}
+            - name: {{ regexReplaceAll "[.]" $name "-" }}
+              subPath: {{ $secret.key | default $name }}
+            {{- if isAbs $secret.path }}
+              mountPath: {{ $secret.path }}
+            {{- else }}
+              mountPath: /tmp/docker-mailserver/{{ $secret.path }}
+            {{- end }}
+        {{- end }}
+
+            # Mount Volumes
+        {{- range $name, $persistence := .Values.persistence }}
+          {{- if $persistence.enabled }}
+            - name: {{ $name }}
+              mountPath: {{ $persistence.mountPath }}
+          {{- end }}
+        {{- end }}
+
+            # Mount Extra Volumes
+          {{- with $.Values.deployment.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
           livenessProbe:
             exec:
                command:
@@ -169,7 +174,7 @@ spec:
                  - -c
                  - supervisorctl status | grep -E "amavis|clamav|cron|dovecot|mailserver|opendkim|opendmarc|postfix|rsyslog" | grep RUNNING
             initialDelaySeconds: 10
-            timeoutSeconds: 1
+            timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
             exec:
@@ -178,15 +183,67 @@ spec:
                  - -c
                  - supervisorctl status | grep -E "mailserver|postfix" | grep RUNNING
             initialDelaySeconds: 10
-            timeoutSeconds: 1
+            timeoutSeconds: 5
             failureThreshold: 3
+          ports:
+            - name: smtp
+              containerPort: 25
 
-{{ if .Values.metrics.enabled }}
+            - name: submissions
+              containerPort: 465
+            - name: submission
+              containerPort: 587
+          {{- if .Values.proxyProtocol.enabled }}
+            - name: smtp-proxy
+              containerPort: 12525
+            - name: subs-proxy
+              containerPort: 10465
+            - name: sub-proxy
+              containerPort: 10587
+          {{- end }}   
+
+        {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
+            - name: imap
+              containerPort: 143
+            - name: imaps
+              containerPort: 993
+          {{- if .Values.proxyProtocol.enabled }}
+            - name: imap-proxy
+              containerPort: 10143
+            - name: imaps-proxy
+              containerPort: 10993
+          {{- end }}   
+        {{- end }}   
+
+        {{- if and (.Values.deployment.env.ENABLE_POP3) (not .Values.deployment.env.SMTP_ONLY) }}
+            - name: pop3
+              containerPort: 110
+            - name: pop3s
+              containerPort: 995
+          {{- if .Values.proxyProtocol.enabled }}
+            - name: pop3-proxy
+              containerPort: 10110
+            - name: pop3s-proxy
+              containerPort: 10995
+          {{- end }}   
+        {{- end }}  
+
+        {{- if .Values.deployment.env.ENABLE_RSPAMD }}
+            - name: rspamd
+              containerPort: 11334  
+        {{- end }}  
+
+        {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
+            - name: managesieve
+              containerPort: 4190  
+        {{- end }}  
+
+{{- if .Values.metrics.enabled }}
         - name: metrics-exporter
           image: {{ .Values.metrics.image.name }}:{{ .Values.metrics.image.tag }}
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
           command: ["/bin/postfix_exporter"]
-          args:
+          args: 
             - "--postfix.showq_path"
             - "/var/mail-state/spool-postfix/public/showq"
             - "--postfix.logfile_path"
@@ -197,20 +254,16 @@ spec:
               name: http
               protocol: TCP
           resources:
-{{ toYaml .Values.metrics.resources | indent 12 }}
+{{ toYaml .Values.metrics.resources | indent 12 }}          
           securityContext:
-{{ toYaml .Values.pod.dockermailserver.containerSecurityContext | indent 12 }}
+{{ toYaml .Values.deployment.containerSecurityContext | indent 12 }}
 
           volumeMounts:
-            - name: data
-              mountPath: /var/log/mail
-              subPath: log
-              readOnly: true
-            - name: data
-              mountPath: /var/mail-state
-              subPath: mail-state
-              readOnly: true
+        {{- range $name, $persistence := pick .Values.persistence "mail-log" "mail-state" }}
+          {{- if $persistence.enabled }}
+            - name: {{ $name }}
+              mountPath: {{ $persistence.mountPath }}
+              readonly: true
+          {{- end }}
+        {{- end }}
 {{- end }}
-
-
-      restartPolicy: "Always"

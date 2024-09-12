@@ -26,17 +26,6 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
-Provide a pre-defined claim or a claim based on the Release
-*/}}
-{{- define "dockermailserver.pvcName" -}}
-{{- if .Values.persistence.existingClaim }}
-{{- .Values.persistence.existingClaim }}
-{{- else -}}
-{{- template "dockermailserver.fullname" . }}
-{{- end -}}
-{{- end -}}
-
-{{/*
 Create the name of the controller service account to use
 */}}
 {{- define "dockermailserver.serviceAccountName" -}}
@@ -48,12 +37,20 @@ Create the name of the controller service account to use
 {{- end -}}
 
 {{/*
-Create the name of the controller service account to use
+Renders a value that contains template perhaps with scope if the scope is present.
+Usage:
+{{ include "common.tplvalues.render" ( dict "value" .Values.path.to.the.Value "context" $ ) }}
+{{ include "common.tplvalues.render" ( dict "value" .Values.path.to.the.Value "context" $ "scope" $app ) }}
 */}}
-{{- define "dockermailserver.rainloop.serviceAccountName" -}}
-{{- if .Values.rainloop.serviceAccount.create -}}
-    {{ default (include "dockermailserver.fullname" .) .Values.rainloop.serviceAccount.name }}
-{{- else -}}
-    {{ default "rainloop" .Values.rainloop.serviceAccount.name }}
-{{- end -}}
+{{- define "common.tplvalues.render" -}}
+{{- $value := typeIs "string" .value | ternary .value (.value | toYaml) }}
+{{- if contains "{{" (toJson .value) }}
+  {{- if .scope }}
+      {{- tpl (cat "{{- with $.RelativeScope -}}" $value "{{- end }}") (merge (dict "RelativeScope" .scope) .context) }}
+  {{- else }}
+    {{- tpl $value .context }}
+  {{- end }}
+{{- else }}
+    {{- $value }}
+{{- end }}
 {{- end -}}
