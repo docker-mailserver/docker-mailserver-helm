@@ -77,6 +77,8 @@ manifest should match snapshot:
                   value: "300"
                 - name: GETMAIL_POLL
                   value: "5"
+                - name: LOGROTATE_COUNT
+                  value: "4"
                 - name: LOGROTATE_INTERVAL
                   value: weekly
                 - name: LOG_LEVEL
@@ -84,8 +86,6 @@ manifest should match snapshot:
                 - name: MARK_SPAM_AS_READ
                   value: "0"
                 - name: MOVE_SPAM_TO_JUNK
-                  value: "1"
-                - name: ONE_DIR
                   value: "1"
                 - name: OVERRIDE_HOSTNAME
                   value: mail.example.com
@@ -117,21 +117,23 @@ manifest should match snapshot:
                   value: "6"
                 - name: RSPAMD_LEARN
                   value: "0"
+                - name: RSPAMD_NEURAL
+                  value: "0"
                 - name: SA_KILL
                   value: "10"
-                - name: SA_SPAM_SUBJECT
-                  value: '***SPAM*** '
                 - name: SA_TAG
                   value: "2"
                 - name: SA_TAG2
                   value: "6.31"
                 - name: SPAMASSASSIN_SPAM_TO_INBOX
                   value: "1"
+                - name: SPAM_SUBJECT
+                  value: '***SPAM*** '
                 - name: SRS_SENDER_CLASSES
                   value: envelope_sender
                 - name: UPDATE_CHECK_INTERVAL
                   value: 1d
-              image: mailserver/docker-mailserver:13.3.1
+              image: mailserver/docker-mailserver:0.1.0
               imagePullPolicy: IfNotPresent
               livenessProbe:
                 exec:
@@ -150,6 +152,8 @@ manifest should match snapshot:
                   name: submissions
                 - containerPort: 587
                   name: submission
+                - containerPort: 12525
+                  name: smtp-proxy
                 - containerPort: 10465
                   name: subs-proxy
                 - containerPort: 10587
