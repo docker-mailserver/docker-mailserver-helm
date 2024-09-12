@@ -611,15 +611,17 @@ configMaps:
 ## such as DKIM signing keys.
 ##
 ##  secrets:
-##  - name: rspamd.example.com                      # This is the name of the Secret
-##    create: true                                  # If true, create a new Secret
-##    path: rspamd.dkim.rsa-2048-mail-example.com.private.txt
-##    data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
+##    rspamd.example.com:
+##      name: rspamd.example.com                      # This is the name of the Secret
+##      create: true                                  # If true, create a new Secret
+##      path: rspamd.dkim.rsa-2048-mail-example.com.private.txt
+##      data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
 ##
-##  - name: rspamd.dkim.rsa-2048-mail-example.com.public
-##    create: true
-##    path: rspamd/dkim/rsa-2048-mail-example.com.public
-##    data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
+##    rspamd.dkim.rsa-2048-mail-example.com.public:
+##      name: rspamd.dkim.rsa-2048-mail-example.com.public
+##      create: true
+##      path: rspamd/dkim/rsa-2048-mail-example.com.public
+##      data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
 ##
 ##  If you set the create key to false, then you must manually create the ConfigMaps before deploying the chart.
 ##

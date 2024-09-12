@@ -57,10 +57,10 @@ spec:
       {{- end }}
 
         # Secrets
-      {{- range .Values.secrets }}
-        - name: {{ regexReplaceAll "[.]" .name "-" }}
+      {{- range $name, $secret := .Values.secrets }}
+        - name: {{ regexReplaceAll "[.]" $name "-" }}
           secret:
-            secretName: {{ regexReplaceAll "[.]" .name "-" }}
+            secretName: {{ regexReplaceAll "[.]" $name "-" }}
       {{- end }}
 
         # Certificate
@@ -144,13 +144,13 @@ spec:
         {{- end }}
 
             # Config via Secrets
-        {{- range .Values.secrets }}
-            - name: {{ regexReplaceAll "[.]" .name "-" }}
-              subPath: {{ .key | default .name }}
-            {{- if isAbs .path }}
-              mountPath: {{ $.path }}
+        {{- range $name, $secret := .Values.secrets }}
+            - name: {{ regexReplaceAll "[.]" $name "-" }}
+              subPath: {{ $secret.key | default $name }}
+            {{- if isAbs $secret.path }}
+              mountPath: {{ $secret.path }}
             {{- else }}
-              mountPath: /tmp/docker-mailserver/{{ .path }}
+              mountPath: /tmp/docker-mailserver/{{ $secret.path }}
             {{- end }}
         {{- end }}
 
