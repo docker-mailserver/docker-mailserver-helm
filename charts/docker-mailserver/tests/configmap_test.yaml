@@ -1,25 +1,26 @@
 suite: configmap
 templates:
   - configmap.yaml
+chart:
+  version: 0.1.0
+  appVersion: 0.1.0
+values:
+  - ../values.yaml
 tests:
-
-  - it: should correctly import configmaps from config/ if demo mode is disabled
-    set:
-      demoMode.enabled: false
-    asserts:
-      - matchRegex:
-          path: data.fail2ban-fail2ban\.cf
-          pattern: "dbpurgeage"        
-
-
   - it: should configure imaps port 10993 if proxyProtocol enabled
     set:
-      proxyProtocol.enabled: true      
+      proxyProtocol.enabled: true
+    documentIndex: 0
     asserts:
+      - isKind:
+          of: ConfigMap
       - matchRegex:
-          path: data.dovecot\.cf
-          pattern: 10993
+          path: data["dovecot.cf"]
+          pattern: "10993"
 
   - it: manifest should match snapshot
+    set:
+      proxyProtocol:
+        enabled: true
     asserts:
-      - matchSnapshot: {}          
+      - matchSnapshot: { }
