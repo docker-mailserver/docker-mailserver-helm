@@ -76,8 +76,8 @@ deployment:
     # --- General Section ---------------------------
     # -----------------------------------------------
     LOG_LEVEL: info
-    SUPERVISOR_LOGLEVEL: 
-    DMS_VMAIL_UID: 
+    SUPERVISOR_LOGLEVEL:
+    DMS_VMAIL_UID:
     DMS_VMAIL_GID: 
     ACCOUNT_PROVISIONER: 
     POSTMASTER_ADDRESS: 
@@ -311,7 +311,7 @@ service:
     ## Default: Automatically assign a random, ephemeral IP
     # publicIp:
     ## If there should be firewall rules restricting the load balancer to a limited set of IPs, specify those IPs below
-    ## in CIDR format. If all IPs shoud be allowed access, set the CIDR as "0.0.0.0/0"
+    ## in CIDR format. If all IPs should be allowed access, set the CIDR as "0.0.0.0/0"
     allowedIps:
       - "0.0.0.0/0"
     ## If there is a Hostname associated with this site, add it here and it will be rendered in the documentation.
@@ -319,7 +319,7 @@ service:
   annotations: {}
   labels: {}
 
-# Note this is a dictionary and not a list so invidual keys can be overriden by --set or --value helm parameters
+# Note this is a dictionary and not a list so individual keys can be overridden by --set or --value helm parameters
 persistence:
   # Stores generated configuration files
   # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsconfig-directory
@@ -380,7 +380,7 @@ persistence:
 ## See https://github.com/prometheus/docs/blob/master/content/docs/operating/configuration.md
 ## See https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus-kubernetes.yml
 monitoring:
-  ## Whether to scrape this service with the montoring toolkit. Mostly useful for blackbox probing of a given service
+  ## Whether to scrape this service with the monitoring toolkit. Mostly useful for blackbox probing of a given service
   ## to ensure it's "up"
   service:
     ## monitoring should be configured to only scrape services that have a value of "true"
@@ -393,7 +393,7 @@ monitoring:
     port: "9102"
   ## Whether to scape the pods associated with this application. Useful for collecting metrics.
   pod:
-    ## monitoring shoudl be configured to only scrape pods that have a value of `true`
+    ## monitoring should be configured to only scrape pods that have a value of `true`
     scrape: "true"
     ## monitoring should be configured to only probe services that have a value of "true"
     probe: "false"    
@@ -455,7 +455,7 @@ metrics:
 ## are stored in its chart/config directory. 
 ## 
 ## However, Helm does not provide a way too save external files to a ConfigMap or Secret.
-## This is problem for docker-mailserver because you need to setup postfix acounts,
+## This is problem for docker-mailserver because you need to setup postfix accounts,
 ## dovecot accounts, etc.
 ##
 ## The configs and secrets keys solve this problem. They allow you to add additional config

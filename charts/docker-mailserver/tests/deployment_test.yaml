@@ -1,6 +1,11 @@
 suite: deployment tests
 templates:
   - deployment.yaml
+chart:
+  version: 0.1.0
+  appVersion: 0.1.0
+values:
+  - ../values.yaml
 tests:
   - it: image and tag should end up in deployment
     set:
@@ -18,4 +23,4 @@ tests:
 
   - it: manifest should match snapshot
     asserts:
-      - matchSnapshot: {}              
+      - matchSnapshot: { }

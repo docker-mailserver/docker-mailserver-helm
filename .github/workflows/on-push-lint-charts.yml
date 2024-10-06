@@ -15,7 +15,7 @@ env:
   KUBE_SCORE_VERSION: 1.17.0
   HELM_VERSION: v3.13.2
 
-concurrency: 
+concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
 
@@ -44,12 +44,27 @@ jobs:
           KUBE_SCORE: /tmp/bin/kube-score
         run: .ci/scripts/kube-score.sh
 
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: install helm unittest
+        run: |
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git
+
+      - name: Run helm unittest
+        run: helm unittest charts/*
+
   chart-testing:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         # Choose from https://hub.docker.com/r/kindest/node/tags
-        KubeVersion: [1.27.3, 1.28.0, 1.29.0]
+        KubeVersion: [ 1.27.3, 1.28.0, 1.29.0 ]
 
     steps:
       - name: Checkout
