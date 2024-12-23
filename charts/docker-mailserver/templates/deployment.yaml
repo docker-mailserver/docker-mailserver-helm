@@ -242,8 +242,7 @@ spec:
         - name: metrics-exporter
           image: {{ .Values.metrics.image.name }}:{{ .Values.metrics.image.tag }}
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
-          command: ["/bin/postfix_exporter"]
-          args: 
+          args:
             - "--postfix.showq_path"
             - "/var/mail-state/spool-postfix/public/showq"
             - "--postfix.logfile_path"
