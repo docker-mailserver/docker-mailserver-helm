@@ -102,8 +102,12 @@ spec:
           env:
           {{- range $pkey, $pval := .Values.deployment.env }}
           - name: {{ $pkey }}
+            {{- if kindIs "map" $pval }}
+            {{- toYaml $pval | nindent 12 }}
+            {{- else }}
             value: {{ quote $pval }}
-          {{- end }} 
+            {{- end }}
+          {{- end }}
 
           {{- if .Values.certificate }}
           - name: SSL_TYPE
@@ -112,6 +116,14 @@ spec:
             value: /tmp/dms/custom-certs/tls.crt
           - name: SSL_KEY_PATH
             value: /tmp/dms/custom-certs/tls.key
+          {{- end }}
+
+          {{- if .Values.deployment.secretEnvironments }}
+          envFrom:
+          {{- range .Values.deployment.secretEnvironments }}
+          - secretRef:
+              name: {{ . | quote }}
+          {{- end }}
           {{- end }}
 
           resources:
