@@ -454,7 +454,7 @@ metrics:
 ## into running containers. This chart automatically sets up any config files that 
 ## are stored in its chart/config directory. 
 ## 
-## However, Helm does not provide a way too save external files to a ConfigMap or Secret.
+## However, Helm does not provide a way to save external files to a ConfigMap or Secret.
 ## This is problem for docker-mailserver because you need to setup postfix accounts,
 ## dovecot accounts, etc.
 ##
