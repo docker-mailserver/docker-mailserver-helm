@@ -2,7 +2,11 @@ apiVersion: v2
 appVersion: "14.0.0"
 description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
 name: docker-mailserver
+<<<<<<< HEAD
 version: 4.1.3
+=======
+version: 4.1.2
+>>>>>>> 42f02f0 (Chart version bump)
 sources:
 - https://github.com/docker-mailserver/docker-mailserver-helm
 maintainers:
