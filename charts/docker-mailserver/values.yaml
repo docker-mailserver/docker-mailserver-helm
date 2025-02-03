@@ -301,8 +301,9 @@ service:
   ## Manually overwrite the externalTrafficPolicy. One of:
   ## - Local
   ## - Cluster
-  ## Set it to "Local" when used with type "LoadBalancer", unless you have a good reason not to.
-  # externalTrafficPolicy: Local
+  ## Set it to "Local" when used with type "LoadBalancer" and set it to "Cluster" when used with type "ClusterIP",
+  ## unless you have a good reason not to.
+  externalTrafficPolicy: "Local"
   ## If there is a port associated with a given service, expose it here.
   # port:
   ## If there is a particular IP that should be used for the service, specify it here.
