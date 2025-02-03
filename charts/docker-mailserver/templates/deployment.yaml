@@ -171,6 +171,7 @@ spec:
           {{- if $persistence.enabled }}
             - name: {{ $name }}
               mountPath: {{ $persistence.mountPath }}
+              subPath: {{ $persistence.subPath }}
           {{- end }}
         {{- end }}
 
