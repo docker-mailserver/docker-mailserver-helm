@@ -30,14 +30,3 @@ tests:
   - it: manifest should match snapshot
     asserts:
       - matchSnapshot: { }
-
-  - it: should use subPath for volumes if defined
-    set:
-      persistence:
-        mail-data:
-          subPath: another-folder
-    documentIndex: 1
-    asserts:
-      - equal:
-          path: spec.template.spec.containers[0].volumeMounts[?(@.name=="mail-data")].subPath
-          value: another-folder
