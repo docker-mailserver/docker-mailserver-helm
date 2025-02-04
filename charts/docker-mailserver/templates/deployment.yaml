@@ -171,8 +171,8 @@ spec:
           {{- if $persistence.enabled }}
             - name: {{ $name }}
               mountPath: {{ $persistence.mountPath }}
-            {{- if .Values.persistence.subPath }}
-              subPath: {{ .Values.persistence.subPath }}
+            {{- if $persistence.subPath }}
+              subPath: {{ $persistence.subPath }}
             {{- end }}
           {{- end }}
         {{- end }}
