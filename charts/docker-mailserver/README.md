@@ -98,11 +98,11 @@ Configuration files are stored on a Kubernetes [volume](#persistence) mounted at
 
 ### ConfigMaps
 
-Its is also possible to use ConfigMaps to mount configuration files in the container. This is done by adding to  the `configFiles` key in a custom `values.yaml` file. For more information please see the [documentation](./values.yaml#L425) in values.yaml
+Its is also possible to use ConfigMaps to mount configuration files in the container. This is done by adding to  the `configFiles` key in a custom `values.yaml` file. For more information please see the [documentation](./values.yaml#L453) in values.yaml
 
 ### Secrets
 
-Secrets can also be used to mount configuration files in the container. For example, dkim keys could be stored in a secret as opposed to a file in the `mail-config` volume. Once again, for more information please see the [documentation](./values.yaml#L600) in values.yaml
+Secrets can also be used to mount configuration files in the container. For example, dkim keys could be stored in a secret as opposed to a file in the `mail-config` volume. Once again, for more information please see the [documentation](./values.yaml#L610) in values.yaml
 
 ## Values YAML
 
