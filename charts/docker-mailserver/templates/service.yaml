@@ -26,11 +26,7 @@ metadata:
 spec:
   ## If a load balancer is being used, ensure that the newer type of LB that passes along IP information is used
   ## rather than the legacy one.
-  {{- if eq .Values.service.type "LoadBalancer" }}
-  externalTrafficPolicy: Local
-  {{- else if eq .Values.service.type "NodePort" }}
-  externalTrafficPolicy: Cluster
-  {{ end }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
   selector:
     app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
     release: "{{ .Release.Name }}"
