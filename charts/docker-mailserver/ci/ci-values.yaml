@@ -1,6 +1,5 @@
 service:
   type: ClusterIP
-  externalTrafficPolicy: Local
 
 configMaps:
   postfix-accounts.cf:
