@@ -21,6 +21,16 @@ tests:
           path: spec.template.spec.containers[0].image
           value: bananas:in-pajamas
 
+  - it: should use subPath for volumes if defined
+    set:
+      persistence:
+        mail-data:
+          subPath: another-folder
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[?(@.name=="mail-data")].subPath
+          value: another-folder
+
   - it: manifest should match snapshot
     asserts:
       - matchSnapshot: { }

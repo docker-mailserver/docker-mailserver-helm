@@ -282,11 +282,13 @@ deployment:
   #    volumeMounts:
   #      - name: extra-storage
   #        mountPath: /mnt/extra-storage
+  #        subPath: another-folder
 
   ## Optionally specify a list of extra mounts to add (normally used with extraVolumes)
   extraVolumeMounts: []
   #  - name: extra-storage
   #    mountPath: /mnt/extra-storage
+  #    subPath: another-folder
 
   ## Optionally specify a list of extra volumes to add
   extraVolumes: []
@@ -334,6 +336,7 @@ persistence:
     enabled: true
     existingClaim: ""
     mountPath: /tmp/docker-mailserver
+    subPath: ""
     size: "1Mi"
     annotations: {}
     accessModes:
@@ -345,6 +348,7 @@ persistence:
   mail-data:
     enabled: true
     existingClaim: ""
+    subPath: ""
     size: 10Gi
     mountPath: /var/mail
     annotations: {}
@@ -359,6 +363,7 @@ persistence:
     enabled: true
     existingClaim: ""
     mountPath: /var/mail-state
+    subPath: ""
     size: "1Gi"
     annotations: {}
     accessModes:
@@ -371,6 +376,7 @@ persistence:
     enabled: true
     existingClaim: ""
     mountPath: /var/log/mail
+    subPath: ""
     size: "1Gi"
     annotations: {}
     accessModes:
