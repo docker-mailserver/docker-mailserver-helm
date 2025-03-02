@@ -64,7 +64,7 @@ jobs:
     strategy:
       matrix:
         # Choose from https://hub.docker.com/r/kindest/node/tags
-        KubeVersion: [ 1.27.3, 1.28.0, 1.29.0 ]
+        KubeVersion: [ 1.32.2, 1.31.0, 1.30.0 ]
 
     steps:
       - name: Checkout
