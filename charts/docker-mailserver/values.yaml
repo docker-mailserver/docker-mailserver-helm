@@ -282,11 +282,13 @@ deployment:
   #    volumeMounts:
   #      - name: extra-storage
   #        mountPath: /mnt/extra-storage
+  #        subPath: another-folder
 
   ## Optionally specify a list of extra mounts to add (normally used with extraVolumes)
   extraVolumeMounts: []
   #  - name: extra-storage
   #    mountPath: /mnt/extra-storage
+  #    subPath: another-folder
 
   ## Optionally specify a list of extra volumes to add
   extraVolumes: []
@@ -296,8 +298,15 @@ deployment:
 service:
   ## What scope the service should be exposed in. One of:
   ## - LoadBalancer (to the world)
+  ## - NodePort (to the world, via high port on a node)
   ## - ClusterIP (to the cluster)
-  type: "LoadBalancer"
+  type: "ClusterIP"
+  ## Manually overwrite the externalTrafficPolicy. One of:
+  ## - Local
+  ## - Cluster
+  ## Set it to "Local" when used with type "LoadBalancer" and set it to "Cluster" when used with "NodePort",
+  ## unless you have a good reason not to.
+  # externalTrafficPolicy: "Cluster"
   ## If there is a port associated with a given service, expose it here.
   # port:
   ## If there is a particular IP that should be used for the service, specify it here.
@@ -327,6 +336,7 @@ persistence:
     enabled: true
     existingClaim: ""
     mountPath: /tmp/docker-mailserver
+    subPath: ""
     size: "1Mi"
     annotations: {}
     accessModes:
@@ -338,6 +348,7 @@ persistence:
   mail-data:
     enabled: true
     existingClaim: ""
+    subPath: ""
     size: 10Gi
     mountPath: /var/mail
     annotations: {}
@@ -352,6 +363,7 @@ persistence:
     enabled: true
     existingClaim: ""
     mountPath: /var/mail-state
+    subPath: ""
     size: "1Gi"
     annotations: {}
     accessModes:
@@ -364,6 +376,7 @@ persistence:
     enabled: true
     existingClaim: ""
     mountPath: /var/log/mail
+    subPath: ""
     size: "1Gi"
     annotations: {}
     accessModes:
@@ -454,7 +467,7 @@ metrics:
 ## into running containers. This chart automatically sets up any config files that 
 ## are stored in its chart/config directory. 
 ## 
-## However, Helm does not provide a way too save external files to a ConfigMap or Secret.
+## However, Helm does not provide a way to save external files to a ConfigMap or Secret.
 ## This is problem for docker-mailserver because you need to setup postfix accounts,
 ## dovecot accounts, etc.
 ##
