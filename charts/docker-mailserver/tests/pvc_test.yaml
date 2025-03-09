@@ -7,9 +7,9 @@ chart:
   version: 0.1.0
   appVersion: 0.1.0
 tests:
-  - it: should apply annotations from persistence.annotations
+  - it: should apply annotations from persistent_volume_claims.annotations
     set:
-      persistence:
+      persistent_volume_claims:
         mail-config:
           annotations:
             backup.banana.io/deltas: pancakes
@@ -18,7 +18,7 @@ tests:
 
   - it: should create pvc of specified size
     set:
-      persistence:
+      persistent_volume_claims:
         mail-data:
           size: 1Pb
     documentIndex: 1
