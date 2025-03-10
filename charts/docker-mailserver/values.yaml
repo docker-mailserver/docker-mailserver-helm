@@ -43,16 +43,6 @@ deployment:
   ## Optionally specify a nodeSelector for the deployment
   nodeSelector: {}
 
-  ## Use the host’s network namespace. If this option is set, the ports that
-  ## will be used must be specified.
-  ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
-  # pod.dockermailserver.hostNetwork will configure the pod to use the host's network namespace
-  hostNetwork: false
-  ## Use the host’s pid namespace
-  ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
-  # pod.dockermailserver.hostPID defines whether the pod should use the host's PID namespace (default false)
-  hostPID: false
-
   ## Update strategy - only really applicable for deployments with RWO PVs attached
   ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the 
   ## PV, and the "incoming" pod can never start. Setting the strategy to "Recreate" (our default) will 
