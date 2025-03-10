@@ -64,7 +64,7 @@ jobs:
     strategy:
       matrix:
         # Choose from https://hub.docker.com/r/kindest/node/tags
-        KubeVersion: [ 1.27.3, 1.28.0, 1.29.0 ]
+        KubeVersion: [ 1.30.10, 1.31.6, 1.32.2]
 
     steps:
       - name: Checkout
@@ -78,7 +78,7 @@ jobs:
           python-version: 3.11
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.6.0
+        uses: helm/chart-testing-action@v2.7.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed
