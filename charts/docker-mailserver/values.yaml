@@ -329,14 +329,12 @@ service:
   labels: {}
 
 # Note this is a dictionary and not a list so individual keys can be overridden by --set or --value helm parameters
-persistence:
+persistent_volume_claims:
   # Stores generated configuration files
   # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsconfig-directory
   mail-config:
     enabled: true
     existingClaim: ""
-    mountPath: /tmp/docker-mailserver
-    subPath: ""
     size: "1Mi"
     annotations: {}
     accessModes:
@@ -348,9 +346,7 @@ persistence:
   mail-data:
     enabled: true
     existingClaim: ""
-    subPath: ""
     size: 10Gi
-    mountPath: /var/mail
     annotations: {}
     accessModes:
       - ReadWriteOnce
@@ -362,8 +358,6 @@ persistence:
   mail-state:
     enabled: true
     existingClaim: ""
-    mountPath: /var/mail-state
-    subPath: ""
     size: "1Gi"
     annotations: {}
     accessModes:
@@ -375,14 +369,39 @@ persistence:
   mail-log:
     enabled: true
     existingClaim: ""
-    mountPath: /var/log/mail
-    subPath: ""
     size: "1Gi"
     annotations: {}
     accessModes:
       - ReadWriteOnce
     storageClass:
     selector: {}
+
+persistence:
+  # Stores generated configuration files
+  # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsconfig-directory
+  mail-config:
+    volumeName: mail-config
+    mountPath: /tmp/docker-mailserver
+    subPath: 
+
+  # Stores emails
+  mail-data:
+    volumeName: mail-data
+    mountPath: /var/mail
+    subPath: 
+
+  # Stores state for Postfix, Dovecot, Fail2Ban, Amavis, PostGrey, ClamAV, SpamAssassin, Rspamd & Redis
+  # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsmail-state-directory
+  mail-state:
+    volumeName: mail-state
+    mountPath: /var/mail-state
+    subPath: 
+
+  # Store mail logs
+  mail-log:
+    volumeName: mail-log
+    mountPath: /var/log/mail
+    subPath: 
 
 ## Monitoring adds the prometheus.io annotations to pods and services, so that the Prometheus Kubernetes SD mechanism
 ## as configured in the examples will automatically discover both the pods and the services to query.
