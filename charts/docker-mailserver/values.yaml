@@ -43,16 +43,6 @@ deployment:
   ## Optionally specify a nodeSelector for the deployment
   nodeSelector: {}
 
-  ## Use the host’s network namespace. If this option is set, the ports that
-  ## will be used must be specified.
-  ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
-  # pod.dockermailserver.hostNetwork will configure the pod to use the host's network namespace
-  hostNetwork: false
-  ## Use the host’s pid namespace
-  ## Ref: https://kubernetes.io/docs/api-reference/v1/definitions/#_v1_podspec
-  # pod.dockermailserver.hostPID defines whether the pod should use the host's PID namespace (default false)
-  hostPID: false
-
   ## Update strategy - only really applicable for deployments with RWO PVs attached
   ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the 
   ## PV, and the "incoming" pod can never start. Setting the strategy to "Recreate" (our default) will 
@@ -282,11 +272,13 @@ deployment:
   #    volumeMounts:
   #      - name: extra-storage
   #        mountPath: /mnt/extra-storage
+  #        subPath: another-folder
 
   ## Optionally specify a list of extra mounts to add (normally used with extraVolumes)
   extraVolumeMounts: []
   #  - name: extra-storage
   #    mountPath: /mnt/extra-storage
+  #    subPath: another-folder
 
   ## Optionally specify a list of extra volumes to add
   extraVolumes: []
@@ -296,8 +288,15 @@ deployment:
 service:
   ## What scope the service should be exposed in. One of:
   ## - LoadBalancer (to the world)
+  ## - NodePort (to the world, via high port on a node)
   ## - ClusterIP (to the cluster)
-  type: "LoadBalancer"
+  type: "ClusterIP"
+  ## Manually overwrite the externalTrafficPolicy. One of:
+  ## - Local
+  ## - Cluster
+  ## Set it to "Local" when used with type "LoadBalancer" and set it to "Cluster" when used with "NodePort",
+  ## unless you have a good reason not to.
+  # externalTrafficPolicy: "Cluster"
   ## If there is a port associated with a given service, expose it here.
   # port:
   ## If there is a particular IP that should be used for the service, specify it here.
@@ -320,13 +319,12 @@ service:
   labels: {}
 
 # Note this is a dictionary and not a list so individual keys can be overridden by --set or --value helm parameters
-persistence:
+persistent_volume_claims:
   # Stores generated configuration files
   # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsconfig-directory
   mail-config:
     enabled: true
     existingClaim: ""
-    mountPath: /tmp/docker-mailserver
     size: "1Mi"
     annotations: {}
     accessModes:
@@ -339,7 +337,6 @@ persistence:
     enabled: true
     existingClaim: ""
     size: 10Gi
-    mountPath: /var/mail
     annotations: {}
     accessModes:
       - ReadWriteOnce
@@ -351,7 +348,6 @@ persistence:
   mail-state:
     enabled: true
     existingClaim: ""
-    mountPath: /var/mail-state
     size: "1Gi"
     annotations: {}
     accessModes:
@@ -363,13 +359,39 @@ persistence:
   mail-log:
     enabled: true
     existingClaim: ""
-    mountPath: /var/log/mail
     size: "1Gi"
     annotations: {}
     accessModes:
       - ReadWriteOnce
     storageClass:
     selector: {}
+
+persistence:
+  # Stores generated configuration files
+  # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsconfig-directory
+  mail-config:
+    volumeName: mail-config
+    mountPath: /tmp/docker-mailserver
+    subPath: 
+
+  # Stores emails
+  mail-data:
+    volumeName: mail-data
+    mountPath: /var/mail
+    subPath: 
+
+  # Stores state for Postfix, Dovecot, Fail2Ban, Amavis, PostGrey, ClamAV, SpamAssassin, Rspamd & Redis
+  # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsmail-state-directory
+  mail-state:
+    volumeName: mail-state
+    mountPath: /var/mail-state
+    subPath: 
+
+  # Store mail logs
+  mail-log:
+    volumeName: mail-log
+    mountPath: /var/log/mail
+    subPath: 
 
 ## Monitoring adds the prometheus.io annotations to pods and services, so that the Prometheus Kubernetes SD mechanism
 ## as configured in the examples will automatically discover both the pods and the services to query.
@@ -454,7 +476,7 @@ metrics:
 ## into running containers. This chart automatically sets up any config files that 
 ## are stored in its chart/config directory. 
 ## 
-## However, Helm does not provide a way too save external files to a ConfigMap or Secret.
+## However, Helm does not provide a way to save external files to a ConfigMap or Secret.
 ## This is problem for docker-mailserver because you need to setup postfix accounts,
 ## dovecot accounts, etc.
 ##

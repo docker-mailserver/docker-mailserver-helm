@@ -43,7 +43,7 @@ manifest should match snapshot:
       resources:
         requests:
           storage: 1Gi
-should apply annotations from persistence.annotations:
+should apply annotations from persistent_volume_claims.annotations:
   1: |
     apiVersion: v1
     kind: PersistentVolumeClaim

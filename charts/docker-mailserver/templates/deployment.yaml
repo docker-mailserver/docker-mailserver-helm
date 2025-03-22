@@ -71,12 +71,12 @@ spec:
       {{- end }}
 
         # PVCs
-    {{- range $name, $persistence := .Values.persistence }}
-      {{- if $persistence.enabled }}
+    {{- range $name, $pvc := .Values.persistent_volume_claims }}
+      {{- if $pvc.enabled }}
         - name: {{ $name }}
           persistentVolumeClaim:
-            {{- if $persistence.existingClaim}}
-            claimName: {{ $persistence.existingClaim }}
+            {{- if $pvc.existingClaim}}
+            claimName: {{ $pvc.existingClaim }}
             {{ else }}
             claimName: {{ template "dockermailserver.fullname" $ }}-{{ $name }}
             {{ end }}
@@ -168,10 +168,11 @@ spec:
 
             # Mount Volumes
         {{- range $name, $persistence := .Values.persistence }}
-          {{- if $persistence.enabled }}
-            - name: {{ $name }}
+            - name: {{ $persistence.volumeName }}
               mountPath: {{ $persistence.mountPath }}
-          {{- end }}
+            {{- if $persistence.subPath }}
+              subPath: {{ $persistence.subPath }}
+            {{- end }}
         {{- end }}
 
             # Mount Extra Volumes
