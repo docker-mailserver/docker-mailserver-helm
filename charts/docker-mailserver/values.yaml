@@ -9,7 +9,7 @@ image:
   # tag: "latest"
   pullPolicy: "IfNotPresent"
 
-# Specify whether to create a serviceAccount for the pod. The name is generated from the 
+# Specify whether to create a serviceAccount for the pod. The name is generated from the
 # dockermailserver.serviceAccountName template
 serviceAccount:
   create: true
@@ -29,13 +29,13 @@ deployment:
   affinity: {}
 
   ## Optionally add additional annotations to the deployment
-  annotations: {}  
+  annotations: {}
 
   ## Optionally add additional labels to the deployment
-  labels: {}  
+  labels: {}
 
   ## Optionally specify a runtimeClassName for the deployment
-  runtimeClassName: 
+  runtimeClassName:
 
   ## Optionally specify a priorityClassName for the deployment
   priorityClassName:
@@ -44,9 +44,9 @@ deployment:
   nodeSelector: {}
 
   ## Update strategy - only really applicable for deployments with RWO PVs attached
-  ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the 
-  ## PV, and the "incoming" pod can never start. Setting the strategy to "Recreate" (our default) will 
-  ## terminate the single previous pod, so that the new, incoming pod can attach to the PV    
+  ## If replicas = 1, an update can get "stuck", as the previous pod remains attached to the
+  ## PV, and the "incoming" pod can never start. Setting the strategy to "Recreate" (our default) will
+  ## terminate the single previous pod, so that the new, incoming pod can attach to the PV
   strategy:
     # rollingUpdate:
     #   maxSurge: 1
@@ -60,7 +60,7 @@ deployment:
     # -----------------------------------------------
     # --- Required Section ---------------------------
     # -----------------------------------------------
-    OVERRIDE_HOSTNAME: mail.example.com       # You must OVERRIDE this!
+    OVERRIDE_HOSTNAME: mail.example.com # You must OVERRIDE this!
 
     # -----------------------------------------------
     # --- General Section ---------------------------
@@ -68,21 +68,21 @@ deployment:
     LOG_LEVEL: info
     SUPERVISOR_LOGLEVEL:
     DMS_VMAIL_UID:
-    DMS_VMAIL_GID: 
-    ACCOUNT_PROVISIONER: 
-    POSTMASTER_ADDRESS: 
+    DMS_VMAIL_GID:
+    ACCOUNT_PROVISIONER:
+    POSTMASTER_ADDRESS:
     ENABLE_UPDATE_CHECK: 1
     UPDATE_CHECK_INTERVAL: 1d
     PERMIT_DOCKER: none
-    TZ: 
-    NETWORK_INTERFACE: 
-    TLS_LEVEL: 
+    TZ:
+    NETWORK_INTERFACE:
+    TLS_LEVEL:
     SPOOF_PROTECTION:
     ENABLE_SRS: 0
     ENABLE_OPENDKIM: 0
     ENABLE_OPENDMARC: 0
     ENABLE_POLICYD_SPF: 0
-    ENABLE_POP3: 
+    ENABLE_POP3:
     ENABLE_IMAP: 1
     ENABLE_CLAMAV: 0
     ENABLE_RSPAMD: 1
@@ -98,29 +98,29 @@ deployment:
     ENABLE_DNSBL: 0
     ENABLE_FAIL2BAN: 0
     FAIL2BAN_BLOCKTYPE: drop
-    ENABLE_MANAGESIEVE: 
+    ENABLE_MANAGESIEVE:
     POSTSCREEN_ACTION: enforce
-    SMTP_ONLY: 
+    SMTP_ONLY:
     # These values are automatically set by the chart based on the certificate key
     # SSL_TYPE:
-    # SSL_CERT_PATH: 
-    # SSL_KEY_PATH: 
-    SSL_ALT_CERT_PATH: 
-    SSL_ALT_KEY_PATH: 
-    VIRUSMAILS_DELETE_DELAY: 
-    POSTFIX_DAGENT: 
-    POSTFIX_MAILBOX_SIZE_LIMIT: 
+    # SSL_CERT_PATH:
+    # SSL_KEY_PATH:
+    SSL_ALT_CERT_PATH:
+    SSL_ALT_KEY_PATH:
+    VIRUSMAILS_DELETE_DELAY:
+    POSTFIX_DAGENT:
+    POSTFIX_MAILBOX_SIZE_LIMIT:
     ENABLE_QUOTAS: 1
-    POSTFIX_MESSAGE_SIZE_LIMIT: 
-    CLAMAV_MESSAGE_SIZE_LIMIT: 
-    PFLOGSUMM_TRIGGER: 
-    PFLOGSUMM_RECIPIENT: 
-    PFLOGSUMM_SENDER: 
-    LOGWATCH_INTERVAL: 
-    LOGWATCH_RECIPIENT: 
-    LOGWATCH_SENDER: 
-    REPORT_RECIPIENT: 
-    REPORT_SENDER: 
+    POSTFIX_MESSAGE_SIZE_LIMIT:
+    CLAMAV_MESSAGE_SIZE_LIMIT:
+    PFLOGSUMM_TRIGGER:
+    PFLOGSUMM_RECIPIENT:
+    PFLOGSUMM_SENDER:
+    LOGWATCH_INTERVAL:
+    LOGWATCH_RECIPIENT:
+    LOGWATCH_SENDER:
+    REPORT_RECIPIENT:
+    REPORT_SENDER:
     LOGROTATE_COUNT: 4
     LOGROTATE_INTERVAL: weekly
     POSTFIX_REJECT_UNKNOWN_CLIENT_HOSTNAME: 0
@@ -138,7 +138,7 @@ deployment:
     SA_TAG: 2.0
     SA_TAG2: 6.31
     SA_KILL: 10.0
-    SPAM_SUBJECT: '***SPAM*** '
+    SPAM_SUBJECT: "***SPAM*** "
 
     # -----------------------------------------------
     # --- Fetchmail Section -------------------------
@@ -152,24 +152,24 @@ deployment:
     # -----------------------------------------------
     # --- LDAP Section ------------------------------
     # -----------------------------------------------
-    LDAP_START_TLS: 
-    LDAP_SERVER_HOST: 
-    LDAP_SEARCH_BASE: 
-    LDAP_BIND_DN: 
-    LDAP_BIND_PW: 
-    LDAP_QUERY_FILTER_USER: 
-    LDAP_QUERY_FILTER_GROUP: 
-    LDAP_QUERY_FILTER_ALIAS: 
-    LDAP_QUERY_FILTER_DOMAIN: 
+    LDAP_START_TLS:
+    LDAP_SERVER_HOST:
+    LDAP_SEARCH_BASE:
+    LDAP_BIND_DN:
+    LDAP_BIND_PW:
+    LDAP_QUERY_FILTER_USER:
+    LDAP_QUERY_FILTER_GROUP:
+    LDAP_QUERY_FILTER_ALIAS:
+    LDAP_QUERY_FILTER_DOMAIN:
 
     # -----------------------------------------------
     # --- Dovecot Section ---------------------------
     # -----------------------------------------------
-    DOVECOT_TLS: 
-    DOVECOT_USER_FILTER: 
-    DOVECOT_PASS_FILTER: 
+    DOVECOT_TLS:
+    DOVECOT_USER_FILTER:
+    DOVECOT_PASS_FILTER:
     DOVECOT_MAILBOX_FORMAT: maildir
-    DOVECOT_AUTH_BIND: 
+    DOVECOT_AUTH_BIND:
 
     # -----------------------------------------------
     # --- Postgrey Section --------------------------
@@ -184,42 +184,42 @@ deployment:
     # --- SASL Section ------------------------------
     # -----------------------------------------------
     ENABLE_SASLAUTHD: 0
-    SASLAUTHD_MECHANISMS: 
-    SASLAUTHD_MECH_OPTIONS: 
-    SASLAUTHD_LDAP_SERVER: 
-    SASLAUTHD_LDAP_BIND_DN: 
-    SASLAUTHD_LDAP_PASSWORD: 
-    SASLAUTHD_LDAP_SEARCH_BASE: 
-    SASLAUTHD_LDAP_FILTER: 
-    SASLAUTHD_LDAP_START_TLS: 
-    SASLAUTHD_LDAP_TLS_CHECK_PEER: 
-    SASLAUTHD_LDAP_TLS_CACERT_FILE: 
-    SASLAUTHD_LDAP_TLS_CACERT_DIR: 
-    SASLAUTHD_LDAP_PASSWORD_ATTR: 
-    SASLAUTHD_LDAP_AUTH_METHOD: 
-    SASLAUTHD_LDAP_MECH: 
+    SASLAUTHD_MECHANISMS:
+    SASLAUTHD_MECH_OPTIONS:
+    SASLAUTHD_LDAP_SERVER:
+    SASLAUTHD_LDAP_BIND_DN:
+    SASLAUTHD_LDAP_PASSWORD:
+    SASLAUTHD_LDAP_SEARCH_BASE:
+    SASLAUTHD_LDAP_FILTER:
+    SASLAUTHD_LDAP_START_TLS:
+    SASLAUTHD_LDAP_TLS_CHECK_PEER:
+    SASLAUTHD_LDAP_TLS_CACERT_FILE:
+    SASLAUTHD_LDAP_TLS_CACERT_DIR:
+    SASLAUTHD_LDAP_PASSWORD_ATTR:
+    SASLAUTHD_LDAP_AUTH_METHOD:
+    SASLAUTHD_LDAP_MECH:
 
     # -----------------------------------------------
     # --- SRS Section -------------------------------
     # -----------------------------------------------
     SRS_SENDER_CLASSES: envelope_sender
-    SRS_EXCLUDE_DOMAINS: 
-    SRS_SECRET: 
+    SRS_EXCLUDE_DOMAINS:
+    SRS_SECRET:
 
     # -----------------------------------------------
     # --- Default Relay Host Section ----------------
     # -----------------------------------------------
 
-    DEFAULT_RELAY_HOST: 
+    DEFAULT_RELAY_HOST:
 
     # -----------------------------------------------
     # --- Multi-Domain Relay Section ----------------
     # -----------------------------------------------
 
-    RELAY_HOST: 
+    RELAY_HOST:
     RELAY_PORT: 25
-    RELAY_USER: 
-    RELAY_PASSWORD: 
+    RELAY_USER:
+    RELAY_PASSWORD:
 
   securityContext:
     runAsUser: 5000
@@ -258,7 +258,7 @@ deployment:
       ## it may terminated.
       memory: "2048Mi"
       ephemeral-storage: "500Mi"
-  
+
   ## Optionally specify tolerations for the deployment
   tolerations: []
 
@@ -372,26 +372,26 @@ persistence:
   mail-config:
     volumeName: mail-config
     mountPath: /tmp/docker-mailserver
-    subPath: 
+    subPath:
 
   # Stores emails
   mail-data:
     volumeName: mail-data
     mountPath: /var/mail
-    subPath: 
+    subPath:
 
   # Stores state for Postfix, Dovecot, Fail2Ban, Amavis, PostGrey, ClamAV, SpamAssassin, Rspamd & Redis
   # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsmail-state-directory
   mail-state:
     volumeName: mail-state
     mountPath: /var/mail-state
-    subPath: 
+    subPath:
 
   # Store mail logs
   mail-log:
     volumeName: mail-log
     mountPath: /var/log/mail
-    subPath: 
+    subPath:
 
 ## Monitoring adds the prometheus.io annotations to pods and services, so that the Prometheus Kubernetes SD mechanism
 ## as configured in the examples will automatically discover both the pods and the services to query.
@@ -408,7 +408,7 @@ monitoring:
     ## monitoring should be configured to only scrape services that have a value of "true"
     scrape: "true"
     ## monitoring should be configured to only probe services that have a value of "true"
-    probe: "false"    
+    probe: "false"
     ## Path on which metrics are exposed
     path: "/metrics"
     ## Port on which HTTP server is served
@@ -418,7 +418,7 @@ monitoring:
     ## monitoring should be configured to only scrape pods that have a value of `true`
     scrape: "true"
     ## monitoring should be configured to only probe services that have a value of "true"
-    probe: "false"    
+    probe: "false"
     ## Path on which metrics are exposed
     path: "/metrics"
     ## Port on which HTTP server is served
@@ -442,14 +442,14 @@ dovecot:
     resources:
       memory: 2GB
     cron:
-      enabled: true       # Optimize index every day
+      enabled: true # Optimize index every day
       schedule: 0 4 * * * # Every day at 4am
 
 proxyProtocol:
   enabled: true
   # List of sources (in CIDR format, space-separated) to permit PROXY protocol from
-  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
-  
+  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/12"
+
 # when metrics is enabled, we mount subpath log from pvc into /var/log/mail
 metrics:
   enabled: false
@@ -470,12 +470,12 @@ metrics:
     enabled: false
     scrapeInterval: 15s
     ## Optionally add additional labels to the deployment
-    labels: {}  
+    labels: {}
 
-## ConfigMaps (and Secrets) are used to copy docker-mailserver configuration files 
-## into running containers. This chart automatically sets up any config files that 
-## are stored in its chart/config directory. 
-## 
+## ConfigMaps (and Secrets) are used to copy docker-mailserver configuration files
+## into running containers. This chart automatically sets up any config files that
+## are stored in its chart/config directory.
+##
 ## However, Helm does not provide a way to save external files to a ConfigMap or Secret.
 ## This is problem for docker-mailserver because you need to setup postfix accounts,
 ## dovecot accounts, etc.
@@ -627,6 +627,24 @@ configMaps:
         -o postscreen_upstream_proxy_protocol=haproxy
         -o postscreen_cache_map=btree:$data_directory/postscreen_10025_cache
       EOS
+      {{- end }}
+
+  postfix-main.cf:
+    create: true
+    path: /tmp/docker-mailserver/postfix-main.cf
+    data: |
+      {{- if .Values.proxyProtocol.enabled }}
+      postscreen_upstream_proxy_protocol = haproxy
+      {{- end }}
+
+  postfix-master.cf:
+    create: true
+    path: /tmp/docker-mailserver/postfix-master.cf
+    data: |
+      {{- if .Values.proxyProtocol.enabled }}
+      smtp/inet/postscreen_upstream_proxy_protocol=haproxy
+      submission/inet/smtpd_upstream_proxy_protocol=haproxy
+      submissions/inet/smtpd_upstream_proxy_protocol=haproxy
       {{- end }}
 
 ## The secrets key works the same way as the configs key. Use secrets to store sensitive information,
