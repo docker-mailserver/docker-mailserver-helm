@@ -551,10 +551,6 @@ configMaps:
         mail_plugins = $mail_plugins fts fts_xapian
 
         plugin {
-          fts_decoder = decode2text
-        }
-
-        plugin {
             fts = xapian
             fts_xapian = partial=3 full=20 verbose={{ .Values.dovecot.fullTextSearch.verbose }}
 
@@ -568,14 +564,6 @@ configMaps:
         service indexer-worker {
             # limit size of indexer-worker RAM usage, ex: 512MB, 1GB, 2GB
             vsz_limit = {{ .Values.dovecot.fullTextSearch.resources.memory }}
-        }
-
-        service decode2text {
-            executable = script /usr/lib/dovecot/decode2text.sh
-            user = dovecot
-            unix_listener decode2text {
-                mode = 0666
-            }
         }
       {{- end -}}
 
