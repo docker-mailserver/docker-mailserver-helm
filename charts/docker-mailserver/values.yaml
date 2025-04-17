@@ -448,7 +448,7 @@ dovecot:
 proxyProtocol:
   enabled: true
   # List of sources (in CIDR format, space-separated) to permit PROXY protocol from
-  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
+  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/12"
 
 # when metrics is enabled, we mount subpath log from pvc into /var/log/mail
 metrics:
