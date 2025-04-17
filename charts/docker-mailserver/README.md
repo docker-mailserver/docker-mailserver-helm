@@ -268,6 +268,6 @@ In addition to tests above, a "snapshot" test is created for each manifest file.
 If you're comfortable with the changes to the saved snapshot, then regenerate the snapshots, by running the following from the root of the repo
 
 ```console
-$helm plugin install https://github.com/lrills/helm-unittest
-$helm unittest helm-chart/docker-mailserver
+helm plugin install https://github.com/helm-unittest/helm-unittest.git
+helm unittest -u charts/docker-mailserver
 ```
