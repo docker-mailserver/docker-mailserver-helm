@@ -273,9 +273,7 @@ spec:
 
           volumeMounts:
         {{- range $name, $persistence := pick .Values.persistence "mail-log" "mail-state" }}
-          {{- if $persistence.enabled }}
-            - name: {{ $name }}
-              mountPath: {{ $persistence.mountPath }}
-          {{- end }}
+          - name: {{ $name }}
+            mountPath: {{ $persistence.mountPath }}
         {{- end }}
 {{- end }}
