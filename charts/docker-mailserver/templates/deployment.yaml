@@ -249,6 +249,10 @@ spec:
         {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
             - name: managesieve
               containerPort: 4190  
+          {{- if .Values.proxyProtocol.enabled }}
+            - name: managesieve-proxy
+              containerPort: 14190
+          {{- end }}   
         {{- end }}  
 
 {{- if .Values.metrics.enabled }}

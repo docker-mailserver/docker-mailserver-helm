@@ -118,23 +118,28 @@ spec:
     {{- end }}   
   {{- end }}   
  
-    {{- if .Values.deployment.env.ENABLE_RSPAMD }}
+  {{- if .Values.deployment.env.ENABLE_RSPAMD }}
     - name: rspamd
       targetPort: rspamd
       port: 11334  
-    {{- end }}   
+  {{- end }}   
 
-    {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
+  {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
     - name: managesieve
       targetPort: managesieve
       port: 4190  
+    {{- if .Values.proxyProtocol.enabled }}
+    - name: managesieve-proxy
+      targetPort: managesieve-proxy
+      port: 14190
     {{- end }}   
+  {{- end }}   
  
-    {{- if .Values.metrics.enabled }}
+  {{- if .Values.metrics.enabled }}
     - name: metrics
       port: 9154
       targetPort: 9154       
-    {{- end }}
+  {{- end }}
 
   type: {{ default "ClusterIP" .Values.service.type }}
   {{- if eq .Values.service.type "LoadBalancer" }}

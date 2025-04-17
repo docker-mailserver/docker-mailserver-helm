@@ -541,6 +541,18 @@ configMaps:
             }
         }
         {{- end -}}
+
+        {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
+        service managesieve-login {
+            inet_listener sieve {
+                port = 4190
+            }
+
+            inet_listener sieve_proxy {
+                port = 14190
+            }
+        }
+        {{- end -}}
       {{- end -}}
 
   fts-xapian-plugin.conf:
