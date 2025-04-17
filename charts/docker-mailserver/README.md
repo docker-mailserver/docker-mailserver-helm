@@ -179,7 +179,14 @@ If you do not enable the PROXY protocol and your mail server is not exposed usin
 
 ## Persistence
 
-By default, the Chart assumes there are for Persistent volumes. Thus it requests four PersistentVolumeClaims which are defined using the `persistent_volume_claims` key. Each PVC can be set to an existing claim by settin the `persistent_volume_claims.<volume_name>.existing_claim` key or a new cliams. To disable creation of a PVC, set `persistent_volume_claims.<volume_name>.enabled` to false. The default PVCs have the following characteristics:
+Docker-mailserver assumes there are [four](https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/optional-config/#volumes) mounted volumes:
+
+* mail-config
+* mail-data
+* mail-state
+* mail-log
+
+Therefore the chart requests four PersistentVolumeClaims under the `persistent_volume_claims` key. Each PVC can be set to an existing claim by setting the `persistent_volume_claims.<volume_name>.existing_claim` key or a new claims. To disable creation of a PVC, set `persistent_volume_claims.<volume_name>.enabled` to false. The default PVCs have the following characteristics:
 
 | PVC Name    |  Default Size  | Mount            |  Description                         |
 | ----------  | ------- | ----------------------- | -------------------------------------|
@@ -188,7 +195,7 @@ By default, the Chart assumes there are for Persistent volumes. Thus it requests
 | mail-state  |   1Gi   | /var/mail-state         | Stores [state](https://docker-mailserver.github.io/docker-mailserver/latest/faq/#what-about-the-docker-datadmsmail-state-directory) for mail services       |
 | mail-log    |   1Gi   | /var/log/mail           | Stores log files                     |
 
-The PVCs are then mounted to `volumeMounts` via the `persistence` key. Each `volumeMount` must specify a volume name and mount path. It is also possbile to set a subpath via the `subPath` key.
+The PVCs are mounted to `volumeMounts` via the `persistence` key. Each `volumeMount` must specify a volume name and mount path. It is also possbile to set a subpath via the `subPath` key.
 
 Extra volumes and volume mounts may be added using the `extraVolumes` and `extraVolumeMounts` keys.
 
