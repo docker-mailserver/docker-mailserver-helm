@@ -60,7 +60,7 @@ deployment:
     # -----------------------------------------------
     # --- Required Section ---------------------------
     # -----------------------------------------------
-    OVERRIDE_HOSTNAME: mail.example.com       # You must OVERRIDE this!
+    OVERRIDE_HOSTNAME: mail.example.com # You must OVERRIDE this!
 
     # -----------------------------------------------
     # --- General Section ---------------------------
@@ -138,7 +138,7 @@ deployment:
     SA_TAG: 2.0
     SA_TAG2: 6.31
     SA_KILL: 10.0
-    SPAM_SUBJECT: '***SPAM*** '
+    SPAM_SUBJECT: "***SPAM*** "
 
     # -----------------------------------------------
     # --- Fetchmail Section -------------------------
@@ -442,7 +442,7 @@ dovecot:
     resources:
       memory: 2GB
     cron:
-      enabled: true       # Optimize index every day
+      enabled: true # Optimize index every day
       schedule: 0 4 * * * # Every day at 4am
 
 proxyProtocol:
@@ -627,6 +627,24 @@ configMaps:
         -o postscreen_upstream_proxy_protocol=haproxy
         -o postscreen_cache_map=btree:$data_directory/postscreen_10025_cache
       EOS
+      {{- end }}
+
+  postfix-main.cf:
+    create: true
+    path: /tmp/docker-mailserver/postfix-main.cf
+    data: |
+      {{- if .Values.proxyProtocol.enabled }}
+      postscreen_upstream_proxy_protocol = haproxy
+      {{- end }}
+
+  postfix-master.cf:
+    create: true
+    path: /tmp/docker-mailserver/postfix-master.cf
+    data: |
+      {{- if .Values.proxyProtocol.enabled }}
+      smtp/inet/postscreen_upstream_proxy_protocol=haproxy
+      submission/inet/smtpd_upstream_proxy_protocol=haproxy
+      submissions/inet/smtpd_upstream_proxy_protocol=haproxy
       {{- end }}
 
 ## The secrets key works the same way as the configs key. Use secrets to store sensitive information,
