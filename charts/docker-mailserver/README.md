@@ -15,6 +15,9 @@
   - [Certificate](#certificate)
 - [Ports](#ports)
 - [Persistence](#persistence)
+  - [Backing Storage](#backing-storage)
+    - [Generic / All](#generic--all)
+    - [NFS](#nfs)
 - [Upgrading to Version 3.0.0](#upgrading-to-version-3)
 - [Development](#development)
   - [Testing](#testing)
@@ -197,7 +200,35 @@ Therefore the chart requests four PersistentVolumeClaims under the `persistent_v
 
 The PVCs are mounted to `volumeMounts` via the `persistence` key. Each `volumeMount` must specify a volume name and mount path. It is also possbile to set a subpath via the `subPath` key.
 
+Certain PV storage types may recommend or require additional external configuration. For more information, see the [Backing Storage](#backing-storage) section.
+
 Extra volumes and volume mounts may be added using the `extraVolumes` and `extraVolumeMounts` keys.
+
+### Backing Storage
+
+This section contains configuration tweaks and quirks related to various PersistentVolume types. This section has been verified as of May 10, 2025. 
+
+Common CSI driver-backed storage providers (such as various block storage providers) have not currently been tested while writing this section, but generic recommendations may still apply. 
+
+#### Generic / All
+
+The DMS container image used inside this chart currently does not forcibly harden the permissions of the recommended persistent volume mounts. It does change ownership for directories where different services need it. 
+
+For any posix-backed storage it is recommended to adjust the Unix octal permissions of `0755` (u:rwx, g:rx, o:rx) if they are not already. Additionally, the primary file ACL for the directory should be set to `u::rwx,g::rx,o:rx` if subPaths are going to be used to map multiple volume mounts to a single PersistentVolume.
+
+The DMS chart is currently not tested for replication, high availability. If subPaths are being used to merge multiple volume mount points to one PersistentVolume, this may potentially break being able to run with high availaility should it be actively tested in the future.
+
+#### NFS
+
+Docker Mailserver (the container) currently assumes that local posix-based storage (e.g. local or hostPath fs drivers) is used, and doesn't fully work with standard writable NFS shares (tested against NFS 4.2). Using fsGroup in the pod's securityContext won't help in this case as the container's root nor any other user seems to get it applied as a supplementary group. 
+
+The current alternative is to apply the `no_root_squash` flag to any backing NFS shares, as well as ensure root ownership initially. If you do not know the caveats of [using the no_root_squash flag](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/4/html/security_guide/s2-server-nfs-noroot) and/or cannot properly mitigate the potential risk from using it, **consider not using NFS shares as backing storage at this time**. 
+
+The reason `no_root_squash` is currently required is due to how DMS does initial fs setup. The container currently utilizes a lot of post-init directory creation and ownership changing done as root. 
+
+DMS does not use techniques such as permissive initial directory creation that is locked down after various service users have made their respectively-owned subdirectories.
+
+Quirks from the generic section also apply to NFS-backed PersistentVolumes.
 
 ## Upgrading to Version 5
 Version 5.0 upgrades docker-mailserver to version 15. This version of the chart *does* include backwards incompatible changes
