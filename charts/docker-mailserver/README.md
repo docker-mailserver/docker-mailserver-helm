@@ -200,10 +200,9 @@ Therefore the chart requests four PersistentVolumeClaims under the `persistent_v
 
 The PVCs are mounted to `volumeMounts` via the `persistence` key. Each `volumeMount` must specify a volume name and mount path. It is also possbile to set a subpath via the `subPath` key.
 
-Certain PV storage types may recommend or require additional external configuration. For more information, see the [Backing Storage](#backing_storage) section.
+Certain PV storage types may recommend or require additional external configuration. For more information, see the [Backing Storage](#backing-storage) section.
 
 Extra volumes and volume mounts may be added using the `extraVolumes` and `extraVolumeMounts` keys.
-one
 
 ### Backing Storage
 
