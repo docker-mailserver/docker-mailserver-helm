@@ -142,6 +142,9 @@ spec:
   {{- end }}
 
   type: {{ default "ClusterIP" .Values.service.type }}
+  {{- if and (eq (default "ClusterIP" .Values.service.type) "ClusterIP") .Values.service.privateIp }}
+  clusterIP: {{ .Values.service.privateIp }}
+  {{- end }}
   {{- if eq .Values.service.type "LoadBalancer" }}
     {{- if .Values.service.loadBalancer.publicIp }}
   loadBalancerIP: {{ .Values.service.loadBalancer.publicIp }}
