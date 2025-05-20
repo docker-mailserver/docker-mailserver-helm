@@ -303,7 +303,7 @@ service:
   ## Note: It's quite unlikely that an IP should be specific. Normally, the best thing to do is leave it to Kubernetes
   ##       to allocate a free IP from the pool.
   ## Default: Automatically assign a random IP
-  # privateIp:
+  # clusterIp:
   annotations: {}
   labels: {}
 

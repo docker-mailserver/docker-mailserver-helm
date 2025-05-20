@@ -137,3 +137,6 @@ spec:
     {{- end }}
 
   type: {{ default "ClusterIP" .Values.service.type }}
+  {{- if .Values.service.clusterIp }}
+  clusterIP: {{ .Values.service.clusterIp }}
+  {{- end }}
