@@ -37,17 +37,56 @@ Kubernetes cluster. docker-mailserver is a production-ready, fullstack mail serv
 - A [Kubernetes](https://kubernetes.io/releases/) cluster with persistent storage and access to email [ports](https://docker-mailserver.github.io/docker-mailserver/latest/config/security/understanding-the-ports/#overview-of-email-ports)
 - A custom domain name (for example, example.com)
 - Correctly configured [DNS](https://docker-mailserver.github.io/docker-mailserver/latest/usage/#minimal-dns-setup)
+- [Cert Manager](https://cert-manager.io/docs/) or a similar tool to create and renew TLS certificates
 
 ## Getting Started
 
 Setting up docker-mailserver requires generating a number of configuration [files](https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/optional-config/). To make this easier, docker-mailserver includes a `setup` command that can generate these files.
 
-To get started, first add the helm repo and install docker-mailserver:
+To get started, first manually create a TLS Certificate, setting `metadata.name` and `spec.secretName` to the same value.  Also set the fully-qualified domain name for your mail server in `spec.dnsNames` and `spec.issuerRef.name` to the name of an Issuer or ClusterIssuer, and `spec.issuerRef.kind` to `Issuer` or `ClusterIssuer`.
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
 
+metadata:
+  name: mail-tls-certificate-rsa
+
+spec:
+  secretName: mail-tls-certificate-rsa
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  dnsNames: [mail.example.com]
+  issuerRef:
+    name: letsencrypt-production
+    kind: Issuer
+```
+```console
+kubectl apply -f certificate.yaml --namespace mail
+```
+
+Then add the helm repo:
 ```console
 helm repo add docker-mailserver https://docker-mailserver.github.io/docker-mailserver-helm
+```
 
-helm upgrade --install docker-mailserver docker-mailserver/docker-mailserver --namespace mail --create-namespace
+Create a Helm values file. See the comments in [values.yaml](https://github.com/docker-mailserver/docker-mailserver-helm/blob/master/charts/docker-mailserver/values.yaml) to understand all the options, or create a minimal file like this (where `mail-tls-certificate-rsa` is the name of the certificate you previously created and `example.com` is the name of your domain):
+```yaml
+## Specify the name of a TLS secret that contains a certificate and private key for your email domain.
+## See https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
+certificate: mail-tls-certificate-rsa
+
+deployment:
+  env:
+    OVERRIDE_HOSTNAME: example.com       # You must OVERRIDE this!
+```
+
+Then install docker-mailserver using the values file:
+
+```console
+helm upgrade --install docker-mailserver docker-mailserver/docker-mailserver --namespace mail --create-namespace -f values.yaml
 ```
 
 Next open a command prompt to the running container.
