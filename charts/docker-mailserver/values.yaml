@@ -304,17 +304,6 @@ service:
   ##       to allocate a free IP from the pool.
   ## Default: Automatically assign a random IP
   # privateIp:
-  ## Only relevant if the `type` above is "LoadBalancer"
-  loadBalancer:
-    ## If there is already a reserved public IP that this load balancer should use, indicate it here.
-    ## Default: Automatically assign a random, ephemeral IP
-    # publicIp:
-    ## If there should be firewall rules restricting the load balancer to a limited set of IPs, specify those IPs below
-    ## in CIDR format. If all IPs should be allowed access, set the CIDR as "0.0.0.0/0"
-    allowedIps:
-      - "0.0.0.0/0"
-    ## If there is a Hostname associated with this site, add it here and it will be rendered in the documentation.
-    # hostName:
   annotations: {}
   labels: {}
 
