@@ -155,8 +155,9 @@ deployment:
     LDAP_START_TLS:
     LDAP_SERVER_HOST:
     LDAP_SEARCH_BASE:
-    LDAP_BIND_DN:
-    LDAP_BIND_PW:
+    # set those unless you're using a secret
+    #LDAP_BIND_DN:
+    #LDAP_BIND_PW:
     LDAP_QUERY_FILTER_USER:
     LDAP_QUERY_FILTER_GROUP:
     LDAP_QUERY_FILTER_ALIAS:
@@ -187,8 +188,9 @@ deployment:
     SASLAUTHD_MECHANISMS:
     SASLAUTHD_MECH_OPTIONS:
     SASLAUTHD_LDAP_SERVER:
-    SASLAUTHD_LDAP_BIND_DN:
-    SASLAUTHD_LDAP_PASSWORD:
+    # set those unless you're using a secret
+    #SASLAUTHD_LDAP_BIND_DN:
+    #SASLAUTHD_LDAP_PASSWORD:
     SASLAUTHD_LDAP_SEARCH_BASE:
     SASLAUTHD_LDAP_FILTER:
     SASLAUTHD_LDAP_START_TLS:
@@ -219,7 +221,8 @@ deployment:
     RELAY_HOST:
     RELAY_PORT: 25
     RELAY_USER:
-    RELAY_PASSWORD:
+    # set those unless you're using a secret
+    #RELAY_PASSWORD:
 
   securityContext:
     runAsUser: 5000
