@@ -43,7 +43,13 @@ Kubernetes cluster. docker-mailserver is a production-ready, fullstack mail serv
 
 Setting up docker-mailserver requires generating a number of configuration [files](https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/optional-config/). To make this easier, docker-mailserver includes a `setup` command that can generate these files.
 
-To get started, first manually create a TLS Certificate, setting `metadata.name` and `spec.secretName` to the same value.  Also set the fully-qualified domain name for your mail server in `spec.dnsNames` and `spec.issuerRef.name` to the name of an Issuer or ClusterIssuer, and `spec.issuerRef.kind` to `Issuer` or `ClusterIssuer`.
+To get started, first configure the firewall on your cluster to allow connections to ports 25 (imap), 465 (submissions), 587 (submission) and 993 (imaps) from any IP address.
+
+If you have a LoadBalancer service routing traffic to your ingress controller, configure it to pass through the mail ports. 
+
+Then, configure your ingress controller (or Gateway) to [pass through the email ports](https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#using-the-proxy-protocol).
+
+Next, manually create a TLS Certificate, setting `metadata.name` and `spec.secretName` to the same value.  Also set the fully-qualified domain name for your mail server in `spec.dnsNames` and `spec.issuerRef.name` to the name of an Issuer or ClusterIssuer, and `spec.issuerRef.kind` to `Issuer` or `ClusterIssuer`.
 ```yaml
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -81,6 +87,12 @@ certificate: mail-tls-certificate-rsa
 deployment:
   env:
     OVERRIDE_HOSTNAME: example.com       # You must OVERRIDE this!
+```
+If you're using the HAProxy ingress controller, configure it to send PROXY Protocol to the docker-mailserver ports, by appending this to your values file:
+```yaml
+service:
+  annotations:
+    haproxy.org/send-proxy-protocol: proxy-v2
 ```
 
 Then install docker-mailserver using the values file:
