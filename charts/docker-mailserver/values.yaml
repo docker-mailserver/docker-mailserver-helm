@@ -615,7 +615,7 @@ configMaps:
 
       # Smtp with proxy
       12525     inet  n       -       n       -       1       postscreen
-        -o syslog_name=postfix/smtp-proxy
+        -o syslog_name=postfix/smtpd-proxy
         -o postscreen_upstream_proxy_protocol=haproxy
         -o postscreen_cache_map=btree:$data_directory/postscreen_10025_cache
       EOS
