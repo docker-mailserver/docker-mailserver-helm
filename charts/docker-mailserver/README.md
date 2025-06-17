@@ -197,13 +197,13 @@ This can get a bit complicated, as explained in the `docker-mailserver` [documen
 
 One approach to preserving the client IP address is to use the PROXY protocol, which is explained in the [documentation](https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#proxy-port-to-service-via-proxy-protocol).
 
-The Helm chart supports the use of the proxy protocol via the `proxyProtocol` key. To enable it set the `proxyProtocol.enable` key to true. You will also want to set the `trustedNetworks` key.
+The Helm chart supports the use of the proxy protocol via the `proxyProtocol` key. By default `proxyProtocol.enable` is true, and `trustedNetworks` is set to the private IP network ranges, as are typically used inside a cluster.
 
 ```yaml
 proxyProtocol:
   enabled: true
   # List of sources (in CIDR format, space-separated) to permit PROXY protocol from
-  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/16"
+  trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/12"
 ```
 
 Enabling the PROXY protocol will create an additional port for each protocol (by adding 10,000 to the standard port value) that is configured to understand the PROXY protocol. Thus:

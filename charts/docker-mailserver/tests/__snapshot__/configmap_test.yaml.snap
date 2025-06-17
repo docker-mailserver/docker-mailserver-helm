@@ -14,13 +14,13 @@ manifest should match snapshot:
                 ssl = yes
             }
 
-            inet_listener imap_proxy {
+            inet_listener imap_proxyprotocol {
                 haproxy = yes
                 port = 10143
                 ssl = no
             }
 
-            inet_listener imaps_proxy {
+            inet_listener imaps_proxyprotocol {
                 haproxy = yes
                 port = 10993
                 ssl = yes
@@ -51,47 +51,17 @@ manifest should match snapshot:
     data:
       user-patches.sh: |
         #!/bin/bash
-        # Make sure to keep this file in sync with https://github.com/docker-mailserver/docker-mailserver/blob/master/target/postfix/master.cf!
-        cat <<EOS >> /etc/postfix/master.cf
+        # Duplicate the config for the submission(s) service ports (587 / 465) with adjustments for the PROXY ports (10587 / 10465) and `syslog_name` setting:
+        postconf -Mf submission/inet | sed -e s/^submission/10587/ -e 's/submission/submission-proxyprotocol/' >> /etc/postfix/master.cf
+        postconf -Mf submissions/inet | sed -e s/^submissions/10465/ -e 's/submissions/submissions-proxyprotocol/' >> /etc/postfix/master.cf
+        # Enable PROXY Protocol support for these new service variants:
+        postconf -P 10587/inet/smtpd_upstream_proxy_protocol=haproxy
+        postconf -P 10465/inet/smtpd_upstream_proxy_protocol=haproxy
 
-        # Submission with proxy
-        10587     inet  n       -       n       -       -       smtpd
-          -o syslog_name=postfix/submission
-          -o smtpd_tls_security_level=encrypt
-          -o smtpd_sasl_auth_enable=yes
-          -o smtpd_sasl_type=dovecot
-          -o smtpd_reject_unlisted_recipient=no
-          -o smtpd_sasl_authenticated_header=yes
-          -o smtpd_client_restrictions=permit_sasl_authenticated,reject
-          -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
-          -o smtpd_sender_restrictions=\$mua_sender_restrictions
-          -o smtpd_discard_ehlo_keywords=
-          -o milter_macro_daemon_name=ORIGINATING
-          -o cleanup_service_name=sender-cleanup
-          -o smtpd_upstream_proxy_protocol=haproxy
-
-        # Submissions with proxy
-        10465     inet  n       -       n       -       -       smtpd
-          -o syslog_name=postfix/submissions
-          -o smtpd_tls_wrappermode=yes
-          -o smtpd_sasl_auth_enable=yes
-          -o smtpd_sasl_type=dovecot
-          -o smtpd_reject_unlisted_recipient=no
-          -o smtpd_sasl_authenticated_header=yes
-          -o smtpd_client_restrictions=permit_sasl_authenticated,reject
-          -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
-          -o smtpd_sender_restrictions=\$mua_sender_restrictions
-          -o smtpd_discard_ehlo_keywords=
-          -o milter_macro_daemon_name=ORIGINATING
-          -o cleanup_service_name=sender-cleanup
-          -o smtpd_upstream_proxy_protocol=haproxy
-
-        # Smtp with proxy
-        12525     inet  n       -       n       -       1       postscreen
-          -o syslog_name=postfix/smtpd-proxy
-          -o postscreen_upstream_proxy_protocol=haproxy
-          -o postscreen_cache_map=btree:$data_directory/postscreen_10025_cache
-        EOS
+        # Create a variant for port 25 too (NOTE: Port 10025 is already assigned in DMS to Amavis):
+        postconf -Mf smtp/inet | sed -e s/^smtp/12525/ >> /etc/postfix/master.cf
+        # Enable PROXY Protocol support (different setting as port 25 is handled via postscreen), optionally configure a `syslog_name` to distinguish in logs:
+        postconf -P 12525/inet/postscreen_upstream_proxy_protocol=haproxy 12525/inet/postscreen_cache_map=proxy:btree:$data_directory/postscreen_12525_cache 12525/inet/syslog_name=postfix/smtp-proxyprotocol
     kind: ConfigMap
     metadata:
       labels:
