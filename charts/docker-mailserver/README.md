@@ -117,6 +117,8 @@ cat /tmp/docker-mailserver/postfix-accounts.cf
 
 This path is [mapped](#persistence) to a Kubernetes Volume.
 
+Optionally (but reccomended), create a [`NetworkPolicy`](https://kubernetes.io/docs/concepts/services-networking/network-policies/) that only allows appropriate pods to connect to the DMS pod.
+
 ## Configuration
 
 Assuming you still have a command prompt [open](#getting-started) in the running container, run the setup command to see additional configuration options:
@@ -206,16 +208,20 @@ proxyProtocol:
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/12"
 ```
 
+For security, you should narrow this to the actual range of IP addresses used by your ingress controller pods, and be certain to exclude any IP ranges gatewayed from IPv6 to v4 or vice versa.
+Also note that any compromised container in the cluster could use the PROXY protocol to evade some security measures, so set a `NetworkPolicy` that only allows the appropriate pods to connect to the DMS pod.
+
 Enabling the PROXY protocol will create an additional port for each protocol (by adding 10,000 to the standard port value) that is configured to understand the PROXY protocol. Thus:
 
-| Protocol    |  Port   |  PROXY Port |
-| ----------  | ------- | ----------- |
-| submissions |   465   |    10465    |
-| submission  |   587   |    10587    |
-| imap        |   143   |    10143    |
-| imaps       |   993   |    10993    |
-| pop3        |   110   |    10110    |
-| pop3s       |   995   |    10995    |
+| Protocol    | Regular Port | PROXY Protocol Port |
+| ----------  |--------------|---------------------|
+| smtp        | 25           | 12525               |
+| submissions | 465          | 10465               |
+| submission  | 587          | 10587               |
+| imap        | 143          | 10143               |
+| imaps       | 993          | 10993               |
+| pop3        | 110          | 10110               |
+| pop3s       | 995          | 10995               |
 
 If you do not enable the PROXY protocol and your mail server is not exposed using a load-balancer service with an external traffic policy in "Local" mode, then all incoming mail traffic will look like it comes from a local Kubernetes cluster IP.
 
