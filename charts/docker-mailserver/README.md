@@ -199,7 +199,7 @@ This can get a bit complicated, as explained in the `docker-mailserver` [documen
 
 One approach to preserving the client IP address is to use the PROXY protocol, which is explained in the [documentation](https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#proxy-port-to-service-via-proxy-protocol).
 
-The Helm chart supports the use of the proxy protocol via the `proxyProtocol` key. By default `proxyProtocol.enable` is true, and `trustedNetworks` is set to the private IP network ranges, as are typically used inside a cluster.
+The Helm chart supports the use of the proxy protocol via the `proxyProtocol` key. By default `proxyProtocol.enable` is true, and `trustedNetworks` is set to the private IP network ranges, as are typically used inside a cluster. Additionally, you will need to enable the proxyProtocol for your loadbalancer. If you are using a cloud service they will most likely have documentation on how to do this for their loadbalancer. If you are using k3s then this is currently impossible with the default components.
 
 ```yaml
 proxyProtocol:
