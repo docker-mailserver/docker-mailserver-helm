@@ -205,13 +205,13 @@ The chart will then automatically copy the certificate and private key to the `/
 
 ## Ports
 
-If you are running on a bare-metal Kubernetes cluster, you will have to expose ports to the internet to receive and send emails. In addition, you need to make sure that `docker-mailserver`` receives the correct client IP address so that spam filtering works.
+If you are running on a bare-metal Kubernetes cluster, you will have to expose ports to the internet to receive and send emails. In addition, you need to make sure that `docker-mailserver` receives the correct client IP address so that spam filtering works.
 
-This can get a bit complicated, as explained in the `docker-mailserver` [documentation](https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#exposing-your-mail-server-to-the-outside-world).
+This can get a bit complicated, as explained in the `docker-mailserver` [documentation][dms-docs::k8s::network-config].
 
-One approach to preserving the client IP address is to use the PROXY protocol, which is explained in the [documentation](https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#proxy-port-to-service-via-proxy-protocol).
+One approach to preserving the client IP address is to [use the PROXY protocol][dms-docs::k8s::proxy-protocol].
 
-The Helm chart supports the use of the proxy protocol via the `proxyProtocol` key. By default `proxyProtocol.enable` is true, and `trustedNetworks` is set to the private IP network ranges, as are typically used inside a cluster. Additionally, you will need to enable the proxyProtocol for your loadbalancer. If you are using a cloud service they will most likely have documentation on how to do this for their loadbalancer. If you are using k3s then this is currently impossible with the default components.
+The Helm chart supports the use of the proxy protocol via the `proxyProtocol` key. By default `proxyProtocol.enable` is true, and `trustedNetworks` is set to the private IP network ranges, as are typically used inside a cluster.
 
 ```yaml
 proxyProtocol:
@@ -220,7 +220,11 @@ proxyProtocol:
   trustedNetworks: "10.0.0.0/8 192.168.0.0/16 172.16.0.0/12"
 ```
 
-For security, you should narrow this to the actual range of IP addresses used by your ingress controller pods, and be certain to exclude any IP ranges gatewayed from IPv6 to v4 or vice versa.
+Additionally, you will need to enable `proxyProtocol` for your loadbalancer.
+- If you are using a cloud service they will most likely have documentation on how to do this for their loadbalancer.
+- If you are using k3s then this is [currently impossible][k3s-klipperlb-pp] with the default components.
+
+For security, you should narrow `trustedNetworks` to the actual range of IP addresses used by your ingress controller pods, and be certain to exclude any IP ranges gatewayed from IPv6 to v4 or vice versa.
 Also note that any compromised container in the cluster could use the PROXY protocol to evade some security measures, so set a `NetworkPolicy` that only allows the appropriate pods to connect to the DMS pod.
 
 Enabling the PROXY protocol will create an additional port for each protocol (by adding 10,000 to the standard port value) that is configured to understand the PROXY protocol. Thus:
@@ -236,6 +240,10 @@ Enabling the PROXY protocol will create an additional port for each protocol (by
 | pop3s       | 995          | 10995               |
 
 If you do not enable the PROXY protocol and your mail server is not exposed using a load-balancer service with an external traffic policy in "Local" mode, then all incoming mail traffic will look like it comes from a local Kubernetes cluster IP.
+
+[dms-docs::k8s::network-config]: https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#exposing-your-mail-server-to-the-outside-world
+[dms-docs::k8s::proxy-protocol]: https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#proxy-port-to-service-via-proxy-protocol
+[k3s-klipperlb-pp]: https://github.com/docker-mailserver/docker-mailserver-helm/issues/176#issuecomment-3097915161
 
 ## Persistence
 
