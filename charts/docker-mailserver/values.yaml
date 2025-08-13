@@ -300,6 +300,11 @@ service:
   ## Set it to "Local" when used with type "LoadBalancer" and set it to "Cluster" when used with "NodePort",
   ## unless you have a good reason not to.
   # externalTrafficPolicy: "Cluster"
+  ## Traffic distribution preference for Services. One of:
+  ## - PreferClose (routes traffic to endpoints that are topologically proximate)
+  ## This field requires Kubernetes 1.31+ and is only available when the feature gate is enabled.
+  ## See: https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution
+  trafficDistribution: ""
   ## If there is a port associated with a given service, expose it here.
   # port:
   ## If there is a particular IP that should be used for the service, specify it here.
