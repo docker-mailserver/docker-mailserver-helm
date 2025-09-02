@@ -301,8 +301,9 @@ service:
   ## unless you have a good reason not to.
   # externalTrafficPolicy: "Cluster"
   ## Traffic distribution preference for Services. One of:
-  ## - PreferClose (routes traffic to endpoints that are topologically proximate)
-  ## Traffic distribution for multi-zone topology (Kubernetes 1.31+)
+  ## - PreferSameZone
+  ## - PreferSameNode
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution
   trafficDistribution: ""
   ## If there is a port associated with a given service, expose it here.
   # port:
