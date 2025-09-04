@@ -145,3 +145,6 @@ spec:
   {{- if .Values.service.clusterIp }}
   clusterIP: {{ .Values.service.clusterIp }}
   {{- end }}
+  {{- if .Values.service.trafficDistribution }}
+  trafficDistribution: {{ .Values.service.trafficDistribution }}
+  {{- end }}
