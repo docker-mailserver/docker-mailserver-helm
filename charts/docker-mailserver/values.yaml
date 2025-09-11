@@ -316,8 +316,6 @@ service:
   ## - PreferSameNode (started from 1.34)
   ## Ref: https://kubernetes.io/docs/concepts/services-networking/service/#traffic-distribution
   trafficDistribution: ""
-  ## If there is a port associated with a given service, expose it here.
-  # port:
   ## If there is a particular IP that should be used for the service, specify it here.
   ## Note: It's quite unlikely that an IP should be specific. Normally, the best thing to do is leave it to Kubernetes
   ##       to allocate a free IP from the pool.
