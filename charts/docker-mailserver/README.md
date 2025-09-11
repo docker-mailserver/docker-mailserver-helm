@@ -201,7 +201,7 @@ Once you acquire a certificate, you will need to store it in a TLS secret in the
 certificate: my-certificate-secret
 ```
 
-The chart will then automatically copy the certificate and private key to the `/tmp/dms/custom-certs` director in the container and correctly set the `SSL_CERT_PATH` and `SSL_KEY_PATH` environment variables.
+The chart will then automatically copy the certificate and private key to the `/tmp/dms/custom-certs` directory in the container and correctly set the `SSL_CERT_PATH` and `SSL_KEY_PATH` environment variables.
 
 ## Ports
 
