@@ -250,7 +250,7 @@ spec:
             - name: managesieve
               containerPort: 4190  
           {{- if .Values.proxyProtocol.enabled }}
-            - name: managesieve-proxy
+            - name: msieve-proxy
               containerPort: 14190
           {{- end }}   
         {{- end }}  
