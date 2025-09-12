@@ -128,7 +128,7 @@ spec:
 
           resources:
 {{ toYaml .Values.deployment.resources | indent 12 }}
-          {{- if and .Values.deployment.resizePolicy (semverCompare ">=1.33-0" .Capabilities.KubeVersion.GitVersion) }}
+          {{- if and .Values.deployment.resizePolicy (semverCompare ">=1.33-0" .Capabilities.KubeVersion.Version) }}
           resizePolicy:
 {{ toYaml .Values.deployment.resizePolicy | indent 12 }}
           {{- end }}
@@ -276,7 +276,7 @@ spec:
               protocol: TCP
           resources:
 {{ toYaml .Values.metrics.resources | indent 12 }}
-          {{- if and .Values.metrics.resizePolicy (semverCompare ">=1.33-0" .Capabilities.KubeVersion.GitVersion) }}
+          {{- if and .Values.metrics.resizePolicy (semverCompare ">=1.33-0" .Capabilities.KubeVersion.Version) }}
           resizePolicy:
 {{ toYaml .Values.metrics.resizePolicy | indent 12 }}
           {{- end }}          
