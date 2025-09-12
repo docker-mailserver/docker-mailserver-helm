@@ -262,6 +262,16 @@ deployment:
       memory: "2048Mi"
       ephemeral-storage: "500Mi"
 
+  ## Container resource resize policy for the docker-mailserver container
+  ## Allows dynamic adjustment of CPU and memory resources without pod restart
+  ## Useful for handling load spikes or optimizing resource utilization in production
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/
+  resizePolicy: []
+    # - resourceName: memory
+    #   restartPolicy: NotRequired
+    # - resourceName: cpu
+    #   restartPolicy: RestartContainer
+
   ## Optionally specify tolerations for the deployment
   tolerations: []
 
@@ -463,6 +473,16 @@ metrics:
     #limits:
     #  memory: "256Mi"
     #  cpu: "500M"
+
+  ## Container resource resize policy for the metrics-exporter container
+  ## Allows dynamic adjustment of CPU and memory resources without pod restart
+  ## Useful for handling load spikes or optimizing resource utilization in production
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/
+  resizePolicy: []
+    # - resourceName: memory
+    #   restartPolicy: NotRequired
+    # - resourceName: cpu
+    #   restartPolicy: RestartContainer
 
   serviceMonitor:
     enabled: false
