@@ -272,7 +272,7 @@ spec:
 
           ports:
             - containerPort: 9154
-              name: http
+              name: metrics
               protocol: TCP
           resources:
 {{ toYaml .Values.metrics.resources | indent 12 }}
