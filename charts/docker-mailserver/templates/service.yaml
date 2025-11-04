@@ -138,7 +138,7 @@ spec:
   {{- if .Values.metrics.enabled }}
     - name: metrics
       port: 9154
-      targetPort: 9154       
+      targetPort: metrics       
   {{- end }}
 
   type: {{ default "ClusterIP" .Values.service.type }}
