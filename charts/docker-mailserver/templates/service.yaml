@@ -137,7 +137,7 @@ spec:
  
   {{- if .Values.metrics.enabled }}
     - name: metrics
-      port: 9154
+      port: {{ .Values.monitoring.service.port }}
       targetPort: metrics       
   {{- end }}
 
