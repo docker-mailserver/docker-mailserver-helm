@@ -296,7 +296,7 @@ DMS does not use techniques such as permissive initial directory creation that i
 Quirks from the generic section also apply to NFS-backed PersistentVolumes.
 
 ## Upgrading to Version 5
-Version 5.0 upgrades docker-mailserver to version 15. This version of the chart *does* include backwards incompatible changes
+Version 5.0 of the chart *does* include backwards incompatible changes.
 
 ### PersistentVolumeClaims
 

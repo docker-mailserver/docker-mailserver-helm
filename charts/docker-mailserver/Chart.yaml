@@ -1,8 +1,8 @@
 apiVersion: v2
-appVersion: "15.0.2"
+appVersion: "15.1.0"
 description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
 name: docker-mailserver
-version: 5.0.0
+version: 5.1.0
 sources:
 - https://github.com/docker-mailserver/docker-mailserver-helm
 maintainers:
