@@ -129,25 +129,22 @@ spec:
       targetPort: managesieve
       port: 4190  
     {{- if .Values.proxyProtocol.enabled }}
-    - name: managesieve-proxy
-      targetPort: managesieve-proxy
+    - name: msieve-proxy
+      targetPort: msieve-proxy
       port: 14190
     {{- end }}   
   {{- end }}   
  
   {{- if .Values.metrics.enabled }}
     - name: metrics
-      port: 9154
-      targetPort: 9154       
+      port: {{ .Values.monitoring.service.port }}
+      targetPort: metrics       
   {{- end }}
 
   type: {{ default "ClusterIP" .Values.service.type }}
-  {{- if eq .Values.service.type "LoadBalancer" }}
-    {{- if .Values.service.loadBalancer.publicIp }}
-  loadBalancerIP: {{ .Values.service.loadBalancer.publicIp }}
-      {{- if .Values.service.loadBalancer.allowedIps }}
-  loadBalancerSourceRanges:
-  {{ .Values.service.loadBalancer.allowedIps | toYaml | indent 4 }}
-      {{- end }}
-    {{- end }}
+  {{- if .Values.service.clusterIp }}
+  clusterIP: {{ .Values.service.clusterIp }}
+  {{- end }}
+  {{- if .Values.service.trafficDistribution }}
+  trafficDistribution: {{ .Values.service.trafficDistribution }}
   {{- end }}

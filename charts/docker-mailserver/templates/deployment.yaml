@@ -128,6 +128,10 @@ spec:
 
           resources:
 {{ toYaml .Values.deployment.resources | indent 12 }}
+          {{- if and .Values.deployment.resizePolicy (semverCompare ">=1.33-0" .Capabilities.KubeVersion.Version) }}
+          resizePolicy:
+{{ toYaml .Values.deployment.resizePolicy | indent 12 }}
+          {{- end }}
           securityContext:
             {{- if eq .Values.deployment.env.ENABLE_FAIL2BAN 1.0 }}
             capabilities:
@@ -250,7 +254,7 @@ spec:
             - name: managesieve
               containerPort: 4190  
           {{- if .Values.proxyProtocol.enabled }}
-            - name: managesieve-proxy
+            - name: msieve-proxy
               containerPort: 14190
           {{- end }}   
         {{- end }}  
@@ -268,10 +272,14 @@ spec:
 
           ports:
             - containerPort: 9154
-              name: http
+              name: metrics
               protocol: TCP
           resources:
-{{ toYaml .Values.metrics.resources | indent 12 }}          
+{{ toYaml .Values.metrics.resources | indent 12 }}
+          {{- if and .Values.metrics.resizePolicy (semverCompare ">=1.33-0" .Capabilities.KubeVersion.Version) }}
+          resizePolicy:
+{{ toYaml .Values.metrics.resizePolicy | indent 12 }}
+          {{- end }}          
           securityContext:
 {{ toYaml .Values.deployment.containerSecurityContext | indent 12 }}
 
