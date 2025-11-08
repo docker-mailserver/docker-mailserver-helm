@@ -285,13 +285,13 @@ The DMS chart is currently not tested for replication, high availability. If sub
 
 #### NFS
 
-Docker Mailserver (the container) currently assumes that local posix-based storage (e.g. local or hostPath fs drivers) is used, and doesn't fully work with standard writable NFS shares (tested against NFS 4.2). Using fsGroup in the pod's securityContext won't help in this case as the container's root nor any other user seems to get it applied as a supplementary group. 
+Docker Mailserver (the container) currently assumes that local posix-based storage (e.g. local or hostPath fs drivers) is used, and doesn't fully work with standard writable NFS shares (tested against NFS 4.2). Using fsGroup in the pod's securityContext won't help in part due to the supplementary group only being applied to root, rather the users that need their directories created. 
 
 The current alternative is to apply the `no_root_squash` flag to any backing NFS shares, as well as ensure root ownership initially. If you do not know the caveats of [using the no_root_squash flag](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/4/html/security_guide/s2-server-nfs-noroot) and/or cannot properly mitigate the potential risk from using it, **consider not using NFS shares as backing storage at this time**. 
 
-The reason `no_root_squash` is currently required is due to how DMS does initial fs setup. The container currently utilizes a lot of post-init directory creation and ownership changing done as root. 
+The reason `no_root_squash` is currently required is due to how DMS does initial fs setup. The container currently utilizes a lot of post-init directory creation with full ownership changes by root. 
 
-DMS does not use techniques such as permissive initial directory creation that is locked down after various service users have made their respectively-owned subdirectories.
+DMS utilizes neither group-only chown as nfsnobody/root, fsGroup applied to all persistence-needing users, nor permissive directory structures during initialization. This prevents any NFS-friendly method of creating directory structures owned by varying users.
 
 Quirks from the generic section also apply to NFS-backed PersistentVolumes.
 
