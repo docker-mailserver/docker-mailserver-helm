@@ -148,3 +148,9 @@ spec:
   {{- if .Values.service.trafficDistribution }}
   trafficDistribution: {{ .Values.service.trafficDistribution }}
   {{- end }}
+
+  ipFamilyPolicy: {{ default "SingleStack" .Values.service.ipFamilyPolicy }}
+  {{- if .Values.service.ipFamilies }}
+  ipFamilies:
+    {{- toYaml .Values.service.ipFamilies | nindent 2 }}
+  {{- end }}
