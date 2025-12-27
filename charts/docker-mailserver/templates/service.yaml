@@ -10,7 +10,7 @@ metadata:
     prometheus.io/probe: {{ .Values.monitoring.service.probe | quote }}
     prometheus.io/path: {{ .Values.monitoring.service.path | quote }}
     prometheus.io/port: {{ .Values.monitoring.service.port | quote }}
-    ##  
+    ##
 {{- if .Values.service.annotations }}
 {{ toYaml .Values.service.annotations | indent 4 }}
 {{ end }}
@@ -44,20 +44,20 @@ spec:
     - name: smtp
       port: 25
       targetPort: smtp
-      {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ default "30025" .Values.service.nodePort.smtp }}
       {{- end }}
 
     - name: submissions
       targetPort: submissions
       port: 465
-      {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ default "30465" .Values.service.nodePort.smtps }}
-      {{- end }}    
+      {{- end }}
     - name: submission
       targetPort: submission
       port: 587
-      {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ default "30587" .Values.service.nodePort.submission }}
       {{ end }}
   {{- if .Values.proxyProtocol.enabled }}
@@ -70,21 +70,21 @@ spec:
     - name: sub-proxy
       targetPort: sub-proxy
       port: 10587
-  {{- end }}   
+  {{- end }}
 
   {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
     - name: imap
       targetPort: imap
       port: 143
-      {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ default "30143" .Values.service.nodePort.imap }}
-      {{- end }}       
+      {{- end }}
     - name: imaps
       targetPort: imaps
       port: 993
-      {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ default "30993" .Values.service.nodePort.imaps }}
-      {{- end }}   
+      {{- end }}
     {{- if .Values.proxyProtocol.enabled }}
     - name: imap-proxy
       targetPort: imap-proxy
@@ -92,22 +92,22 @@ spec:
     - name: imaps-proxy
       targetPort: imaps-proxy
       port: 10993
-    {{- end }}   
-  {{- end }}   
+    {{- end }}
+  {{- end }}
 
   {{- if and (.Values.deployment.env.ENABLE_POP3) (not .Values.deployment.env.SMTP_ONLY) }}
     - name: pop3
       targetPort: pop3
       port: 110
-      {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ default "30110" .Values.service.nodePort.pop3 }}
-      {{- end }}   
+      {{- end }}
     - name: pop3s
       targetPort: pop3s
       port: 995
-      {{- if eq .Values.service.type "NodePort" }}    
+      {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ default "30995" .Values.service.nodePort.pop3s }}
-      {{- end }}    
+      {{- end }}
     {{- if .Values.proxyProtocol.enabled }}
     - name: pop3-proxy
       targetPort: pop3-proxy
@@ -115,30 +115,30 @@ spec:
     - name: pop3s-proxy
       targetPort: pop3s-proxy
       port: 10995
-    {{- end }}   
-  {{- end }}   
- 
+    {{- end }}
+  {{- end }}
+
   {{- if .Values.deployment.env.ENABLE_RSPAMD }}
     - name: rspamd
       targetPort: rspamd
-      port: 11334  
-  {{- end }}   
+      port: 11334
+  {{- end }}
 
   {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
     - name: managesieve
       targetPort: managesieve
-      port: 4190  
+      port: 4190
     {{- if .Values.proxyProtocol.enabled }}
     - name: msieve-proxy
       targetPort: msieve-proxy
       port: 14190
-    {{- end }}   
-  {{- end }}   
- 
+    {{- end }}
+  {{- end }}
+
   {{- if .Values.metrics.enabled }}
     - name: metrics
       port: {{ .Values.monitoring.service.port }}
-      targetPort: metrics       
+      targetPort: metrics
   {{- end }}
 
   type: {{ default "ClusterIP" .Values.service.type }}
@@ -147,4 +147,10 @@ spec:
   {{- end }}
   {{- if .Values.service.trafficDistribution }}
   trafficDistribution: {{ .Values.service.trafficDistribution }}
+  {{- end }}
+
+  ipFamilyPolicy: {{ default "SingleStack" .Values.service.ipFamilyPolicy }}
+  {{- if .Values.service.ipFamilies }}
+  ipFamilies:
+    {{- toYaml .Values.service.ipFamilies | nindent 2 }}
   {{- end }}

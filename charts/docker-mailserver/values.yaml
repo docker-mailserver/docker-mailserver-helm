@@ -321,6 +321,13 @@ service:
   ##       to allocate a free IP from the pool.
   ## Default: Automatically assign a random IP
   # clusterIp:
+  ## IP family policy for the service. Options: SingleStack, PreferDualStack, RequireDualStack
+  ## Default: SingleStack
+  #ipFamilyPolicy:
+  ## List of IP families to use. Options: IPv4, IPv6
+  ## Order determines preference when ipFamilyPolicy is PreferDualStack or RequireDualStack
+  ## Default: Determined by cluster configuration
+  #ipFamilies:
   annotations: {}
   labels: {}
 
