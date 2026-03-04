@@ -197,8 +197,8 @@ spec:
                  - -c
                  - supervisorctl status mailserver postfix
             initialDelaySeconds: 30
-            timeoutSeconds: 15
-            failureThreshold: 5
+            timeoutSeconds: 30
+            failureThreshold: 10
           ports:
             - name: smtp
               containerPort: 25
