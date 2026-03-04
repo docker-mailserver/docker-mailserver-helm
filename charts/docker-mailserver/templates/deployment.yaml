@@ -186,18 +186,18 @@ spec:
                  - /bin/bash
                  - -c
                  - supervisorctl status | grep -E "amavis|clamav|cron|dovecot|mailserver|opendkim|opendmarc|postfix|rsyslog" | grep RUNNING
-            initialDelaySeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
+            initialDelaySeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 5
           readinessProbe:
             exec:
                command:
                  - /bin/bash
                  - -c
                  - supervisorctl status | grep -E "mailserver|postfix" | grep RUNNING
-            initialDelaySeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
+            initialDelaySeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 5
           ports:
             - name: smtp
               containerPort: 25
