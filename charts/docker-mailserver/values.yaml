@@ -224,9 +224,7 @@ deployment:
     # set those unless you're using a secret
     #RELAY_PASSWORD:
 
-  securityContext:
-    runAsUser: 5000
-    runAsGroup: 5000
+  securityContext: {}
 
   containerSecurityContext:
     readOnlyRootFilesystem: false # incompatible with the way docker-mailserver works
@@ -618,7 +616,7 @@ configMaps:
       # Enable PROXY Protocol support for these new service variants:
       postconf -P 10587/inet/smtpd_upstream_proxy_protocol=haproxy
       postconf -P 10465/inet/smtpd_upstream_proxy_protocol=haproxy
-      
+
       # Create a variant for port 25 too (NOTE: Port 10025 is already assigned in DMS to Amavis):
       postconf -Mf smtp/inet | sed -e s/^smtp/12525/ >> /etc/postfix/master.cf
       # Enable PROXY Protocol support:
