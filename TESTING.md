@@ -34,9 +34,6 @@ To run locally:
 
 *ct* can also test a chart by deploying it to a temporary namespace in a Kubernetes cluster, and waiting for indications that the deployment has been successful. This is a good way to test how the deployment behaves "for real".
 
-
-
-
 ct lint --config=.ci/ct-config.yaml
 
 Create a KinD cluster, by running `kind create cluster`:

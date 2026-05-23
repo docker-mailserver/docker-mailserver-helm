@@ -9,7 +9,7 @@ Initial Setup
 If you have not yet configured your mail server you'll need to quickly open a command
 prompt inside the running container (you have two minutes) and setup a first email account.
 
-    kubectl exec -it --namespace mail deploy/docker-mailserver -- bash
+    kubectl exec -it --namespace {{ .Release.Namespace }} deploy/{{ template "dockermailserver.fullname" . }} -- bash
 
     setup email add user@example.com password
 
@@ -23,7 +23,7 @@ Next, run the setup command to see additional options:
 
 For more information please refer to this Chart's README file.
 
-{{ if .Values.proxyProtocol.enabled -}}  
+{{ if .Values.proxyProtocol.enabled -}}
 
 Proxy Ports
 ------------
