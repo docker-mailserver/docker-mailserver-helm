@@ -184,25 +184,30 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
 
+          # check every 10s for startup, 90s for pod restart
+          startupProbe:
+            exec:
+              command:
+                - dms-healthcheck
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 9
+          # check every 30s for liveness, 90s for pod restart
           livenessProbe:
             exec:
-               command:
-                 - /bin/bash
-                 - -c
-                 - supervisorctl status cron mailserver postfix rsyslog
-                 # TODO: conditionally? add 'amavis changedetector clamav cron dovecot fail2ban fetchmail mta-sts-daemon opendkim opendmarc postgrey postsrsd rspamd rspamd-redis saslauthd_ldap saslauthd_mysql saslauthd_pam saslauthd_rimap saslauthd_shadow'
-            initialDelaySeconds: 60
-            timeoutSeconds: 60
-            failureThreshold: 5
+              command:
+                - dms-healthcheck
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # check every 10s for readiness, 30s for service removal
           readinessProbe:
             exec:
-               command:
-                 - /bin/bash
-                 - -c
-                 - supervisorctl status mailserver postfix
-            initialDelaySeconds: 60
-            timeoutSeconds: 60
-            failureThreshold: 10
+              command:
+                - dms-healthcheck
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           ports:
             - name: smtp
               containerPort: 25
