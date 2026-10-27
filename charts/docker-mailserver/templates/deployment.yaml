@@ -44,7 +44,7 @@ spec:
       restartPolicy: "Always"
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
       securityContext:
-{{ toYaml .Values.securityContext | indent 8 }}
+{{ toYaml (coalesce .Values.deployment.securityContext .Values.securityContext) | indent 8 }}
       {{- if .Values.deployment.tolerations }}
       tolerations: {{- toYaml .Values.deployment.tolerations | nindent 8 }}
       {{ end }}
@@ -217,7 +217,7 @@ spec:
               containerPort: 10465
             - name: sub-proxy
               containerPort: 10587
-          {{- end }}   
+          {{- end }}
 
         {{- if and (.Values.deployment.env.ENABLE_IMAP) (not .Values.deployment.env.SMTP_ONLY) }}
             - name: imap
@@ -229,8 +229,8 @@ spec:
               containerPort: 10143
             - name: imaps-proxy
               containerPort: 10993
-          {{- end }}   
-        {{- end }}   
+          {{- end }}
+        {{- end }}
 
         {{- if and (.Values.deployment.env.ENABLE_POP3) (not .Values.deployment.env.SMTP_ONLY) }}
             - name: pop3
@@ -242,29 +242,29 @@ spec:
               containerPort: 10110
             - name: pop3s-proxy
               containerPort: 10995
-          {{- end }}   
-        {{- end }}  
+          {{- end }}
+        {{- end }}
 
         {{- if .Values.deployment.env.ENABLE_RSPAMD }}
             - name: rspamd
-              containerPort: 11334  
-        {{- end }}  
+              containerPort: 11334
+        {{- end }}
 
         {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
             - name: managesieve
-              containerPort: 4190  
+              containerPort: 4190
           {{- if .Values.proxyProtocol.enabled }}
             - name: msieve-proxy
               containerPort: 14190
-          {{- end }}   
-        {{- end }}  
+          {{- end }}
+        {{- end }}
 
 {{- if .Values.metrics.enabled }}
         - name: metrics-exporter
           image: {{ .Values.metrics.image.name }}:{{ .Values.metrics.image.tag }}
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
           command: ["/bin/postfix_exporter"]
-          args: 
+          args:
             - "--postfix.showq_path"
             - "/var/mail-state/spool-postfix/public/showq"
             - "--postfix.logfile_path"
@@ -279,7 +279,7 @@ spec:
           {{- if and .Values.metrics.resizePolicy (semverCompare ">=1.33-0" .Capabilities.KubeVersion.Version) }}
           resizePolicy:
 {{ toYaml .Values.metrics.resizePolicy | indent 12 }}
-          {{- end }}          
+          {{- end }}
           securityContext:
 {{ toYaml .Values.deployment.containerSecurityContext | indent 12 }}
 
