@@ -306,9 +306,9 @@ manifest should match snapshot:
                 - mountPath: /tmp/docker-mailserver/dovecot.cf
                   name: dovecot-cf
                   subPath: dovecot.cf
-                - mountPath: /etc/dovecot/conf.d/10-plugin.conf
-                  name: fts-xapian-plugin-conf
-                  subPath: fts-xapian-plugin.conf
+                - mountPath: /etc/dovecot/conf.d/90-fts-flatcurve.conf
+                  name: fts-flatcurve-conf
+                  subPath: fts-flatcurve.conf
                 - mountPath: /tmp/docker-mailserver/user-patches.sh
                   name: user-patches-sh
                   subPath: user-patches.sh
@@ -331,8 +331,8 @@ manifest should match snapshot:
                 name: dovecot-cf
               name: dovecot-cf
             - configMap:
-                name: fts-xapian-plugin-conf
-              name: fts-xapian-plugin-conf
+                name: fts-flatcurve-conf
+              name: fts-flatcurve-conf
             - configMap:
                 name: user-patches-sh
               name: user-patches-sh

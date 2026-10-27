@@ -6,15 +6,15 @@ metadata:
   name: {{ template "dockermailserver.fullname" $ }}-{{ $name }}
   {{- if $pvc.annotations }}
   annotations:
-    {{ toYaml $pvc.annotations }}  
+    {{ toYaml $pvc.annotations }}
   {{ end }}
 spec:
   accessModes:
   {{ toYaml $pvc.accessModes | indent 2 }}
-    
+
   {{- if $pvc.storageClass }}
   storageClassName: {{ $pvc.storageClass | quote }}
-  {{- end }}    
+  {{- end }}
   resources:
     requests:
       storage: {{ $pvc.size | quote }}

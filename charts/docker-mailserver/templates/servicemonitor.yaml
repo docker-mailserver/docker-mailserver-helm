@@ -10,7 +10,7 @@ metadata:
     release: "{{ .Release.Name }}"
 {{- if .Values.metrics.serviceMonitor.labels }}
 {{ toYaml .Values.metrics.serviceMonitor.labels | indent 4 }}
-{{ end }}    
+{{ end }}
   name: {{ template "dockermailserver.fullname" . }}
 spec:
   endpoints:
