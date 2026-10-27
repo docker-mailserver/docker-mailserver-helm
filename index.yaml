@@ -3,6 +3,35 @@ entries:
   docker-mailserver:
   - annotations:
       artifacthub.io/changes: |
+        - Breaking : Upgrade to docker-mailserver 16 (Debian 13, Dovecot 2.4)
+        - Breaking : Full text search uses Dovecot flatcurve instead of fts-xapian
+        - Breaking : deployment.securityContext is now applied to the pod
+        - Probes use docker-mailserver's dms-healthcheck script
+    apiVersion: v2
+    appVersion: 16.0.1
+    created: "2026-10-27T03:52:48.025941916Z"
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
+    digest: e6135e38710f8c6a043608c63dc93fe77ee5a4b7a34194a07716983ca746aa9d
+    home: https://github.com/funkypenguin/helm-docker-mailserver
+    icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
+    keywords:
+    - mailserver
+    - postfix
+    - dovecot
+    - amavis
+    - imap
+    maintainers:
+    - email: davidy@funkypenguin.co.nz
+      name: funkypenguin
+    name: docker-mailserver
+    sources:
+    - https://github.com/docker-mailserver/docker-mailserver-helm
+    urls:
+    - https://github.com/docker-mailserver/docker-mailserver-helm/releases/download/docker-mailserver-6.0.0/docker-mailserver-6.0.0.tgz
+    version: 6.0.0
+  - annotations:
+      artifacthub.io/changes: |
         - Breaking : Standardized app labels to app.kubernetes.io/name for Istio workload/Cilium compatibility
     apiVersion: v2
     appVersion: 15.1.0
@@ -1697,4 +1726,4 @@ entries:
     urls:
     - https://github.com/funkypenguin/helm-docker-mailserver/releases/download/docker-mailserver-0.2.2-dev1/docker-mailserver-0.2.2-dev1.tgz
     version: 0.2.2-dev1
-generated: "2025-11-10T19:47:40.289593181Z"
+generated: "2026-10-27T03:52:48.026234686Z"
