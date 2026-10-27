@@ -18,6 +18,8 @@
   - [Backing Storage](#backing-storage)
     - [Generic / All](#generic--all)
     - [NFS](#nfs)
+- [Upgrading to Version 6](#upgrading-to-version-6)
+- [Upgrading to Version 5](#upgrading-to-version-5)
 - [Upgrading to Version 3.0.0](#upgrading-to-version-3)
 - [Development](#development)
   - [Testing](#testing)
@@ -294,6 +296,53 @@ The reason `no_root_squash` is currently required is due to how DMS does initial
 DMS utilizes neither group-only chown as nfsnobody/root, fsGroup applied to all persistence-needing users, nor permissive directory structures during initialization. This prevents any NFS-friendly method of creating directory structures owned by varying users.
 
 Quirks from the generic section also apply to NFS-backed PersistentVolumes.
+
+## Upgrading to Version 6
+Version 6.0 upgrades docker-mailserver to version 16, which moves from Debian 12 to Debian 13 and from Dovecot 2.3 to Dovecot 2.4. Read the [docker-mailserver v16 changelog](https://github.com/docker-mailserver/docker-mailserver/blob/master/CHANGELOG.md) before upgrading.
+
+### Dovecot 2.4
+
+Dovecot 2.4 does not load configuration written with 2.3 syntax. If you added Dovecot configuration through `configMaps` (for example a custom `15-mailboxes.conf`) or a `dovecot.cf` file, check it before upgrading. You can validate it against the new image with:
+
+```console
+docker run --rm --entrypoint doveconf \
+  -v ./my.conf:/etc/dovecot/conf.d/99-my.conf:ro \
+  mailserver/docker-mailserver:16.0.1 -n
+```
+
+The `dovecot.cf` file the chart generates for PROXY protocol support works with both versions.
+
+### Full Text Search
+
+Full text search now uses Dovecot's [flatcurve](https://doc.dovecot.org/latest/core/plugins/fts_flatcurve.html) plugin instead of fts-xapian, which is no longer supported by docker-mailserver. The configuration file moved from `/etc/dovecot/conf.d/10-plugin.conf` to `/etc/dovecot/conf.d/90-fts-flatcurve.conf`.
+
+The `dovecot.fullTextSearch` values changed:
+
+* `verbose` was replaced by `debug` (true or false)
+* `cron` was removed because flatcurve optimizes its indexes automatically
+* `substringSearch` was added. It defaults to `true`, which matches the partial word matching of the previous xapian configuration
+* `resources.memory` is unchanged
+
+Attachments are no longer indexed because docker-mailserver 16 no longer includes the `decode2text` script.
+
+Existing xapian indexes are not used by flatcurve. After upgrading, build the new indexes and then remove the old ones:
+
+```console
+kubectl exec -it deploy/docker-mailserver -- doveadm index -A -q '*'
+kubectl exec -it deploy/docker-mailserver -- find /var/mail -type d -name xapian-indexes -prune -exec rm -rf {} +
+```
+
+### Environment Variables
+
+`SA_SPAM_SUBJECT` was removed in docker-mailserver 16. Use `SPAM_SUBJECT` instead.
+
+### Pod Security Context
+
+Previously the deployment ignored `deployment.securityContext` and instead read a top-level `securityContext` key that `values.yaml` did not define, so by default no pod security context was set. The deployment now uses `deployment.securityContext`, which defaults to `{}`, so the default behavior is unchanged.
+
+If you set `deployment.securityContext` in your values, it will now be applied. docker-mailserver must run as root because it manages the users its services run as, so don't set `runAsUser`, `runAsGroup` or `runAsNonRoot` (the previous default of `runAsUser: 5000` would stop the pod from starting).
+
+A top-level `securityContext` is still used if `deployment.securityContext` is empty, but move it to `deployment.securityContext` since this fallback may be removed in a future version.
 
 ## Upgrading to Version 5
 Version 5.0 of the chart *does* include backwards incompatible changes.
