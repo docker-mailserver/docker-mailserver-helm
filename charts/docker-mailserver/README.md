@@ -336,6 +336,14 @@ kubectl exec -it deploy/docker-mailserver -- find /var/mail -type d -name xapian
 
 `SA_SPAM_SUBJECT` was removed in docker-mailserver 16. Use `SPAM_SUBJECT` instead.
 
+### Pod Security Context
+
+Previously the deployment ignored `deployment.securityContext` and instead read a top-level `securityContext` key that `values.yaml` did not define, so by default no pod security context was set. The deployment now uses `deployment.securityContext`, which defaults to `{}`, so the default behavior is unchanged.
+
+If you set `deployment.securityContext` in your values, it will now be applied. docker-mailserver must run as root because it manages the users its services run as, so don't set `runAsUser`, `runAsGroup` or `runAsNonRoot` (the previous default of `runAsUser: 5000` would stop the pod from starting).
+
+A top-level `securityContext` is still used if `deployment.securityContext` is empty, but move it to `deployment.securityContext` since this fallback may be removed in a future version.
+
 ## Upgrading to Version 5
 Version 5.0 of the chart *does* include backwards incompatible changes.
 
