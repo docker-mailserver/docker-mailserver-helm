@@ -37,7 +37,7 @@ manifest should match snapshot:
   2: |
     apiVersion: v1
     data:
-      fts-xapian-plugin.conf: ""
+      fts-flatcurve.conf: ""
     kind: ConfigMap
     metadata:
       labels:
@@ -45,14 +45,14 @@ manifest should match snapshot:
         chart: docker-mailserver-0.1.0
         heritage: Helm
         release: RELEASE-NAME
-      name: fts-xapian-plugin-conf
+      name: fts-flatcurve-conf
   3: |
     apiVersion: v1
     data:
       user-patches.sh: |
         #!/bin/bash
         # NOTE: Keep in sync with upstream advice:
-        # https://github.com/docker-mailserver/docker-mailserver/blob/v15.0.0/docs/content/examples/tutorials/mailserver-behind-proxy.md?plain=1#L238-L268
+        # https://github.com/docker-mailserver/docker-mailserver/blob/v16.0.1/docs/content/examples/tutorials/mailserver-behind-proxy.md
 
         # Duplicate the config for the submission(s) service ports (587 / 465) with adjustments for the PROXY ports (10587 / 10465) and `syslog_name` setting:
         postconf -Mf submission/inet | sed -e s/^submission/10587/ -e 's/submission/submission-proxyprotocol/' >> /etc/postfix/master.cf
