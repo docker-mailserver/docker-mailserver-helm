@@ -2,19 +2,35 @@
 
 # Automated tests
 
-Every pull request to the master branch trigger the following tests:
+Every pull request to the master branch triggers the following tests:
 
+* kube-score
+* helm unittest
 * ct lint
-* ct install
+* ct install, against several Kubernetes versions using kind
 
+[![Lint and Test Charts](https://github.com/docker-mailserver/docker-mailserver-helm/actions/workflows/on-push-lint-charts.yml/badge.svg)](.github/workflows/on-push-lint-charts.yml)
 
-[![Linting](https://github.com/funkypenguin/helm-docker-mailserver/workflows/Linting/badge.svg)](.github/workflows/on-pr-lint-charts.yml)
-[![Testing](https://github.com/funkypenguin/helm-docker-mailserver/workflows/Testing/badge.svg)](.github/workflows/on-pr-test-charts.yml)
+The versions of Helm, helm-unittest and the other tools are pinned at the top of [the workflow](.github/workflows/on-push-lint-charts.yml).
 
 
 # Local testing
 
 If you're submitting a PR, and you want to ensure your changes will pass automated testing (above), here are your options:
+
+## Unit tests
+
+Unit tests use [helm-unittest](https://github.com/helm-unittest/helm-unittest). Most of them compare the rendered manifests against snapshots in `charts/docker-mailserver/tests/__snapshot__`. If you change the templates or default values, regenerate the snapshots and check the diff.
+
+Snapshot output depends on the helm-unittest version, so install the same version as CI (`HELM_UNITTEST_VERSION` in the workflow):
+
+```console
+helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v1.2.1 --verify=false
+helm unittest charts/docker-mailserver        # run the tests
+helm unittest -u charts/docker-mailserver     # update the snapshots
+```
+
+Leave out `--verify=false` on Helm 3.
 
 ## Linting
 
@@ -55,4 +71,4 @@ kubectl cluster-info --context kind-kind
 Have a nice day! 👋
 ```
 
-Trigger a `ct install` test against the KinD cluster, by running `t install --config=.ci/ct-config.yaml`. **ct** will target your current context (be careful if you've got multiple contexts configured!), create a temporary namespace, and deploy the chart into that namespace, until `helm --wait` indicates success. After this, the helm release will be removed, the namespace deleted, and you can retire your KinD cluster by running `kind delete cluster`.
+Trigger a `ct install` test against the KinD cluster, by running `ct install --config=.ci/ct-config.yaml`. **ct** will target your current context (be careful if you've got multiple contexts configured!), create a temporary namespace, and deploy the chart into that namespace, until `helm --wait` indicates success. After this, the helm release will be removed, the namespace deleted, and you can retire your KinD cluster by running `kind delete cluster`.
