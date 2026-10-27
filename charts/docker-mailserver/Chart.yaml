@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "16.0.1"
 description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus, ssl...) using Docker.
 name: docker-mailserver
-version: 5.1.1
+version: 6.0.0
 sources:
 - https://github.com/docker-mailserver/docker-mailserver-helm
 maintainers:
@@ -21,5 +21,7 @@ annotations:
   artifacthub.io/changes: |
     - Breaking : Upgrade to docker-mailserver 16 (Debian 13, Dovecot 2.4)
     - Breaking : Full text search uses Dovecot flatcurve instead of fts-xapian
+    - Breaking : deployment.securityContext is now applied to the pod
+    - Probes use docker-mailserver's dms-healthcheck script
 
 dependencies: []
