@@ -86,7 +86,7 @@ deployment:
     ENABLE_IMAP: 1
     ENABLE_CLAMAV: 0
     ENABLE_RSPAMD: 1
-    ENABLE_RSPAMD_REDIS: 1
+    ENABLE_RSPAMD_VALKEY: 1
     RSPAMD_LEARN: 0
     RSPAMD_CHECK_AUTHENTICATED: 0
     RSPAMD_GREYLISTING: 0
@@ -148,6 +148,8 @@ deployment:
     FETCHMAIL_PARALLEL: 0
     ENABLE_GETMAIL: 0
     GETMAIL_POLL: 5
+    GETMAIL_PARALLEL: 0
+    GETMAIL_IDLE:
 
     # -----------------------------------------------
     # --- LDAP Section ------------------------------
@@ -158,10 +160,12 @@ deployment:
     # set those unless you're using a secret
     #LDAP_BIND_DN:
     #LDAP_BIND_PW:
-    LDAP_QUERY_FILTER_USER:
-    LDAP_QUERY_FILTER_GROUP:
-    LDAP_QUERY_FILTER_ALIAS:
-    LDAP_QUERY_FILTER_DOMAIN:
+    # A Postfix lookup table without a query filter is disabled
+    POSTFIX_USERS_QUERY_FILTER:
+    POSTFIX_GROUPS_QUERY_FILTER:
+    POSTFIX_ALIASES_QUERY_FILTER:
+    POSTFIX_DOMAINS_QUERY_FILTER:
+    POSTFIX_SENDERS_QUERY_FILTER:
 
     # -----------------------------------------------
     # --- Dovecot Section ---------------------------
@@ -354,7 +358,7 @@ persistent_volume_claims:
     storageClass:
     selector: {}
 
-  # Stores state for Postfix, Dovecot, Fail2Ban, Amavis, PostGrey, ClamAV, SpamAssassin, Rspamd & Redis
+  # Stores state for Postfix, Dovecot, Fail2Ban, Amavis, PostGrey, ClamAV, SpamAssassin, Rspamd & Valkey
   # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsmail-state-directory
   mail-state:
     enabled: true
@@ -391,7 +395,7 @@ persistence:
     mountPath: /var/mail
     subPath:
 
-  # Stores state for Postfix, Dovecot, Fail2Ban, Amavis, PostGrey, ClamAV, SpamAssassin, Rspamd & Redis
+  # Stores state for Postfix, Dovecot, Fail2Ban, Amavis, PostGrey, ClamAV, SpamAssassin, Rspamd & Valkey
   # https://docker-mailserver.github.io/docker-mailserver/edge/faq/#what-about-the-docker-datadmsmail-state-directory
   mail-state:
     volumeName: mail-state
@@ -658,21 +662,15 @@ configMaps:
 ## such as DKIM signing keys.
 ##
 ##  secrets:
-##    rspamd.example.com:
-##      name: rspamd.example.com                      # This is the name of the Secret
+##    rspamd.dkim.example.com:
+##      name: rspamd.dkim.example.com                 # This is the name of the Secret
 ##      create: true                                  # If true, create a new Secret
-##      path: rspamd.dkim.rsa-2048-mail-example.com.private.txt
-##      data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
-##
-##    rspamd.dkim.rsa-2048-mail-example.com.public:
-##      name: rspamd.dkim.rsa-2048-mail-example.com.public
-##      create: true
-##      path: rspamd/dkim/rsa-2048-mail-example.com.public
+##      path: rspamd/dkim/example.com-mail.private
 ##      data: abace                           # If create is true, then you must specify content. Must be base 64 encoded!
 ##
 ##  If you set the create key to false, then you must manually create the Secrets before deploying the chart.
 ##
-##    kubectl create secret rspamd.example.com --namespace mail --from-file=rspamd.dkim.rsa-2048-mail-example.com.private.txt=<path_to_rspamd.dkim.rsa-2048-mail-example.com.private.txt>
+##    kubectl create secret generic rspamd-dkim-example-com --namespace mail --from-file=rspamd.dkim.example.com=<path_to_example.com-mail.private>
 secrets: {}
 
 ## @param extraDeploy Array of extra objects to deploy with the release
