@@ -14,7 +14,7 @@ keywords:
 - dovecot
 - amavis
 - imap
-home: https://github.com/funkypenguin/helm-docker-mailserver
+home: https://github.com/docker-mailserver/docker-mailserver-helm
 icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
 
 annotations:
