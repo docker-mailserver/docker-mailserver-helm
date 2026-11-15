@@ -18,6 +18,7 @@
   - [Backing Storage](#backing-storage)
     - [Generic / All](#generic--all)
     - [NFS](#nfs)
+- [Upgrading to Version 7](#upgrading-to-version-7)
 - [Upgrading to Version 6](#upgrading-to-version-6)
 - [Upgrading to Version 5](#upgrading-to-version-5)
 - [Upgrading to Version 3.0.0](#upgrading-to-version-3)
@@ -296,6 +297,29 @@ The reason `no_root_squash` is currently required is due to how DMS does initial
 DMS utilizes neither group-only chown as nfsnobody/root, fsGroup applied to all persistence-needing users, nor permissive directory structures during initialization. This prevents any NFS-friendly method of creating directory structures owned by varying users.
 
 Quirks from the generic section also apply to NFS-backed PersistentVolumes.
+
+## Upgrading to Version 7
+Version 7.0 upgrades docker-mailserver to version 17. Read the [docker-mailserver v17 changelog](https://github.com/docker-mailserver/docker-mailserver/blob/master/CHANGELOG.md#v1700) before upgrading.
+
+### Environment Variables
+
+docker-mailserver 17 renamed these environment variables, and the chart's `values.yaml` uses the new names. If you set any of the old names in your values, rename them, because docker-mailserver ignores them.
+
+| Version 6 | Version 7 |
+| --- | --- |
+| `ENABLE_RSPAMD_REDIS` | `ENABLE_RSPAMD_VALKEY` |
+| `LDAP_QUERY_FILTER_USER` | `POSTFIX_USERS_QUERY_FILTER` |
+| `LDAP_QUERY_FILTER_GROUP` | `POSTFIX_GROUPS_QUERY_FILTER` |
+| `LDAP_QUERY_FILTER_ALIAS` | `POSTFIX_ALIASES_QUERY_FILTER` |
+| `LDAP_QUERY_FILTER_DOMAIN` | `POSTFIX_DOMAINS_QUERY_FILTER` |
+
+### Valkey
+
+docker-mailserver 17 replaces Redis with Valkey, which Rspamd uses to store its data. If you use the internal Valkey provided by docker-mailserver, Rspamd's data, such as its Bayes training, will not carry over from version 6 (see [Persistence with Valkey](https://docker-mailserver.github.io/docker-mailserver/latest/config/security/rspamd/#persistence-with-valkey)).
+
+### DKIM
+
+If you store Rspamd DKIM keys in `secrets`, note that `setup config dkim` uses a new file name. See the example in [values.yaml](./values.yaml).
 
 ## Upgrading to Version 6
 Version 6.0 upgrades docker-mailserver to version 16, which moves from Debian 12 to Debian 13 and from Dovecot 2.3 to Dovecot 2.4. Read the [docker-mailserver v16 changelog](https://github.com/docker-mailserver/docker-mailserver/blob/master/CHANGELOG.md) before upgrading.
