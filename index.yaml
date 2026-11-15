@@ -3,6 +3,35 @@ entries:
   docker-mailserver:
   - annotations:
       artifacthub.io/changes: |
+        - Breaking : Upgrade to docker-mailserver 17
+        - Breaking : ENABLE_RSPAMD_REDIS is renamed to ENABLE_RSPAMD_VALKEY
+        - Breaking : LDAP_QUERY_FILTER_* are renamed to POSTFIX_*_QUERY_FILTER
+        - The chart's home points to this repository
+    apiVersion: v2
+    appVersion: 17.0.0
+    created: "2026-11-15T09:25:32.056559672Z"
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
+    digest: 3bb5830b121e6fade33ff1b9911b8019fd1ad871e65e1549f8d9e956e40314e8
+    home: https://github.com/docker-mailserver/docker-mailserver-helm
+    icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
+    keywords:
+    - mailserver
+    - postfix
+    - dovecot
+    - amavis
+    - imap
+    maintainers:
+    - email: davidy@funkypenguin.co.nz
+      name: funkypenguin
+    name: docker-mailserver
+    sources:
+    - https://github.com/docker-mailserver/docker-mailserver-helm
+    urls:
+    - https://github.com/docker-mailserver/docker-mailserver-helm/releases/download/docker-mailserver-7.0.0/docker-mailserver-7.0.0.tgz
+    version: 7.0.0
+  - annotations:
+      artifacthub.io/changes: |
         - Breaking : Upgrade to docker-mailserver 16 (Debian 13, Dovecot 2.4)
         - Breaking : Full text search uses Dovecot flatcurve instead of fts-xapian
         - Breaking : deployment.securityContext is now applied to the pod
@@ -1726,4 +1755,4 @@ entries:
     urls:
     - https://github.com/funkypenguin/helm-docker-mailserver/releases/download/docker-mailserver-0.2.2-dev1/docker-mailserver-0.2.2-dev1.tgz
     version: 0.2.2-dev1
-generated: "2026-10-27T03:52:48.026234686Z"
+generated: "2026-11-15T09:25:32.056700484Z"
