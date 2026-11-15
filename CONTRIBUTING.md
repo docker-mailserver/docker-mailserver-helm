@@ -8,9 +8,9 @@ To test the chart locally, before submitting changes, run `./.ci/scripts/local-c
 
 ## Submitting changes
 
-Please send a [GitHub Pull Request](https://github.com/funkypenguin/helm-docker-mailserver/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)).
+Please send a [GitHub Pull Request](https://github.com/docker-mailserver/docker-mailserver-helm/compare) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)).
 
-When you send a pull request, please make sure all of your commits are atomic (one feature per commit), and bump the chart version in `chart.yaml`
+When you send a pull request, please make sure all of your commits are atomic (one feature per commit). Don't bump the chart version in `Chart.yaml`. The maintainers bump it in a separate release pull request.
 
 Always write a clear log message for your commits. One-line messages are fine for small changes, but bigger changes should look like this:
 
