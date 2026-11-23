@@ -1,0 +1,124 @@
+suite: service tests
+templates:
+  - service.yaml
+  - service-internal.yaml
+  - ingress-rspamd.yaml
+  - servicemonitor.yaml
+chart:
+  version: 0.1.0
+  appVersion: 0.1.0
+values:
+  - ../values.yaml
+set:
+  service.type: LoadBalancer
+  metrics.enabled: true
+  metrics.serviceMonitor.enabled: true
+  rspamd.ingress.enabled: true
+tests:
+  - it: keeps the rspamd and metrics ports off the main service
+    template: service.yaml
+    asserts:
+      - notContains:
+          path: spec.ports
+          any: true
+          content:
+            name: rspamd
+      - notContains:
+          path: spec.ports
+          any: true
+          content:
+            name: metrics
+      - contains:
+          path: spec.ports
+          any: true
+          content:
+            name: smtp
+
+  - it: leaves the prometheus annotations off the main service
+    template: service.yaml
+    asserts:
+      - notExists:
+          path: metadata.annotations["prometheus.io/scrape"]
+      - notExists:
+          path: metadata.annotations["prometheus.io/port"]
+
+  - it: serves the rspamd and metrics ports on a ClusterIP service
+    template: service-internal.yaml
+    asserts:
+      - isKind:
+          of: Service
+      - matchRegex:
+          path: metadata.name
+          pattern: -docker-mailserver-internal$
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: metadata.labels["app.kubernetes.io/component"]
+          value: internal
+      - equal:
+          path: spec.ports
+          value:
+            - name: rspamd
+              targetPort: rspamd
+              port: 11334
+            - name: metrics
+              targetPort: metrics
+              port: 9102
+
+  - it: carries the prometheus annotations on the internal service
+    template: service-internal.yaml
+    asserts:
+      - equal:
+          path: metadata.annotations["prometheus.io/scrape"]
+          value: "true"
+      - equal:
+          path: metadata.annotations["prometheus.io/port"]
+          value: "9102"
+      - equal:
+          path: metadata.annotations["prometheus.io/path"]
+          value: /metrics
+
+  - it: applies service.labels and the IP family settings to the internal service
+    template: service-internal.yaml
+    set:
+      service.labels:
+        team: mail
+      service.ipFamilyPolicy: PreferDualStack
+      service.ipFamilies: [IPv4, IPv6]
+    asserts:
+      - equal:
+          path: metadata.labels.team
+          value: mail
+      - equal:
+          path: spec.ipFamilyPolicy
+          value: PreferDualStack
+      - equal:
+          path: spec.ipFamilies
+          value: [IPv4, IPv6]
+
+  - it: renders no internal service when rspamd and metrics are both off
+    template: service-internal.yaml
+    set:
+      deployment.env.ENABLE_RSPAMD: 0
+      metrics.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: routes the rspamd ingress to the internal service
+    template: ingress-rspamd.yaml
+    asserts:
+      - matchRegex:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          pattern: -docker-mailserver-internal$
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.port.name
+          value: rspamd
+
+  - it: scrapes only the internal service, so metrics are not collected twice
+    template: servicemonitor.yaml
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels["app.kubernetes.io/component"]
+          value: internal

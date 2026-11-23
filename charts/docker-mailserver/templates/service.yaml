@@ -2,16 +2,8 @@
 kind: "Service"
 apiVersion: "v1"
 metadata:
-  annotations:
-    ## These annontations mark the service as monitorable by Prometheus, both directly as a service level metric and
-    ## via the blackbox exporter. For more information, see
-    ## values.yaml
-    prometheus.io/scrape: {{ .Values.monitoring.service.scrape | quote }}
-    prometheus.io/probe: {{ .Values.monitoring.service.probe | quote }}
-    prometheus.io/path: {{ .Values.monitoring.service.path | quote }}
-    prometheus.io/port: {{ .Values.monitoring.service.port | quote }}
-    ##
 {{- if .Values.service.annotations }}
+  annotations:
 {{ toYaml .Values.service.annotations | indent 4 }}
 {{ end }}
   labels:
@@ -118,12 +110,6 @@ spec:
     {{- end }}
   {{- end }}
 
-  {{- if .Values.deployment.env.ENABLE_RSPAMD }}
-    - name: rspamd
-      targetPort: rspamd
-      port: 11334
-  {{- end }}
-
   {{- if and (.Values.deployment.env.ENABLE_MANAGESIEVE) (not .Values.deployment.env.SMTP_ONLY) }}
     - name: managesieve
       targetPort: managesieve
@@ -133,12 +119,6 @@ spec:
       targetPort: msieve-proxy
       port: 14190
     {{- end }}
-  {{- end }}
-
-  {{- if .Values.metrics.enabled }}
-    - name: metrics
-      port: {{ .Values.monitoring.service.port }}
-      targetPort: metrics
   {{- end }}
 
   type: {{ default "ClusterIP" .Values.service.type }}

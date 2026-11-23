@@ -23,6 +23,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
+      app.kubernetes.io/component: internal
       release: "{{ .Release.Name }}"
 
 {{- end }}
