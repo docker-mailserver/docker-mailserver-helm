@@ -43,6 +43,9 @@ spec:
       priorityClassName: {{ .Values.deployment.priorityClassName }}
       restartPolicy: "Always"
       serviceAccountName: {{ template "dockermailserver.serviceAccountName" . }}
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
       securityContext:
 {{ toYaml (coalesce .Values.deployment.securityContext .Values.securityContext) | indent 8 }}
       {{- if .Values.deployment.tolerations }}
