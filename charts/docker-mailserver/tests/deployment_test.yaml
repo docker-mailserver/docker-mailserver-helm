@@ -34,3 +34,17 @@ tests:
   - it: manifest should match snapshot
     asserts:
       - matchSnapshot: { }
+  - it: renders no imagePullSecrets by default
+    asserts:
+      - notExists:
+          path: spec.template.spec.imagePullSecrets
+
+  - it: passes image.pullSecrets to the pod
+    set:
+      image.pullSecrets:
+        - name: registry-credentials
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value:
+            - name: registry-credentials

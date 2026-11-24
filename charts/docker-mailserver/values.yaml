@@ -8,6 +8,11 @@ image:
   ## If image.tag is not defined it will default to `.Chart.appVersion`
   # tag: "latest"
   pullPolicy: "IfNotPresent"
+  ## image.pullSecrets lists Secrets of type kubernetes.io/dockerconfigjson for pulling from a private registry.
+  ## They apply to every container of the pod, including the metrics exporter.
+  # pullSecrets:
+  #   - name: registry-credentials
+  pullSecrets: []
 
 # Specify whether to create a serviceAccount for the pod. The name is generated from the
 # dockermailserver.serviceAccountName template
