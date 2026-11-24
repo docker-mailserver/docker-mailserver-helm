@@ -1,0 +1,48 @@
+{{- if or .Values.deployment.env.ENABLE_RSPAMD .Values.metrics.enabled }}
+---
+## The Rspamd web interface and the metrics exporter live on this ClusterIP
+## Service, never on the main Service, so a LoadBalancer or NodePort main
+## Service does not publish them outside the cluster. The rspamd ingress and the
+## ServiceMonitor use this Service.
+kind: "Service"
+apiVersion: "v1"
+metadata:
+  annotations:
+    ## These annotations mark the service as monitorable by Prometheus, both directly as a service level metric and
+    ## via the blackbox exporter. For more information, see values.yaml
+    prometheus.io/scrape: {{ .Values.monitoring.service.scrape | quote }}
+    prometheus.io/probe: {{ .Values.monitoring.service.probe | quote }}
+    prometheus.io/path: {{ .Values.monitoring.service.path | quote }}
+    prometheus.io/port: {{ .Values.monitoring.service.port | quote }}
+  labels:
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
+    app.kubernetes.io/component: internal
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+{{- if .Values.service.labels }}
+{{ toYaml .Values.service.labels | indent 4 }}
+{{- end }}
+  name: {{ template "dockermailserver.fullname" . }}-internal
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: {{ template "dockermailserver.fullname" . }}
+    release: "{{ .Release.Name }}"
+  ports:
+  {{- if .Values.deployment.env.ENABLE_RSPAMD }}
+    - name: rspamd
+      targetPort: rspamd
+      port: 11334
+  {{- end }}
+  {{- if .Values.metrics.enabled }}
+    - name: metrics
+      targetPort: metrics
+      port: {{ .Values.monitoring.service.port }}
+  {{- end }}
+  ipFamilyPolicy: {{ default "SingleStack" .Values.service.ipFamilyPolicy }}
+  {{- if .Values.service.ipFamilies }}
+  ipFamilies:
+    {{- toYaml .Values.service.ipFamilies | nindent 2 }}
+  {{- end }}
+{{- end }}

@@ -14,6 +14,7 @@
   - [Minimal Configuration](#minimal-configuration)
   - [Certificate](#certificate)
 - [Ports](#ports)
+  - [Rspamd web interface and metrics](#rspamd-web-interface-and-metrics)
 - [Persistence](#persistence)
   - [Backing Storage](#backing-storage)
     - [Generic / All](#generic--all)
@@ -247,6 +248,12 @@ If you do not enable the PROXY protocol and your mail server is not exposed usin
 [dms-docs::k8s::network-config]: https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#exposing-your-mail-server-to-the-outside-world
 [dms-docs::k8s::proxy-protocol]: https://docker-mailserver.github.io/docker-mailserver/latest/config/advanced/kubernetes/#proxy-port-to-service-via-proxy-protocol
 [k3s-klipperlb-pp]: https://github.com/docker-mailserver/docker-mailserver-helm/issues/176#issuecomment-3097915161
+
+### Rspamd web interface and metrics
+
+The Rspamd web interface (port 11334) and the metrics exporter (`monitoring.service.port`, 9102 by default) are not on the main Service. They are on a separate ClusterIP Service named `<fullname>-internal`, so a main Service of type `LoadBalancer` or `NodePort` never publishes them outside the cluster. The Rspamd ingress (`rspamd.ingress`) and the ServiceMonitor (`metrics.serviceMonitor`) use the internal Service, and it carries the `prometheus.io/*` annotations. `service.labels`, `service.ipFamilyPolicy` and `service.ipFamilies` apply to both Services.
+
+If you reached the Rspamd web interface or scraped the metrics through the main Service before (a port-forward, an annotation-based scrape, or an external address), use `<fullname>-internal` instead.
 
 ## Persistence
 

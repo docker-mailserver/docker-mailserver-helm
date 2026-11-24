@@ -22,7 +22,7 @@ spec:
             path: {{ .Values.rspamd.ingress.path }}
             backend:
               service:
-                name: {{ template "dockermailserver.fullname" . }}
+                name: {{ template "dockermailserver.fullname" . }}-internal
                 port:
                   name: rspamd
 

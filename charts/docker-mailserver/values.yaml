@@ -423,7 +423,8 @@ persistence:
 ## See https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus-kubernetes.yml
 monitoring:
   ## Whether to scrape this service with the monitoring toolkit. Mostly useful for blackbox probing of a given service
-  ## to ensure it's "up"
+  ## to ensure it's "up". These prometheus.io/* annotations go on the <fullname>-internal Service, which carries the
+  ## metrics port (the main Service does not).
   service:
     ## monitoring should be configured to only scrape services that have a value of "true"
     scrape: "true"
