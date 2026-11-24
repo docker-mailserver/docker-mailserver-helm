@@ -3,6 +3,33 @@ entries:
   docker-mailserver:
   - annotations:
       artifacthub.io/changes: |
+        - The Rspamd web interface and metrics are served on a ClusterIP Service, <fullname>-internal, instead of the main Service
+        - Add image.pullSecrets for pulling from private registries
+    apiVersion: v2
+    appVersion: 17.0.0
+    created: "2026-11-24T08:38:42.683602863Z"
+    description: A fullstack but simple mailserver (smtp, imap, antispam, antivirus,
+      ssl...) using Docker.
+    digest: 7228595ca0612cdc67b419f5c896be44c966d6cd6cd50f0b45473cff79a4b895
+    home: https://github.com/docker-mailserver/docker-mailserver-helm
+    icon: https://avatars.githubusercontent.com/u/76868633?s=400&v=4
+    keywords:
+    - mailserver
+    - postfix
+    - dovecot
+    - amavis
+    - imap
+    maintainers:
+    - email: davidy@funkypenguin.co.nz
+      name: funkypenguin
+    name: docker-mailserver
+    sources:
+    - https://github.com/docker-mailserver/docker-mailserver-helm
+    urls:
+    - https://github.com/docker-mailserver/docker-mailserver-helm/releases/download/docker-mailserver-7.1.0/docker-mailserver-7.1.0.tgz
+    version: 7.1.0
+  - annotations:
+      artifacthub.io/changes: |
         - Breaking : Upgrade to docker-mailserver 17
         - Breaking : ENABLE_RSPAMD_REDIS is renamed to ENABLE_RSPAMD_VALKEY
         - Breaking : LDAP_QUERY_FILTER_* are renamed to POSTFIX_*_QUERY_FILTER
@@ -1755,4 +1782,4 @@ entries:
     urls:
     - https://github.com/funkypenguin/helm-docker-mailserver/releases/download/docker-mailserver-0.2.2-dev1/docker-mailserver-0.2.2-dev1.tgz
     version: 0.2.2-dev1
-generated: "2026-11-15T09:25:32.056700484Z"
+generated: "2026-11-24T08:38:42.683817611Z"
